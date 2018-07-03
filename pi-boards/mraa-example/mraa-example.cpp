@@ -108,8 +108,8 @@ class BinaryswitchResource : public Resource
          */
         OCStackResult sendNotification();
 
-mraa::Gpio *gpio;
-int ledPin = 7;
+        mraa::Gpio *gpio;
+        int ledPin = 7;
 
     private:
 
@@ -150,7 +150,7 @@ int ledPin = 7;
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-        
+
     protected:
         /*
          * Check if the interface is
@@ -184,16 +184,16 @@ BinaryswitchResource::BinaryswitchResource(std::string resourceUri)
     m_var_value_rt.push_back("oic.r.switch.binary");
     m_var_value_value = false; // current value of property "value" Status of the switch
 
-gpio = new mraa::Gpio(ledPin);
-if (!gpio)
-{
-    std::cout << "Error instantiating gpio" << std::endl;
-}
-gpio->dir(mraa::DIR_OUT);
+    gpio = new mraa::Gpio(ledPin);
+    if (!gpio)
+    {
+        std::cout << "Error instantiating gpio" << std::endl;
+    }
+    gpio->dir(mraa::DIR_OUT);
 
-gpio->write(1);
-sleep(1);
-gpio->write(0);        
+    gpio->write(1);
+    sleep(1);
+    gpio->write(0);
 }
 
 /*
@@ -267,18 +267,18 @@ OCStackResult BinaryswitchResource::sendNotification(void)
 OCRepresentation BinaryswitchResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-	
+
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-    
-    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
-    m_rep.setValue(m_var_name_n, m_var_value_n ); 
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
-    m_rep.setValue(m_var_name_value, m_var_value_value ); 
+
+    m_rep.setValue(m_var_name_if,  m_var_value_if );
+    m_rep.setValue(m_var_name_n, m_var_value_n );
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
+    m_rep.setValue(m_var_name_value, m_var_value_value );
 
     return m_rep;
 }
@@ -293,52 +293,52 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-    
+
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-            
+
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-            
+
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-    
+
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-            
+
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-            
+
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-    
+
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-            
+
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-            
+
         }
     }
     catch (std::exception& e)
@@ -349,7 +349,7 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-            
+
         }
     }
     catch (std::exception& e)
@@ -453,10 +453,10 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
-gpio->write(m_var_value_value);
+      	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        gpio->write(m_var_value_value);
     }
     return ehResult;
 }
@@ -580,8 +580,8 @@ OCEntityHandlerResult BinaryswitchResource::entityHandler(std::shared_ptr<OCReso
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl; 
-            } 
+                std::cout << "register" << std::endl;
+            }
             else
             {
                 std::cout << "unregister" << std::endl;

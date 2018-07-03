@@ -28,10 +28,6 @@
 #include <windows.h>
 #endif
 
-#ifdef MRAA
-#include "mraa.hpp"
-#endif
-
 #include "ocstack.h"
 #include "OCPlatform.h"
 #include "OCApi.h"
@@ -107,10 +103,6 @@ class BinaryswitchResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
-
-mraa::Gpio *gpio;
-int ledPin = 7;
-
     private:
 
         /*
@@ -183,18 +175,7 @@ BinaryswitchResource::BinaryswitchResource(std::string resourceUri)
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.switch.binary");
     m_var_value_value = false; // current value of property "value" Status of the switch
-
-gpio = new mraa::Gpio(ledPin);
-if (!gpio)
-{
-    std::cout << "Error instantiating gpio" << std::endl;
-}
-gpio->dir(mraa::DIR_OUT);
-
-gpio->write(1);
-sleep(1);
-gpio->write(0);        
-}
+    }
 
 /*
 * Destructor code
@@ -456,7 +437,6 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
 	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
 	// one can use the member variables as input to those calls
 	// the member values have been updated already with the request data
-gpio->write(m_var_value_value);
     }
     return ehResult;
 }

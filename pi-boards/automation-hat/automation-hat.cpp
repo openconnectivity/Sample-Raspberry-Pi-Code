@@ -7669,15 +7669,8 @@ int main(void)
     std::cout << "platformID: " <<  platform.getPlatformInfo()->platformID << std::endl;
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
 
-    // create the server
-    IoTServer server;
-    if (OC_STACK_OK != server.registerResources())
-    {
-        std::cerr << "Failed to register server resources." << std::endl;
-        return 1;
-    }
-
     testAutomationHat = new AutomationHat();
+    
     // create the server
     IoTServer server;
     if (OC_STACK_OK != server.registerResources())

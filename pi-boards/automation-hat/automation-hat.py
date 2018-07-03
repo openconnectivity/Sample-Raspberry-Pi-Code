@@ -18,7 +18,7 @@ def readADC(channel):
         print "Specified analog channel is out of range."
     print "voltage value = ", voltage
     return float(voltage)
-        
+
 def readInput(channel):
     if automationhat.is_automation_hat():
         automationhat.enable_auto_lights(True)
@@ -33,7 +33,7 @@ def readInput(channel):
         print "Specified input channel is out of range."
     print "Input value = ", state
     return int(state)
-        
+
 def writeOutput(channel, state):
     if automationhat.is_automation_hat():
         automationhat.enable_auto_lights(True)
@@ -120,7 +120,7 @@ def writeInputLight(channel, state):
         elif channel == 2:
             automationhat.input.two.light.write(state)
         elif channel == 3:
-            automationhat.input.three.light.write(state)  
+            automationhat.input.three.light.write(state)
         else:
             print "Specified input light channel is out of range."
     return 0
@@ -133,7 +133,7 @@ def writeOutputLight(channel, state):
         elif channel == 2:
             automationhat.output.two.light.write(state)
         elif channel == 3:
-            automationhat.output.three.light.write(state)  
+            automationhat.output.three.light.write(state)
         else:
             print "Specified output light channel is out of range."
     return 0
@@ -209,4 +209,3 @@ def test(dummy):
         automationhat.light.power.write(0)
 
     return 0
-

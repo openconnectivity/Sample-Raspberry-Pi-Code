@@ -34,18 +34,21 @@ build_dir = env.get('BUILD_DIR')
 # Build flags
 ######################################################################
 samples_env.PrependUnique(CPPPATH=[
-    '#/resource/include/',
+    '#/resource/include',
     '#/resource/csdk/include',
     '#/resource/csdk/stack/include',
-    '#/resource/csdk/stack/include/experimental',
+    '#/resource/csdk/stack/include/internal',
     '#/resource/csdk/security/include',
     '#/resource/csdk/connectivity/api',
-    '#/resource/oc_logger/include',
-    '#/resource/csdk/logger/include/experimental'
+    '#/resource/csdk/logger/include',
+    '#/resource/oc_logger/include'
+
 ])
 cpp_defines = ['__WITH_DTLS__', 'TB_LOG']
-libraries = ['octbstack', 'oc']
-# identify which hardware the samples will be running on.
+libraries = ['octbstack']
+libraries.append('oc')
+#libraries.append('log')
+		
 platform_info = p.platform()
 joule = 'Linux' in platform_info and 'joule' in platform_info and \
 'Ubuntu' in platform_info
@@ -70,28 +73,15 @@ if joule or raspberry_pi:
                 $sudo make install")
         else:
             print("please install mraa")
-    elif not conf.CheckCXXHeader('Python.h'):
-        print("required library Python not installed! ")
-        if raspberry_pi:
-            print("to install Python\n\
-                $git clone https://github.com/intel-iot-devkit/\
-                mraa.git ../mraa\n\
-                $mkdir ../mraa/build && cd ../mraa/build && cmake .. && make\n\
-                $sudo make install")
-        else:
-            print("please install mraa")
     else:
-        cpp_defines.append('WITH_MRAA')
+        cpp_defines.append('MRAA')
         libraries.append('mraa')
-        cpp_defines.append('WITH_PYTHON')
-        libraries.append('python3')
-
         if joule and not raspberry_pi:
             cpp_defines.append('JOULE')
         elif not joule and raspberry_pi:
             cpp_defines.append('RASPBERRY')
         else:
-            print("ERROR: unknown board")
+            print "ERROR: unknown board"
     conf.Finish()
 samples_env.AppendUnique(RPATH=[build_dir])
 samples_env.AppendUnique(CPPDEFINES=cpp_defines)
@@ -111,20 +101,19 @@ if target_os in ['linux']:
 ######################################################################
 # Source files and Targets
 ######################################################################
-client = samples_env.Program('client', ['client.c'])
+#client = samples_env.Program('client', ['client.c'])
 server = samples_env.Program('server', ['server.cpp'])
-examples_dir = '/examples/OCFSecure/'
-client_dat = samples_env.Install(
-    build_dir + examples_dir, src_dir + examples_dir + 'ocf_svr_db_client.dat')
-client_dev = samples_env.Install(
-    build_dir + examples_dir, src_dir + examples_dir + 'device_properties.dat')
-server_dat = samples_env.Install(
-    build_dir + examples_dir, src_dir + examples_dir + 'ocf_svr_db_server.dat')
-introspection_dat = samples_env.Install(
-    build_dir + examples_dir, src_dir + examples_dir + 'switch_introspection.dat')
+examples_dir = '/examples/OCFDeviceBuilder/'
+#client_dat = samples_env.Install(
+#    build_dir + examples_dir, src_dir + examples_dir + 'ocf_svr_db_client.dat')
+#client_dev = samples_env.Install(
+#    build_dir + examples_dir, src_dir + examples_dir + 'device_properties.dat')
+#server_dat = samples_env.Install(
+#    build_dir + examples_dir, src_dir + examples_dir + 'ocf_svr_db_server.dat')
 
-list_of_samples = [client, client_dat, client_dev, server, server_dat]
+#list_of_samples = [client, client_dat, client_dev, server, server_dat]
+list_of_samples = [server]
 
-Alias("secureExamples", list_of_samples)
+Alias("OCFDeviceBuilder", list_of_samples)
 
-env.AppendTarget('secureExamples')
+env.AppendTarget('OCFDeviceBuilder')

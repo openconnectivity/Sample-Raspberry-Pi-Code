@@ -41,8 +41,8 @@ samples_env.PrependUnique(CPPPATH=[
     '#/resource/csdk/security/include',
     '#/resource/csdk/connectivity/api',
     '#/resource/csdk/logger/include',
-    '#/resource/oc_logger/include',
-    '/usr/include/python2.7'
+    '#/resource/oc_logger/include'
+
 ])
 cpp_defines = ['__WITH_DTLS__', 'TB_LOG']
 libraries = ['octbstack']
@@ -76,7 +76,6 @@ if joule or raspberry_pi:
     else:
         cpp_defines.append('MRAA')
         libraries.append('mraa')
-        libraries.append('python2.7')
         if joule and not raspberry_pi:
             cpp_defines.append('JOULE')
         elif not joule and raspberry_pi:
