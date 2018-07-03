@@ -5,15 +5,15 @@ then
 FILE1=$1
 MY_COMMAND="cp ~/Sample-Raspberry-Pi-Code/pi-boards/$FILE1/$FILE1.json ./example.json"
 eval ${MY_COMMAND}
+MY_COMMAND="cp ~/Sample-Raspberry-Pi-Code/pi-boards/$FILE1/SConscript ~/iot/iotivity/examples/OCFDeviceBuilder/"
+eval ${MY_COMMAND}
 fi
-
-export PYTHONPATH='.'
 
 cd DeviceBuilder
 sh ./DeviceBuilder_C++IotivityServer.sh ../example.json  ../device_output "oic.d.light"
 cd ..
 # copying source code to compile location
-cp ./device_output/code/server.cpp ./iotivity/examples/OCFDeviceBuilder/server.cpp 
+cp ./device_output/code/server.cpp ./iotivity/examples/OCFDeviceBuilder/server.cpp
 # making executable folder
 mkdir -p ./iotivity/out/linux/armv7l/release/examples/OCFDeviceBuilder >/dev/null 2>&1
 # copying the introspection file to the executable folder
