@@ -18,18 +18,19 @@ set -x #echo on
 #
 #############################
 
+if [[ ! -v PYTHONPATH ]]; then
+    export PYTHONPATH='.'
+    echo "export PYTHONPATH='.'" >> ~/.bashrc
+fi
+
 cd ~
-curl https://get.pimoroni.com/automationhat | bash
-curl https://get.pimoroni.com/envirophat | bash
 
 git clone https://github.com/openconnectivity/Sample-Raspberry-Pi-Code.git
 
 cp ~/Sample-Raspberry-Pi-Code/pi-boards/gen.sh ~/iot/
 cp ~/Sample-Raspberry-Pi-Code/pi-boards/build.sh ~/iot/
 
-if [[ ! -v PYTHONPATH ]]; then
-    export PYTHONPATH='.'
-    echo "export PYTHONPATH='.'" >> ~/.bashrc
-fi
+curl https://get.pimoroni.com/automationhat -y | bash
+curl https://get.pimoroni.com/envirophat -y | bash
 
 cd ~/iot
