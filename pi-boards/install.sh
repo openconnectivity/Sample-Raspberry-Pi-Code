@@ -30,7 +30,7 @@ git clone https://github.com/openconnectivity/Sample-Raspberry-Pi-Code.git
 cp ~/Sample-Raspberry-Pi-Code/pi-boards/gen.sh ~/iot/
 cp ~/Sample-Raspberry-Pi-Code/pi-boards/build.sh ~/iot/
 
-curl https://get.pimoroni.com/automationhat -y | bash
-curl https://get.pimoroni.com/envirophat -y | bash
+curl https://get.pimoroni.com/automationhat | bash
+curl https://get.pimoroni.com/envirophat | bash
 
 cd ~/iot
