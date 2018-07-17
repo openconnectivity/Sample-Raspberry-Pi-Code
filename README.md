@@ -16,11 +16,6 @@ To install all the samples described above, just type the following command. Typ
 
 - curl https://openconnectivity.github.io/Sample-Raspberry-Pi-Code/pi-boards/install.sh | bash
 
-One other note:
-
-The PYTHONPATH environment variable needs to be set so that the C++ server code can find the Python interface code. When the curl command is run, the ~/.bashrc file will be modified so that PYTHONPATH is set on bootup. The system will need to be booted in order for ~/.bashrc to be run.
-- sudo reboot
-
 This command will do a number of things:
 
 - Clone the Sample-Raspberry-Pi-Code repository (which includes all the sample code described above). Each sample subdirectory includes the following files:
@@ -28,6 +23,11 @@ This command will do a number of things:
   - <sample>.json: The JSON device description file that is the input to DeviceBuilder and describes all the resources available on the device. Each of these resources will show up in the source code and introspection file created by DeviceBuilder.
   - <sample>.cpp: The C++ code that includes all the resources plus the code to interface to the hardware. This code can be copied over the C++ code created by DeviceBuilder when the gen.sh script is run in order to control the hardware. If you run gen.sh again, <sample>.cpp will be overwritten. So if you change anything in <sample>.cpp, be sure to make a backup or avoid running gen.sh again. Otherwise, you will lose your work.
   - <sample>.py: The Python code that connects the C++ code to the Pimoroni python libraries. This code will be copied to the executable directory so it will be available at runtime to control the hardware.
+
+One other note:
+
+The PYTHONPATH environment variable needs to be set so that the C++ server code can find the Python interface code. When the curl command is run, the ~/.bashrc file will be modified so that PYTHONPATH is set on bootup. The system will need to be booted in order for ~/.bashrc to be run.
+- sudo reboot
 
 # Building and Running the samples
 
