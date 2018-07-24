@@ -29,12 +29,12 @@ cd ~
 
 git clone https://github.com/openconnectivity/Sample-Raspberry-Pi-Code.git
 
-if [ -d "~/iot" ] then
+if [ -d "~/iot" ]; then
     cp ~/Sample-Raspberry-Pi-Code/IoTivity/gen.sh ~/iot/
     cp ~/Sample-Raspberry-Pi-Code/IoTivity/build.sh ~/iot/
 fi
 
-if [ -d "~/iot-lite" ] then
+if [ -d "~/iot-lite" ]; then
     cp ~/Sample-Raspberry-Pi-Code/IoTivity-lite/gen.sh ~/iot-lite/
     cp ~/Sample-Raspberry-Pi-Code/IoTivity-lite/build.sh ~/iot-lite/
 fi
