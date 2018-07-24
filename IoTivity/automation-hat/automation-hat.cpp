@@ -7670,7 +7670,7 @@ int main(void)
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
 
     testAutomationHat = new AutomationHat();
-    
+
     // create the server
     IoTServer server;
     if (OC_STACK_OK != server.registerResources())

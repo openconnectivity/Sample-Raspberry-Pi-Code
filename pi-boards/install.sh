@@ -23,14 +23,23 @@ if [[ ! -v PYTHONPATH ]]; then
     echo "export PYTHONPATH='.'" >> ~/.bashrc
 fi
 
+CURPWD=`pwd`
+
 cd ~
 
 git clone https://github.com/openconnectivity/Sample-Raspberry-Pi-Code.git
 
-cp ~/Sample-Raspberry-Pi-Code/pi-boards/gen.sh ~/iot/
-cp ~/Sample-Raspberry-Pi-Code/pi-boards/build.sh ~/iot/
+if [ -d "~/iot" ]
+    cp ~/Sample-Raspberry-Pi-Code/IoTivity/gen.sh ~/iot/
+    cp ~/Sample-Raspberry-Pi-Code/IoTivity/build.sh ~/iot/
+fi
+
+if [ -d "~/iot-lite" ]
+    cp ~/Sample-Raspberry-Pi-Code/IoTivity-lite/gen.sh ~/iot-lite/
+    cp ~/Sample-Raspberry-Pi-Code/IoTivity-lite/build.sh ~/iot-lite/
+fi
 
 curl https://get.pimoroni.com/automationhat | bash
 curl https://get.pimoroni.com/envirophat | bash
 
-cd ~/iot
+cd $CURPWD

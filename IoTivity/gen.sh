@@ -5,8 +5,6 @@ then
 FILE1=$1
 MY_COMMAND="cp ~/Sample-Raspberry-Pi-Code/pi-boards/$FILE1/$FILE1.json ./example.json"
 eval ${MY_COMMAND}
-MY_COMMAND="cp ~/Sample-Raspberry-Pi-Code/pi-boards/$FILE1/SConscript ~/iot/iotivity/examples/OCFDeviceBuilder/"
-eval ${MY_COMMAND}
 fi
 
 cd DeviceBuilder
