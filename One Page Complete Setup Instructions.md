@@ -14,7 +14,7 @@
         1. curl https://openconnectivity.github.io/IOTivity-Lite-setup/install.sh | bash
 8. At this point, we have a working server that will show up on OTGC, implement all the resource and manipulate those resource. All that needs to be added is the code to interface with the board. (That’s what we’ll do next.)
 
-For Raspberry Pi and Pimoroni board control stuff:
+# For Raspberry Pi and Pimoroni board control stuff:
 1. Install the Pimoroni libraries and examples for the Automation Hat (&pHat) and the Enviro pHat along with the Python interfaces to attach the modified C++ IoTivity code to the Pimoroni Python libraries. This also installs the MRAA example to control the Enviro pHat light directly.:
     1. curl https://openconnectivity.github.io/Sample-Raspberry-Pi-Code/pi-boards/install.sh | bash
     2. sudo reboot
@@ -23,7 +23,7 @@ For Raspberry Pi and Pimoroni board control stuff:
 1. Change to the development directory where the scripts are found:
     1. cd ~/iot (for IoTivity) or cd ~/iot-lite (for IoTivity-lite)
 2. Run the following development cycle scripts as needed
-    1. ./gen.sh - generate the code, introspection file, PICS file, onboarding file
+    1. ./gen.sh - generate the code, introspection file, onboarding file, etc.
         1. (optional) To load new a new example: ./gen.sh automation-phat (or whatever example you want) This will copy the correct device description code and generate the .cpp code, introspection file, etc. The currently available examples are: automation-phat, automation-hat, enviro-phat, mraa-example, and example (original simple single switch with no board interface code).
     2. ./build.sh - compile and link everything
     3. ./edit_code.sh - edit the server source code. NOTE: This edits whatever server.cpp code is currently active. It does NOT edit the code in the example directories.
