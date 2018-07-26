@@ -1,4 +1,4 @@
-OS and development system setup:
+# OS and development system setup:
 1. Initialize SD card
 2. Install Raspian Stretch lite or desktop https://www.raspberrypi.org/downloads/raspbian/
 3. Copy empty ssh to root directory on SD card (will enable ssh on boot).
@@ -19,7 +19,7 @@ For Raspberry Pi and Pimoroni board control stuff:
     1. curl https://openconnectivity.github.io/Sample-Raspberry-Pi-Code/pi-boards/install.sh | bash
     2. sudo reboot
 
-Development cycle:
+# Development cycle:
 1. Change to the development directory where the scripts are found:
     1. cd ~/iot (for IoTivity) or cd ~/iot-lite (for IoTivity-lite)
 2. Run the following development cycle scripts as needed
