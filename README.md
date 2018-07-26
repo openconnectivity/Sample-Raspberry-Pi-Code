@@ -36,9 +36,8 @@ A number of convenience scripts have been written to make the development cycle 
     1. cd ~/iot
 2. Run the following development cycle scripts as needed
     1. ./gen.sh - generate the code, introspection file, PICS file, onboarding file
-        1. (optional) To load new a new example: ./gen.sh automation-phat (or whatever example you want) This will copy the correct device description code and generate the .cpp code, introspection file, etc. The currently available examples are: automation-phat, automation-hat, enviro-phat, mraa-example, and example (original simple single switch with no board interface code).
+        1. (optional) To load new a new example: ./gen.sh automation-phat (or whatever example you want) This will copy the correct device description code and generate the .cpp code, introspection file, etc. The currently available examples are: automation-phat, automation-hat, enviro-phat, mraa-example, and example (original simple single switch with no board interface code). It will also copy the completed sample code to run the board hardware and the Python interface code. So this is everything you need to run the sample. If you run gen.sh without a parameter, it will generate new code from the existing example.json device description file in the ~/iot directory. This is useful if you want new clean code to be generated (but it won't run the hardware).
     2. ./build.sh - compile and link everything
-        1. (optional) ./build.sh automation-phat (or whatever example you want) This will copy the code from the example specified to actually run the board.
     3. ./edit_code.sh - edit the server source code. NOTE: This edits whatever server.cpp code is currently active. It does NOT edit the code in the example directories.
     4. ./reset.sh - reset the sever to RFOTM by copying a fresh onboarding file
     5. ./run.sh - run the currently compiled server in the appropriate directory
