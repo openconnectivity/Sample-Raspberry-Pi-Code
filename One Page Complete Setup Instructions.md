@@ -15,7 +15,7 @@
 8. At this point, we have a working server that will show up on OTGC, implement all the resource and manipulate those resource. All that needs to be added is the code to interface with the board. (That’s what we’ll do next.)
 
 # For Raspberry Pi and Pimoroni board control stuff:
-1. Install the Pimoroni libraries and examples for the Automation Hat (&pHat) and the Enviro pHat along with the Python interfaces to attach the modified C++ IoTivity code (or modified C IoTivity-lite code) to the Pimoroni Python libraries. This also installs the MRAA example to control the Enviro pHat light directly.:
+1. Install the Pimoroni libraries and examples for the Automation Hat (and pHat) and the Enviro pHat along with the Python interfaces to attach the modified C++ IoTivity code (or modified C IoTivity-lite code) to the Pimoroni Python libraries. This also installs the MRAA example to control the Enviro pHat light directly.:
     1. curl https://openconnectivity.github.io/Sample-Raspberry-Pi-Code/pi-boards/install.sh | bash
     2. sudo reboot
 
