@@ -1,7 +1,7 @@
 # OS and development system setup:
 1. Initialize SD card
 2. Install Raspian Stretch lite or desktop https://www.raspberrypi.org/downloads/raspbian/
-3. Copy empty ssh to root directory on SD card (will enable ssh on boot). Empty ssh file is in this repository.
+3. Copy empty ssh file to root directory on SD card (will enable ssh on boot). Empty ssh file is in this repository.
 4. (optional) For Wi-Fi, copy wpa_supplicant.conf to root directory on SD card (will automatically log in to Wi-Fi on boot). Sample wpa_supplicant.conf file is in this repository.
 5. Insert the SD card into the Raspberry Pi and connect power. It should boot and connect to the network (either Ethernet or Wi-Fi).
 6. Create SSH connection to Raspberry Pi. (Use Connect to Server… menu on Mac)
