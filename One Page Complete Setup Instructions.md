@@ -6,7 +6,7 @@
 5. Insert the SD card into the Raspberry Pi and connect power. It should boot and connect to the network (either Ethernet or Wi-Fi).
 6. Create SSH connection to Raspberry Pi. (Use Connect to Server… menu on Mac)
     1. If you get the message that it can’t connect due to security, edit ~/.ssh/known_hosts (on the Mac) and delete the line associated with the IP address causing trouble. Or, you can use this command:
-        1. ssh-keygen -R <hostname>
+        1. ssh-keygen -R [IP address or hostname]
 7. Install the development system (for IoTivity, IoTivity-lite or both) using the following commands on the Raspberry Pi:
     1. For IoTivity:
         1. curl https://openconnectivity.github.io/IOTivity-setup/install.sh | bash
