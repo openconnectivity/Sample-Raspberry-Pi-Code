@@ -9,14 +9,14 @@
     "path" : "/brightness",
     "rt"   : [ "oic.r.light.brightness" ],
     "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_properties" : [ "range", "step" , "id", "precision", "value" ],
     "remove_methods" : ["post"]
   },
   {
     "path" : "/color",
     "rt"   : [ "oic.r.colour.rgb" ],
     "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_properties" : [ "range", "step" , "id", "precision", "value" ],
     "remove_methods" : ["post"]
   },
   {
