@@ -8,7 +8,7 @@
         1. ssh-keygen -R [IP address or hostname]
         
 # Install IoTivity or IoTivity-lite and its development system (This works on most Linux systems and Windows):
-1. Install the development system (for IoTivity, IoTivity-lite or both) using the following commands on the Raspberry Pi:
+1. Install the development system (for IoTivity, IoTivity-lite or both) using the following commands on the Raspberry Pi (or other development system):
     1. For IoTivity:
         1. curl https://openconnectivity.github.io/IOTivity-setup/install.sh | bash
     2. For IoTivity-lite
