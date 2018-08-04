@@ -2,9 +2,9 @@
 CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
-MY_COMMAND="cp ~/Sample-Raspberry-Pi-Code/IoTivity/mraa-example/SConscript $CURPWD/"
+MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/mraa-example/SConscript $CURPWD/src/"
 eval ${MY_COMMAND}
-MY_COMMAND="cp ~/Sample-Raspberry-Pi-Code/pi-boards/mraa-example/mraa-example.json $CURPWD/$PROJNAME.json"
+MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/mraa-example/mraa-example.json $CURPWD/$PROJNAME.json"
 eval ${MY_COMMAND}
-MY_COMMAND="cp ~/Sample-Raspberry-Pi-Code/IoTivity/mraa-example/mraa-example.cpp $CURPWD/src/$PROJNAME.cpp"
+MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/mraa-example/mraa-example.cpp $CURPWD/src/$PROJNAME.cpp"
 eval ${MY_COMMAND}

@@ -25,6 +25,11 @@ if [[ ! -v PYTHONPATH ]]; then
     echo "export PYTHONPATH='.'" >> ~/.bashrc
 fi
 
+if [[ ! -v EXAMPLEPATH ]]; then
+    export EXAMPLEPATH='.'
+    echo "export EXAMPLEPATH=`pwd`" >> ~/.bashrc
+fi
+
 git clone https://github.com/openconnectivity/Sample-Raspberry-Pi-Code.git
 
 MY_COMMAND="cp ./Sample-Raspberry-Pi-Code/IoTivity/*.sh ${OCFPATH}/../iot/"
