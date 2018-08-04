@@ -1,4 +1,4 @@
-#!/bi#!/bin/bash
+#!/bin/bash
 CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
