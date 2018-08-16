@@ -7,9 +7,13 @@ eval ${MY_COMMAND}
 MY_COMMAND="sh ./DeviceBuilder_C++IotivityServer.sh $CURPWD/$PROJNAME.json  $CURPWD/device_output \"oic.d.light\""
 eval ${MY_COMMAND}
 
-#TODO Add command to merge generated code from DeviceBuilder with modified code in the src directory
-MY_COMMAND="cp $CURPWD/device_output/code/server.cpp $CURPWD/src/$PROJNAME.cpp"
-eval ${MY_COMMAND}
+if [ -e PROJNAME.cpp ]
+then
+  echo "It appears that you have modified the automatically generated source file. Use a tool like diff3 if you want to merge in any changes."
+else
+  MY_COMMAND="cp $CURPWD/device_output/code/server.cpp $CURPWD/src/$PROJNAME.cpp"
+  eval ${MY_COMMAND}
+fi
 
 # copying the introspection file to the executable folder
 MY_COMMAND="cp $CURPWD/device_output/code/server_introspection.dat $CURPWD/bin/"

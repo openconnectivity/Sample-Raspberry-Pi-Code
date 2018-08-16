@@ -18,7 +18,7 @@
 # For Raspberry Pi and Pimoroni board control stuff:
 1. Install the Pimoroni libraries and examples for the Automation Hat (and pHat) and the Enviro pHat along with the Python interfaces to attach the modified C++ IoTivity code (or modified C IoTivity-lite code) to the Pimoroni Python libraries. This also installs the MRAA example to control the Enviro pHat light directly.:
     1. curl https://openconnectivity.github.io/Sample-Raspberry-Pi-Code/pi-boards/install.sh | bash
-    2. sudo reboot
+    2. source ~/.bashrc
 
 # Development cycle:
 1. Change to the development directory where the scripts are found:
