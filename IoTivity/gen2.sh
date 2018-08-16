@@ -7,7 +7,7 @@ eval ${MY_COMMAND}
 MY_COMMAND="sh ./DeviceBuilder_C++IotivityServer.sh $CURPWD/$PROJNAME.json  $CURPWD/device_output \"oic.d.light\""
 eval ${MY_COMMAND}
 
-if [ -e PROJNAME.cpp ]
+if [ -e $CURPWD/src/$PROJNAME.cpp ]
 then
   echo "It appears that you have modified the automatically generated source file. Use a tool like diff3 if you want to merge in any changes."
 else
