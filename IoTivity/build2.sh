@@ -9,6 +9,10 @@ eval ${MY_COMMAND}
 MY_COMMAND="cp $CURPWD/src/$PROJNAME.cpp ${OCFPATH}/iotivity/examples/OCFDeviceBuilder/server.cpp"
 eval ${MY_COMMAND}
 
+# copying the SConscript file to the source folder
+MY_COMMAND="cp $CURPWD/src/SConscript ${OCFPATH}/iotivity/examples/OCFDeviceBuilder/"
+eval ${MY_COMMAND}
+
 #scons resource/examples
 MY_COMMAND="scons examples/OCFDeviceBuilder"
 eval ${MY_COMMAND}
