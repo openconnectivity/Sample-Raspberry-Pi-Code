@@ -53,14 +53,14 @@ int value = 0;
 
 // membervariables for path: /binaryswitch
 static char g_binaryswitch_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_binaryswitch_value; // the value for the attribute
+//bool g_binaryswitch_value; // the value for the attribute 
 
 bool g_binaryswitch_value = false; // current value of property "value" Status of the switch// variables for the resources
 
 static char g_binaryswitch_RESOURCE_ENDPOINT[] = "/binaryswitch";  // used path for this resource
 static char g_binaryswitch_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.switch.binary"}; // rt value (as an array)
 int g_binaryswitch_nr_resource_types = 1;
-static char g_binaryswitch_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.a","oic.if.baseline"}; // interface if (as an array)
+static char g_binaryswitch_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.a","oic.if.baseline"}; // interface if (as an array) 
 int g_binaryswitch_nr_resource_interfaces = 2;
 /**
 *  function to set up the device.
@@ -69,15 +69,15 @@ int g_binaryswitch_nr_resource_interfaces = 2;
 static int
 app_init(void)
 {
+PRINT("In app_init\n");
   gpio = mraa_gpio_init(ledPin);
   mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
   mraa_gpio_write(gpio,1);
   sleep(1);
   mraa_gpio_write(gpio,0);
-  PRINT("Lights should have flashed\n");
-
+PRINT("Lights should have flashed\n");
   int ret = oc_init_platform("ocf", NULL, NULL);
-  ret |= oc_add_device("/oic/d", "oic.d.light", "Binary Switch",
+  ret |= oc_add_device("/oic/d", "oic.d.light", "Binary Switch", 
                        "ocf.1.0.0", // icv value
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  // dmv value
                        NULL, NULL);
@@ -105,7 +105,7 @@ convert_if_string(char *interface_name)
 }
 
 
-
+ 
 /**
 *  get method for /binaryswitch to assign the returned values to the member values
 * @param request the request representation.
@@ -127,7 +127,7 @@ get_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *us
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_boolean(root, value, g_binaryswitch_value);
+    oc_rep_set_boolean(root, value, g_binaryswitch_value); 
     PRINT("   %s : %d\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,  g_binaryswitch_value );
     break;
   default:
@@ -136,7 +136,7 @@ get_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *us
   oc_rep_end_root_object();
   oc_send_response(request, OC_STATUS_OK);
 }
-
+ 
 /**
 *  post method for /binaryswitch to assign the returned values to the member values
 * @param requestRep the request representation.
@@ -153,18 +153,18 @@ post_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *u
     PRINT("key: (check) %s ", oc_string(rep->name));if (strcmp ( oc_string(rep->name), g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0)
     {
       // value exist in payload
-
+      
       if (rep->type != OC_REP_BOOL)
       {
         error_state = true;
         PRINT ("   property 'value' is not of type bool %d \n", rep->type);
       }
     }
-
-
+    
+    
     rep = rep->next;
   }
-
+    
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -180,18 +180,10 @@ post_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *u
       }
       rep = rep->next;
     }
-
-    // set the response
-    oc_rep_start_root_object();
-    //oc_process_baseline_interface(request->resource);
-    oc_rep_set_boolean(root, value, g_binaryswitch_value);
-    oc_rep_end_root_object();
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
-    // TODO: add error response, if any
     oc_send_response(request, OC_STATUS_NOT_MODIFIED);
   }
 }
@@ -214,13 +206,13 @@ register_resources(void)
   {
     oc_resource_bind_resource_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[0]));  
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[0]), g_binaryswitch_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_binaryswitch, true);
   oc_resource_set_periodic_observable(res_binaryswitch, 1);
-
+   
   oc_resource_set_request_handler(res_binaryswitch, OC_GET, get_binaryswitch, NULL);
-
+   
   oc_resource_set_request_handler(res_binaryswitch, OC_POST, post_binaryswitch, NULL);
   oc_add_resource(res_binaryswitch);
 }
@@ -271,8 +263,8 @@ int init;
 #endif
   // initialize member variables /binaryswitch
   g_binaryswitch_value = false; // current value of property "value" Status of the switch
-
-
+   
+  
   // no oic/con resource.
   oc_set_con_res_announced(false);
 
@@ -281,16 +273,16 @@ int init;
                                        .register_resources = register_resources
 #ifdef WIN32
                                        ,
-                                       .requests_entry = 0
+                                       .requests_entry = 0 
 #endif
                                        };
 
   oc_clock_time_t next_event;
-
-
+  
+  
   PRINT("file : ../device_output/out_codegeneration_merged.swagger.json\n");
   PRINT("title: Binary Switch\n");
-
+  
 
 #ifdef OC_SECURITY
   PRINT("intialize secure resources\n");
@@ -315,7 +307,7 @@ int init;
     }
   }
 #endif
-
+  
 #ifdef __linux__
   while (quit != 1) {
     next_event = oc_main_poll();
