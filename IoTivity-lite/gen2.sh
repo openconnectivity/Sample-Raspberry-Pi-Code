@@ -7,7 +7,7 @@ eval ${MY_COMMAND}
 MY_COMMAND="sh ./DeviceBuilder_IotivityLiteServer.sh $CURPWD/$PROJNAME.json  $CURPWD/device_output \"oic.d.light\""
 eval ${MY_COMMAND}
 
-# copying the introspection file to the executable folder
+# copying the introspection file to the include folder
 MY_COMMAND="cp $CURPWD/device_output/code/server_introspection.dat.h ${OCFPATH}/iotivity-constrained/include/"
 eval ${MY_COMMAND}
 

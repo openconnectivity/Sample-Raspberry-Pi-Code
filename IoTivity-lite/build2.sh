@@ -9,7 +9,11 @@ eval ${MY_COMMAND}
 MY_COMMAND="cp $CURPWD/src/$PROJNAME.c ${OCFPATH}/iotivity-constrained/apps/device_builder_server.c"
 eval ${MY_COMMAND}
 
-#scons resource/examples
+# Copying the Makefile file to the executable folder
+MY_COMMAND="cp $CURPWD/src/Makefile ${OCFPATH}/iotivity-constrained/ports/linux/"
+eval ${MY_COMMAND}
+
+#make resource/examples
 MY_COMMAND="make DYNAMIC=1 IPV4=1 device_builder_server"
 eval ${MY_COMMAND}
 
