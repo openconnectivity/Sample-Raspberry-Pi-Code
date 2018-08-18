@@ -10,7 +10,7 @@ MY_COMMAND="cp $CURPWD/src/$PROJNAME.c ${OCFPATH}/iotivity-constrained/apps/devi
 eval ${MY_COMMAND}
 
 # Copying the Makefile file to the executable folder
-MY_COMMAND="cp $CURPWD/src/Makefile ${OCFPATH}/iotivity-constrained/ports/linux/"
+MY_COMMAND="cp $CURPWD/src/Makefile ${OCFPATH}/iotivity-constrained/port/linux/"
 eval ${MY_COMMAND}
 
 #make resource/examples
