@@ -20,6 +20,8 @@ then
 else
   MY_COMMAND="cp $CURPWD/device_output/code/simpleserver.c $CURPWD/src/$PROJNAME.c"
   eval ${MY_COMMAND}
+  MY_COMMAND="cp $CURPWD/device_output/code/simpleserver.c $CURPWD/src/$PROJNAME.c.gen"
+  eval ${MY_COMMAND}
 fi
 
 cd $CURPWD

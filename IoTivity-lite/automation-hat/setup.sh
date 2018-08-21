@@ -8,5 +8,7 @@ MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/automation-hat/
 eval ${MY_COMMAND}
 MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/automation-hat/automation-hat.c $CURPWD/src/$PROJNAME.c"
 eval ${MY_COMMAND}
+MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/automation-hat/automation-hat.c.gen $CURPWD/src/$PROJNAME.c.gen"
+eval ${MY_COMMAND}
 MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/automation-hat/automation-hat.py $CURPWD/bin/"
 eval ${MY_COMMAND}

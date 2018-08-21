@@ -8,3 +8,5 @@ MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/mraa-example/mr
 eval ${MY_COMMAND}
 MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/mraa-example/mraa-example.cpp $CURPWD/src/$PROJNAME.cpp"
 eval ${MY_COMMAND}
+MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/mraa-example/mraa-example.cpp.gen $CURPWD/src/$PROJNAME.cpp.gen"
+eval ${MY_COMMAND}

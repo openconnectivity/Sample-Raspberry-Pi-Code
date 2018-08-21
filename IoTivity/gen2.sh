@@ -21,6 +21,8 @@ then
 else
   MY_COMMAND="cp $CURPWD/device_output/code/server.cpp $CURPWD/src/$PROJNAME.cpp"
   eval ${MY_COMMAND}
+  MY_COMMAND="cp $CURPWD/device_output/code/server.cpp $CURPWD/src/$PROJNAME.cpp.gen"
+  eval ${MY_COMMAND}
 fi
 
 cd $CURPWD
