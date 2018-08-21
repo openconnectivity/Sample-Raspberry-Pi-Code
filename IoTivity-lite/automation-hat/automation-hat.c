@@ -17,9 +17,43 @@
 // limitations under the License.
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=/
+
+/* Application Design
+*
+* support functions:
+* app_init
+*  initializes the oic/p and oic/d values.
+* register_resources
+*  function that registers all endpoints, e.g. sets the RETRIEVE/UPDATE handlers for each end point
+*
+* main
+*  starts the stack, with the registered resources.
+*
+* Each endpoint has:
+*  global variables for:
+*    the property name
+*       naming convention: g_<path>_RESOURCE_PROPERTY_NAME_<propertyname>
+*    the actual value of the property, which is typed from the json data type
+*      naming convention: g_<path>_<propertyname>
+*    the path in a variable:
+*      naming convention: g_<path>_RESOURCE_ENDPOINT
+*    array of interfaces, where by the first will be set as default interface
+*      naming convention g_<path>_RESOURCE_INTERFACE
+*
+*  handlers for the implemented methods (get/post)
+*   get_<path>
+*     function that is being called when a RETRIEVE is called on <path>
+*     set the global variables in the output
+*   post_<path>
+*     function that is being called when a UPDATE is called on <path>
+*     checks the input data
+*     if input data is correct
+*       updates the global variables
+*
+*/
 /*
  tool_version          : 20171123
- input_file            : ../device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/tmp/automationhatlite/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20170815
  title of input_file   : Energy
 */
@@ -30,6 +64,7 @@
 #include <signal.h>
 
 #ifdef __linux__
+// linux specific code
 #include <pthread.h>
 static pthread_mutex_t mutex;
 static pthread_cond_t cv;
@@ -37,12 +72,14 @@ static struct timespec ts;
 #endif
 
 #ifdef WIN32
+// windows specific code
 #include <windows.h>
 static CONDITION_VARIABLE cv;   // event loop variable
 static CRITICAL_SECTION cs;     // event loop variable
 #endif
 
-#define MAX_STRING 25
+#define MAX_STRING 65   // max size of the strings.
+volatile int quit = 0;  // stop variable, used by handle_signal
 
 //Python calling stuff
 static PyObject *pName, *pModule, *pFunc;
@@ -122,170 +159,94 @@ int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int 
     return 0;
 }
 
-volatile int quit = 0;          // stop variable
-oc_string_t name;               // name of the device
-
-
-// membervariables for path: /ADC1
+// global variables for path: /ADC1
+static char g_ADC1_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_ADC1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_ADC1_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
+double g_ADC1_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC1_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-//double g_ADC1_voltage; // the value for the attribute
-
 double g_ADC1_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
 static char g_ADC1_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-//double g_ADC1_desiredfrequency; // the value for the attribute
-
 double g_ADC1_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_ADC1_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
-//double g_ADC1_desiredvoltage; // the value for the attribute
-
-double g_ADC1_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC1_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-//double g_ADC1_current; // the value for the attribute
-
 double g_ADC1_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-static char g_ADC1_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-//double g_ADC1_desiredcurrent; // the value for the attribute
-
-double g_ADC1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_ADC1_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
-//double g_ADC1_frequency; // the value for the attribute
-
 double g_ADC1_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// membervariables for path: /ADC2
+// global variables for path: /ADC2
+static char g_ADC2_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_ADC2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_ADC2_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
+double g_ADC2_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC2_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-//double g_ADC2_voltage; // the value for the attribute
-
 double g_ADC2_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
 static char g_ADC2_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-//double g_ADC2_desiredfrequency; // the value for the attribute
-
 double g_ADC2_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_ADC2_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
-//double g_ADC2_desiredvoltage; // the value for the attribute
-
-double g_ADC2_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC2_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-//double g_ADC2_current; // the value for the attribute
-
 double g_ADC2_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-static char g_ADC2_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-//double g_ADC2_desiredcurrent; // the value for the attribute
-
-double g_ADC2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_ADC2_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
-//double g_ADC2_frequency; // the value for the attribute
-
 double g_ADC2_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// membervariables for path: /ADC3
+// global variables for path: /ADC3
+static char g_ADC3_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_ADC3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_ADC3_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
+double g_ADC3_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC3_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-//double g_ADC3_voltage; // the value for the attribute
-
 double g_ADC3_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
 static char g_ADC3_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-//double g_ADC3_desiredfrequency; // the value for the attribute
-
 double g_ADC3_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_ADC3_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
-//double g_ADC3_desiredvoltage; // the value for the attribute
-
-double g_ADC3_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC3_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-//double g_ADC3_current; // the value for the attribute
-
 double g_ADC3_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-static char g_ADC3_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-//double g_ADC3_desiredcurrent; // the value for the attribute
-
-double g_ADC3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_ADC3_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
-//double g_ADC3_frequency; // the value for the attribute
-
 double g_ADC3_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// membervariables for path: /ADC4
+// global variables for path: /ADC4
+static char g_ADC4_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_ADC4_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_ADC4_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
+double g_ADC4_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC4_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-//double g_ADC4_voltage; // the value for the attribute
-
 double g_ADC4_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
 static char g_ADC4_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-//double g_ADC4_desiredfrequency; // the value for the attribute
-
 double g_ADC4_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_ADC4_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
-//double g_ADC4_desiredvoltage; // the value for the attribute
-
-double g_ADC4_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
 static char g_ADC4_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-//double g_ADC4_current; // the value for the attribute
-
 double g_ADC4_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-static char g_ADC4_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-//double g_ADC4_desiredcurrent; // the value for the attribute
-
-double g_ADC4_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_ADC4_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
-//double g_ADC4_frequency; // the value for the attribute
-
 double g_ADC4_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// membervariables for path: /CommsLight
+// global variables for path: /CommsLight
 static char g_CommsLight_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_CommsLight_value; // the value for the attribute
-
 bool g_CommsLight_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /PowerLight
+// global variables for path: /PowerLight
 static char g_PowerLight_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_PowerLight_value; // the value for the attribute
-
 bool g_PowerLight_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /WarnLight
+// global variables for path: /WarnLight
 static char g_WarnLight_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_WarnLight_value; // the value for the attribute
-
 bool g_WarnLight_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /input1
+// global variables for path: /input1
 static char g_input1_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_input1_value; // the value for the attribute
-
 bool g_input1_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /input2
+// global variables for path: /input2
 static char g_input2_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_input2_value; // the value for the attribute
-
 bool g_input2_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /input3
+// global variables for path: /input3
 static char g_input3_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_input3_value; // the value for the attribute
-
 bool g_input3_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /output1
+// global variables for path: /output1
 static char g_output1_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_output1_value; // the value for the attribute
-
 bool g_output1_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /output2
+// global variables for path: /output2
 static char g_output2_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_output2_value; // the value for the attribute
-
 bool g_output2_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /output3
+// global variables for path: /output3
 static char g_output3_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_output3_value; // the value for the attribute
-
 bool g_output3_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /relay1
+// global variables for path: /relay1
 static char g_relay1_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_relay1_value; // the value for the attribute
-
 bool g_relay1_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /relay2
+// global variables for path: /relay2
 static char g_relay2_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_relay2_value; // the value for the attribute
-
 bool g_relay2_value = false; // current value of property "value" Status of the switch
-// membervariables for path: /relay3
+// global variables for path: /relay3
 static char g_relay3_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-//bool g_relay3_value; // the value for the attribute
-
-bool g_relay3_value = false; // current value of property "value" Status of the switch// variables for the resources
+bool g_relay3_value = false; // current value of property "value" Status of the switch// registration data variables for the resources
 
 static char g_ADC1_RESOURCE_ENDPOINT[] = "/ADC1";  // used path for this resource
 static char g_ADC1_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.energy.electrical"}; // rt value (as an array)
@@ -383,7 +344,7 @@ int g_relay3_nr_resource_types = 1;
 static char g_relay3_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
 int g_relay3_nr_resource_interfaces = 2;
 /**
-*  function to set up the device.
+* function to set up the device.
 *
 */
 static int
@@ -394,10 +355,8 @@ app_init(void)
                        "ocf.1.0.0", // icv value
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  // dmv value
                        NULL, NULL);
-  oc_new_string(&name, "ocf", sizeof("ocf") );
   return ret;
 }
-
 
 /**
 *  function to convert the interface string definition to the constant
@@ -418,23 +377,28 @@ convert_if_string(char *interface_name)
 }
 
 
-
 /**
-*  get method for /ADC1 to assign the returned values to the member values
+* get method for "/ADC1" endpoint to intialize the returned values from the global values
+* This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
+* Retrieves the current energy.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_ADC1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
-  // the current implementation always return everything that belongs to the resource.
-  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   myParamArgs[0] = 1;
   CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, myParamArgs);
   g_ADC1_voltage = returnDouble;
+
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_ADC1: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -444,20 +408,20 @@ get_ADC1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
+    oc_rep_set_double(root, desiredcurrent, g_ADC1_desiredcurrent );
+    PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC1_desiredcurrent );
+
+    oc_rep_set_double(root, desiredvoltage, g_ADC1_desiredvoltage );
+    PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC1_desiredvoltage );
+
     oc_rep_set_double(root, voltage, g_ADC1_voltage );
     PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_voltage, g_ADC1_voltage );
 
     oc_rep_set_double(root, desiredfrequency, g_ADC1_desiredfrequency );
     PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_desiredfrequency, g_ADC1_desiredfrequency );
 
-    oc_rep_set_double(root, desiredvoltage, g_ADC1_desiredvoltage );
-    PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC1_desiredvoltage );
-
     oc_rep_set_double(root, current, g_ADC1_current );
     PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_current, g_ADC1_current );
-
-    oc_rep_set_double(root, desiredcurrent, g_ADC1_desiredcurrent );
-    PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC1_desiredcurrent );
 
     oc_rep_set_double(root, frequency, g_ADC1_frequency );
     PRINT("   %s : %f\n", g_ADC1_RESOURCE_PROPERTY_NAME_frequency, g_ADC1_frequency );
@@ -470,21 +434,27 @@ get_ADC1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 }
 
 /**
-*  get method for /ADC2 to assign the returned values to the member values
+* get method for "/ADC2" endpoint to intialize the returned values from the global values
+* This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
+* Retrieves the current energy.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_ADC2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
-  // the current implementation always return everything that belongs to the resource.
-  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   myParamArgs[0] = 2;
   CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, myParamArgs);
   g_ADC2_voltage = returnDouble;
+
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_ADC2: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -494,20 +464,20 @@ get_ADC2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
+    oc_rep_set_double(root, desiredcurrent, g_ADC2_desiredcurrent );
+    PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC2_desiredcurrent );
+
+    oc_rep_set_double(root, desiredvoltage, g_ADC2_desiredvoltage );
+    PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC2_desiredvoltage );
+
     oc_rep_set_double(root, voltage, g_ADC2_voltage );
     PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_voltage, g_ADC2_voltage );
 
     oc_rep_set_double(root, desiredfrequency, g_ADC2_desiredfrequency );
     PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_desiredfrequency, g_ADC2_desiredfrequency );
 
-    oc_rep_set_double(root, desiredvoltage, g_ADC2_desiredvoltage );
-    PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC2_desiredvoltage );
-
     oc_rep_set_double(root, current, g_ADC2_current );
     PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_current, g_ADC2_current );
-
-    oc_rep_set_double(root, desiredcurrent, g_ADC2_desiredcurrent );
-    PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC2_desiredcurrent );
 
     oc_rep_set_double(root, frequency, g_ADC2_frequency );
     PRINT("   %s : %f\n", g_ADC2_RESOURCE_PROPERTY_NAME_frequency, g_ADC2_frequency );
@@ -520,21 +490,27 @@ get_ADC2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 }
 
 /**
-*  get method for /ADC3 to assign the returned values to the member values
+* get method for "/ADC3" endpoint to intialize the returned values from the global values
+* This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
+* Retrieves the current energy.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_ADC3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
-  // the current implementation always return everything that belongs to the resource.
-  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   myParamArgs[0] = 3;
   CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, myParamArgs);
   g_ADC3_voltage = returnDouble;
+
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_ADC3: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -544,20 +520,20 @@ get_ADC3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
+    oc_rep_set_double(root, desiredcurrent, g_ADC3_desiredcurrent );
+    PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC3_desiredcurrent );
+
+    oc_rep_set_double(root, desiredvoltage, g_ADC3_desiredvoltage );
+    PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC3_desiredvoltage );
+
     oc_rep_set_double(root, voltage, g_ADC3_voltage );
     PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_voltage, g_ADC3_voltage );
 
     oc_rep_set_double(root, desiredfrequency, g_ADC3_desiredfrequency );
     PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_desiredfrequency, g_ADC3_desiredfrequency );
 
-    oc_rep_set_double(root, desiredvoltage, g_ADC3_desiredvoltage );
-    PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC3_desiredvoltage );
-
     oc_rep_set_double(root, current, g_ADC3_current );
     PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_current, g_ADC3_current );
-
-    oc_rep_set_double(root, desiredcurrent, g_ADC3_desiredcurrent );
-    PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC3_desiredcurrent );
 
     oc_rep_set_double(root, frequency, g_ADC3_frequency );
     PRINT("   %s : %f\n", g_ADC3_RESOURCE_PROPERTY_NAME_frequency, g_ADC3_frequency );
@@ -570,21 +546,27 @@ get_ADC3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 }
 
 /**
-*  get method for /ADC4 to assign the returned values to the member values
+* get method for "/ADC4" endpoint to intialize the returned values from the global values
+* This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
+* Retrieves the current energy.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_ADC4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
-  // the current implementation always return everything that belongs to the resource.
-  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   myParamArgs[0] = 4;
   CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, myParamArgs);
   g_ADC4_voltage = returnDouble;
+
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_ADC4: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -594,20 +576,20 @@ get_ADC4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
+    oc_rep_set_double(root, desiredcurrent, g_ADC4_desiredcurrent );
+    PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC4_desiredcurrent );
+
+    oc_rep_set_double(root, desiredvoltage, g_ADC4_desiredvoltage );
+    PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC4_desiredvoltage );
+
     oc_rep_set_double(root, voltage, g_ADC4_voltage );
     PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_voltage, g_ADC4_voltage );
 
     oc_rep_set_double(root, desiredfrequency, g_ADC4_desiredfrequency );
     PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_desiredfrequency, g_ADC4_desiredfrequency );
 
-    oc_rep_set_double(root, desiredvoltage, g_ADC4_desiredvoltage );
-    PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_desiredvoltage, g_ADC4_desiredvoltage );
-
     oc_rep_set_double(root, current, g_ADC4_current );
     PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_current, g_ADC4_current );
-
-    oc_rep_set_double(root, desiredcurrent, g_ADC4_desiredcurrent );
-    PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_desiredcurrent, g_ADC4_desiredcurrent );
 
     oc_rep_set_double(root, frequency, g_ADC4_frequency );
     PRINT("   %s : %f\n", g_ADC4_RESOURCE_PROPERTY_NAME_frequency, g_ADC4_frequency );
@@ -620,18 +602,27 @@ get_ADC4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 }
 
 /**
-*  get method for /CommsLight to assign the returned values to the member values
+* get method for "/CommsLight" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_CommsLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_CommsLight: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -651,18 +642,27 @@ get_CommsLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user
 }
 
 /**
-*  get method for /PowerLight to assign the returned values to the member values
+* get method for "/PowerLight" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_PowerLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_PowerLight: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -682,18 +682,27 @@ get_PowerLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user
 }
 
 /**
-*  get method for /WarnLight to assign the returned values to the member values
+* get method for "/WarnLight" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_WarnLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_WarnLight: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -713,21 +722,29 @@ get_WarnLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user_
 }
 
 /**
-*  get method for /input1 to assign the returned values to the member values
+* get method for "/input1" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_input1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
-  // the current implementation always return everything that belongs to the resource.
-  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   myParamArgs[0] = 1;
   CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, myParamArgs);
   g_input1_value = returnLong;
+
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_input1: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -748,21 +765,29 @@ get_input1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
 }
 
 /**
-*  get method for /input2 to assign the returned values to the member values
+* get method for "/input2" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_input2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
-  // the current implementation always return everything that belongs to the resource.
-  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   myParamArgs[0] = 2;
   CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, myParamArgs);
   g_input2_value = returnLong;
+
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_input2: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -783,21 +808,29 @@ get_input2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
 }
 
 /**
-*  get method for /input3 to assign the returned values to the member values
+* get method for "/input3" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_input3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
-  // the current implementation always return everything that belongs to the resource.
-  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   myParamArgs[0] = 3;
   CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, myParamArgs);
   g_input3_value = returnLong;
+
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_input3: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -818,18 +851,27 @@ get_input3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
 }
 
 /**
-*  get method for /output1 to assign the returned values to the member values
+* get method for "/output1" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_output1: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -849,18 +891,27 @@ get_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-*  get method for /output2 to assign the returned values to the member values
+* get method for "/output2" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_output2: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -880,18 +931,27 @@ get_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-*  get method for /output3 to assign the returned values to the member values
+* get method for "/output3" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_output3: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -911,18 +971,27 @@ get_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-*  get method for /relay1 to assign the returned values to the member values
+* get method for "/relay1" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_relay1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_relay1: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -942,18 +1011,27 @@ get_relay1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
 }
 
 /**
-*  get method for /relay2 to assign the returned values to the member values
+* get method for "/relay2" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_relay2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_relay2: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -973,18 +1051,27 @@ get_relay2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
 }
 
 /**
-*  get method for /relay3 to assign the returned values to the member values
+* get method for "/relay3" endpoint to intialize the returned values from the global values
+* This resource describes a binary switch (on/off).
+* The value is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
 * @param request the request representation.
-* @param interfaces the interfaces.
+* @param interfaces the interface used for this call
 * @param user_data the user data.
-* TODO: this function is also referenced when only get is implemented, something to fix..
 */
 static void
 get_relay3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
+
+  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+
   // the current implementation always return everything that belongs to the resource.
   // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
+
   PRINT("get_relay3: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1004,7 +1091,8 @@ get_relay3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
 }
 
 /**
-*  post method for /CommsLight to assign the returned values to the member values
+* post method for "/CommsLight" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1030,7 +1118,6 @@ post_CommsLight(oc_request_t *request, oc_interface_mask_t interfaces, void *use
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1044,16 +1131,19 @@ post_CommsLight(oc_request_t *request, oc_interface_mask_t interfaces, void *use
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_CommsLight_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = g_CommsLight_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeCommsLight", 1, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1063,7 +1153,8 @@ post_CommsLight(oc_request_t *request, oc_interface_mask_t interfaces, void *use
 }
 
 /**
-*  post method for /PowerLight to assign the returned values to the member values
+* post method for "/PowerLight" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1089,7 +1180,6 @@ post_PowerLight(oc_request_t *request, oc_interface_mask_t interfaces, void *use
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1103,16 +1193,19 @@ post_PowerLight(oc_request_t *request, oc_interface_mask_t interfaces, void *use
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_PowerLight_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = g_PowerLight_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writePowerLight", 1, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1122,7 +1215,8 @@ post_PowerLight(oc_request_t *request, oc_interface_mask_t interfaces, void *use
 }
 
 /**
-*  post method for /WarnLight to assign the returned values to the member values
+* post method for "/WarnLight" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1148,7 +1242,6 @@ post_WarnLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1162,16 +1255,19 @@ post_WarnLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_WarnLight_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = g_WarnLight_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeWarnLight", 1, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1181,7 +1277,8 @@ post_WarnLight(oc_request_t *request, oc_interface_mask_t interfaces, void *user
 }
 
 /**
-*  post method for /output1 to assign the returned values to the member values
+* post method for "/output1" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1207,7 +1304,6 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1221,17 +1317,20 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_output1_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = 1;
     myParamArgs[1] = g_output1_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1241,7 +1340,8 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-*  post method for /output2 to assign the returned values to the member values
+* post method for "/output2" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1267,7 +1367,6 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1281,17 +1380,20 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_output2_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = 2;
     myParamArgs[1] = g_output2_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1301,7 +1403,8 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-*  post method for /output3 to assign the returned values to the member values
+* post method for "/output3" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1327,7 +1430,6 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1341,17 +1443,20 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_output3_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = 3;
     myParamArgs[1] = g_output3_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1361,7 +1466,8 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-*  post method for /relay1 to assign the returned values to the member values
+* post method for "/relay1" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1387,7 +1493,6 @@ post_relay1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1401,17 +1506,20 @@ post_relay1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_relay1_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = 1;
     myParamArgs[1] = g_relay1_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1421,7 +1529,8 @@ post_relay1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-*  post method for /relay2 to assign the returned values to the member values
+* post method for "/relay2" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1447,7 +1556,6 @@ post_relay2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1461,17 +1569,20 @@ post_relay2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_relay2_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = 2;
     myParamArgs[1] = g_relay2_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1481,7 +1592,8 @@ post_relay2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-*  post method for /relay3 to assign the returned values to the member values
+* post method for "/relay3" endpoint to assign the returned values to the global values.
+
 * @param requestRep the request representation.
 */
 static void
@@ -1507,7 +1619,6 @@ post_relay3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 
     rep = rep->next;
   }
-
   if (error_state == false)
   {
     oc_rep_t *rep = request->request_payload;
@@ -1521,17 +1632,20 @@ post_relay3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
       }
       rep = rep->next;
     }
-
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_relay3_value);
     oc_rep_end_root_object();
 
-    oc_send_response(request, OC_STATUS_CHANGED);
+    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    // one can use the global variables as input to those calls
+    // the global values have been updated already with the data from the request
     myParamArgs[0] = 3;
     myParamArgs[1] = g_relay3_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, myParamArgs);
+
+    oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
@@ -1886,14 +2000,19 @@ register_resources(void)
 }
 
 #ifdef WIN32
+/**
+* signal the event loop
+*/
 static void
 signal_event_loop(void)
 {
   WakeConditionVariable(&cv);
 }
 #endif
-
 #ifdef __linux__
+/**
+* signal the event loop
+*/
 static void
 signal_event_loop(void)
 {
@@ -1903,7 +2022,10 @@ signal_event_loop(void)
 }
 #endif
 
-
+/**
+* handle Ctrl-C
+* @param signal the captured signal
+*/
 void
 handle_signal(int signal)
 {
@@ -1912,126 +2034,134 @@ handle_signal(int signal)
   quit = 1;
 }
 
+/**
+* main application.
+* intializes the global variables
+* registers and starts the handler
+* handles (in a loop) the next event.
+* shuts down the stack
+*/
 int
 main(void)
 {
 int init;
 
 #ifdef WIN32
+  // windows specific
   InitializeCriticalSection(&cs);
   InitializeConditionVariable(&cv);
+  // install Ctrl-C
   signal(SIGINT, handle_signal);
 #endif
 #ifdef __linux__
+  // linux specific
   struct sigaction sa;
   sigfillset(&sa.sa_mask);
   sa.sa_flags = 0;
   sa.sa_handler = handle_signal;
+  // install Ctrl-C
   sigaction(SIGINT, &sa, NULL);
 #endif
-  // initialize member variables /ADC1
+  // initialize global variables for endpoint "/ADC1"
+  g_ADC1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_ADC1_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC1_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
   g_ADC1_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_ADC1_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC1_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-  g_ADC1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_ADC1_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
 
-  // initialize member variables /ADC2
+  // initialize global variables for endpoint "/ADC2"
+  g_ADC2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_ADC2_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC2_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
   g_ADC2_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_ADC2_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC2_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-  g_ADC2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_ADC2_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
 
-  // initialize member variables /ADC3
+  // initialize global variables for endpoint "/ADC3"
+  g_ADC3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_ADC3_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC3_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
   g_ADC3_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_ADC3_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC3_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-  g_ADC3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_ADC3_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
 
-  // initialize member variables /ADC4
+  // initialize global variables for endpoint "/ADC4"
+  g_ADC4_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_ADC4_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC4_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
   g_ADC4_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_ADC4_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
   g_ADC4_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-  g_ADC4_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_ADC4_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
 
-  // initialize member variables /CommsLight
+  // initialize global variables for endpoint "/CommsLight"
   g_CommsLight_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /PowerLight
+  // initialize global variables for endpoint "/PowerLight"
   g_PowerLight_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /WarnLight
+  // initialize global variables for endpoint "/WarnLight"
   g_WarnLight_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /input1
+  // initialize global variables for endpoint "/input1"
   g_input1_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /input2
+  // initialize global variables for endpoint "/input2"
   g_input2_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /input3
+  // initialize global variables for endpoint "/input3"
   g_input3_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /output1
+  // initialize global variables for endpoint "/output1"
   g_output1_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /output2
+  // initialize global variables for endpoint "/output2"
   g_output2_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /output3
+  // initialize global variables for endpoint "/output3"
   g_output3_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /relay1
+  // initialize global variables for endpoint "/relay1"
   g_relay1_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /relay2
+  // initialize global variables for endpoint "/relay2"
   g_relay2_value = false; // current value of property "value" Status of the switch
 
-  // initialize member variables /relay3
+  // initialize global variables for endpoint "/relay3"
   g_relay3_value = false; // current value of property "value" Status of the switch
 
 
   // no oic/con resource.
   oc_set_con_res_announced(false);
 
+  // initializes the handlers structure
   static const oc_handler_t handler = {.init = app_init,
                                        .signal_event_loop = signal_event_loop,
                                        .register_resources = register_resources
-#ifdef WIN32
+#ifdef OC_CLIENT
                                        ,
                                        .requests_entry = 0
 #endif
                                        };
-
   oc_clock_time_t next_event;
 
-
-  PRINT("file : ../device_output/out_codegeneration_merged.swagger.json\n");
+  PRINT("file : /home/pi/tmp/automationhatlite/device_output/out_codegeneration_merged.swagger.json\n");
   PRINT("title: Energy\n");
-
 
 #ifdef OC_SECURITY
   PRINT("intialize secure resources\n");
-  oc_storage_config("./simpleserver_creds/");
+  oc_storage_config("./device_builder_server_creds/");
 #endif /* OC_SECURITY */
 
   Py_Initialize();
 
-  // initialize the IDD from a specific file
-  // oc_set_introspection_file(0, "myfile.dat");
-
+  // start the stack
   init = oc_main_init(&handler);
   if (init < 0)
     return init;
 
 #ifdef WIN32
+  // windows specific loop
   while (quit != 1) {
     next_event = oc_main_poll();
     if (next_event == 0) {
@@ -2044,6 +2174,7 @@ int init;
 #endif
 
 #ifdef __linux__
+  // linux specific loop
   while (quit != 1) {
     next_event = oc_main_poll();
     pthread_mutex_lock(&mutex);
@@ -2060,6 +2191,7 @@ int init;
 
   Py_Finalize();
 
+  // shut down the stack
   oc_main_shutdown();
   return 0;
 }

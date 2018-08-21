@@ -17,8 +17,6 @@
 // limitations under the License.
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include <Python.h>
-
 #include <signal.h>
 #include <functional>
 #include <string>
@@ -40,7 +38,7 @@ namespace PH = std::placeholders;
 
 /*
  tool_version          : 20171123
- input_file            : /home/pi/tmp/automationhattest/device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/tmp/automationphattest/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20170815
  title of input_file   : Energy
 */
@@ -59,116 +57,6 @@ class Resource
 
 };
 
-class AutomationHat
-{
-    public:
-        /*
-         * constructor
-         */
-        AutomationHat();
-
-        /*
-         * destructor
-         */
-        virtual ~AutomationHat();
-
-        int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[]);
-
-        PyObject *pName, *pModule, *pDict, *pFunc;
-        PyObject *pArgs, *pValue;
-
-	int myParamArgs[2];
-        long returnLong = 0;
-        double returnDouble = 0.0;
-};
-
-/*
-* Constructor code
-*/
-AutomationHat::AutomationHat()
-{
-    Py_Initialize();
-}
-
-/*
-* Destructor code
-*/
-AutomationHat::~AutomationHat()
-{
-    Py_Finalize();
-}
-
-/*
-* Funcion to call Pimoroni python libraries
-*/
-int AutomationHat::CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[])
-{
-    int i;
-
-    printf("module = %s\n", moduleName);
-    pName = PyString_FromString(moduleName);
-    /* Error checking of pName left out */
-
-    pModule = PyImport_Import(pName);
-    Py_DECREF(pName);
-
-    if (pModule != NULL) {
-        printf("function = %s\n", functionName);
-        pFunc = PyObject_GetAttrString(pModule, functionName);
-        /* pFunc is a new reference */
-
-        if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(numArgs);
-            for (i = 0; i < numArgs; ++i) {
-                printf("arg%d = %d\n", i+1, args[i]);
-                pValue = PyInt_FromLong(args[i]);
-                if (!pValue) {
-                    Py_DECREF(pArgs);
-                    Py_DECREF(pModule);
-                    fprintf(stderr, "Cannot convert argument\n");
-                    return 1;
-                }
-                /* pValue reference stolen here: */
-                PyTuple_SetItem(pArgs, i, pValue);
-            }
-            pValue = PyObject_CallObject(pFunc, pArgs);
-            Py_DECREF(pArgs);
-            if (pValue != NULL) {
-                if (PyFloat_Check(pValue)) {
-                    returnDouble = PyFloat_AsDouble(pValue);
-                    printf("Result of call: %f\n", returnDouble);
-                } else {
-                    returnLong = PyInt_AsLong(pValue);
-                    printf("Result of call: %ld\n", PyInt_AsLong(pValue));
-                }
-                Py_DECREF(pValue);
-            }
-            else {
-                Py_DECREF(pFunc);
-                Py_DECREF(pModule);
-                PyErr_Print();
-                fprintf(stderr,"Call failed\n");
-                return 1;
-            }
-        }
-        else {
-            if (PyErr_Occurred())
-                PyErr_Print();
-            fprintf(stderr, "Cannot find function \"%s\"\n", functionName);
-        }
-        Py_XDECREF(pFunc);
-        Py_DECREF(pModule);
-    }
-    else {
-        PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", moduleName);
-        return 1;
-    }
-
-    return 0;
-}
-
-AutomationHat *testAutomationHat;
 
 /*
  * class definition for class that handles /ADC1
@@ -251,7 +139,7 @@ class Adc1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -382,13 +270,10 @@ OCStackResult Adc1Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 1;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -397,16 +282,16 @@ OCRepresentation Adc1Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -484,8 +369,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -593,7 +478,7 @@ class Adc2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -724,13 +609,10 @@ OCStackResult Adc2Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 2;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -739,16 +621,16 @@ OCRepresentation Adc2Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -826,8 +708,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -935,7 +817,7 @@ class Adc3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -1066,13 +948,10 @@ OCStackResult Adc3Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 3;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1081,16 +960,16 @@ OCRepresentation Adc3Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -1168,8 +1047,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -1277,7 +1156,7 @@ class Adc4Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -1408,13 +1287,10 @@ OCStackResult Adc4Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 4;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1423,16 +1299,16 @@ OCRepresentation Adc4Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -1510,1664 +1386,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
-            else
-            {
-                std::cout << "unregister" << std::endl;
-            }
-
-            if(ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                // add observer
-                m_interestedObservers.push_back(observationInfo.obsId);
-            }
-            else if(ObserveAction::ObserveUnregister == observationInfo.action)
-            {
-                // delete observer
-                m_interestedObservers.erase(std::remove(
-                                            m_interestedObservers.begin(),
-                                            m_interestedObservers.end(),
-                                            observationInfo.obsId),
-                                            m_interestedObservers.end());
-            }
-            ehResult = OC_EH_OK;
-        }
-    }
-    return ehResult;
-}
-
-
-/*
- * class definition for class that handles /CommsLight
- *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
- * A value of 'true' means that the switch is on.
- * A value of 'false' means that the switch is off.
-*/
-class CommslightResource : public Resource
-{
-    public:
-        /*
-         * constructor
-         *
-         * @param resourceUri the uri for this resource
-         */
-        CommslightResource(std::string resourceUri = "/CommsLight");
-
-        /*
-         * destructor
-         */
-         virtual ~CommslightResource(void);
-
-        /*
-         * Register the resource with the server
-         *
-         * setting resourceProperty as OC_DISCOVERABLE will allow Discovery of this resource
-         * setting resourceProperty as OC_OBSERVABLE will allow observation
-         * setting resourceProperty as OC_DISCOVERABLE | OC_OBSERVABLE will allow both discovery and observation
-         * setting resourceProperty as OC_SECURE the resource supports access via secure endpoints
-         * setting resourceProperty as OC_NONSECURE the resource supports access via non-secure endpoints
-         * setting resourceProperty as OC_SECURE | OC_NONSECURE will allow access via secure and non-secure endpoints
-         *
-         * @param resourceProperty indicates the property of the resource. Defined in octypes.h.
-         */
-        OCStackResult registerResource(uint8_t resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE);
-
-        /*
-         * Attempt to send out notifications to observing clients
-         * if no value on the device has been changed no notification
-         * will be sent.
-         *
-         * @return OC_STACK_OK on success
-         */
-        OCStackResult sendNotification();
-        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-    private:
-
-        /*
-         * Make the payload for the retrieve function (e.g. GET) /CommsLight
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
-         * A value of 'true' means that the switch is on.
-         * A value of 'false' means that the switch is off.
-         * @param queries  the query parameters for this call
-         */
-        OCRepresentation get(OC::QueryParamsMap queries);
-
-        /*
-         * Parse the payload for the update function (e.g. POST) /CommsLight
-
-         * @param queries  the query parameters for this call
-         * @param rep  the response to get the property values from
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        OCEntityHandlerResult post(OC::QueryParamsMap queries, const OC::OCRepresentation& rep);
-
-
-        std::string m_resourceUri;
-        // resource types and interfaces as array..
-        std::string m_RESOURCE_TYPE[1] = {"oic.r.switch.binary"}; // rt value (as an array)
-        std::string m_RESOURCE_INTERFACE[2] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
-        std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
-        ObservationIds m_interestedObservers;
-
-        // member variables for path: "/CommsLight"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
-        std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
-        std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
-        std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
-        std::string m_var_name_value = "value"; // the name for the attribute "value"
-
-    protected:
-        /*
-         * Check if the interface is
-         * @param  interface_name the interface name used during the request
-         * @return true: updatable interface
-         */
-        bool in_updatable_interfaces(std::string interface_name);
-
-        /*
-         * the entity handler for this resource
-         * @param request the incoming request to handle
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request);
-};
-
-/*
-* Constructor code
-*/
-CommslightResource::CommslightResource(std::string resourceUri)
-{
-    std::cout << "- Running: CommslightResource constructor" << std::endl;
-
-    m_resourceUri = resourceUri;
-    // initialize member variables /CommsLight
-    // initialize vector if  The interface set supported by this resource
-    m_var_value_if.push_back("oic.if.baseline");
-    m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
-    m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
-    }
-
-/*
-* Destructor code
-*/
-CommslightResource::~CommslightResource() { }
-
-OCStackResult CommslightResource::registerResource(uint8_t resourceProperty)
-{
-    OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&CommslightResource::entityHandler, this,PH::_1);
-    result = OCPlatform::registerResource(m_resourceHandle,
-                                          m_resourceUri,
-                                          m_RESOURCE_TYPE[0],
-                                          m_RESOURCE_INTERFACE[0],
-                                          cb,
-                                          resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        std::cerr << "Failed to register CommslightResource." << std::endl;
-        return result;
-    }
-
-    /// add the additional resource types
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0])); a++ )
-    {
-        result = OCPlatform::bindTypeToResource(m_resourceHandle, m_RESOURCE_TYPE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind resource type:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-    // add the additional interfaces
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0])); a++)
-    {
-        result = OCPlatform::bindInterfaceToResource(m_resourceHandle, m_RESOURCE_INTERFACE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind interface:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-
-    std::cout << "CommslightResource:" << std::endl;
-    std::cout << "\t" << "# resource interfaces: "
-              << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
-    std::cout << "\t" << "# resource types     : "
-              << sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0]) << std::endl;
-
-    return result;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /CommsLight
-*/
-OCStackResult CommslightResource::sendNotification(void)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        auto pResponse = std::make_shared<OC::OCResourceResponse>();
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /CommsLight
-* @param pResponse  the response to use for the observe
-*/
-OCStackResult CommslightResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-
-/*
-* Make the payload for the retrieve function (e.g. GET) /CommsLight
-* @param queries  the query parameters for this call
-*/
-OCRepresentation CommslightResource::get(QueryParamsMap queries)
-{
-    OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-
-    std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-    std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
-
-    return m_rep;
-}
-
-/*
-* Parse the payload for the update function (e.g. POST) /CommsLight
-* @param queries  the query parameters for this call
-* @param rep  the response to get the property values from
-* @return OCEntityHandlerResult ok or not ok indication
-*/
-OCEntityHandlerResult CommslightResource::post(QueryParamsMap queries, const OCRepresentation& rep)
-{
-    OCEntityHandlerResult ehResult = OC_EH_OK;
-    OC_UNUSED(queries);
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_if))
-        {
-            // value exist in payload
-
-            // check if "if" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_n))
-        {
-            // value exist in payload
-
-            // check if "n" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_rt))
-        {
-            // value exist in payload
-
-            // check if "rt" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    try {
-        if (rep.hasAttribute(m_var_name_value))
-        {
-            // value exist in payload
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    if (ehResult == OC_EH_OK)
-    {
-        // no error: assign the variables
-        // array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_if))
-            {
-                rep.getValue(m_var_name_if, m_var_value_if);
-                int first = 1;
-                std::cout << "\t\t" << "property 'if' UPDATED: " ;
-                for(auto myvar: m_var_value_if)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'if' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            std::string temp;
-            if (rep.getValue(m_var_name_n, temp ))
-            {
-                m_var_value_n = temp;
-                std::cout << "\t\t" << "property 'n' UPDATED: " << m_var_value_n << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'n' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_rt))
-            {
-                rep.getValue(m_var_name_rt, m_var_value_rt);
-                int first = 1;
-                std::cout << "\t\t" << "property 'rt' UPDATED: " ;
-                for(auto myvar: m_var_value_rt)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'rt' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            bool temp;
-            if (rep.getValue(m_var_name_value, temp ))
-            {
-                m_var_value_value = temp;
-                std::cout << "\t\t" << "property 'value' UPDATED: " << ((m_var_value_value) ? "true" : "false") << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'value' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-	    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-	    // the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeCommsLight", 1, testAutomationHat->myParamArgs);
-    }
-    return ehResult;
-}
-/*
-* Check if the interface name is an registered interface name
-*/
-bool CommslightResource::in_updatable_interfaces(std::string interface_name)
-{
-    for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
-    {
-        if (m_IF_UPDATE[i].compare(interface_name) == 0)
-            return true;
-    }
-    return false;
-}
-
-/*
-* the entity handler
-*/
-OCEntityHandlerResult CommslightResource::entityHandler(std::shared_ptr<OCResourceRequest> request)
-{
-    OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for CommslightResource " << std::endl;
-
-    if(request)
-    {
-        std::cout << "In entity handler for CommslightResource, URI is : "
-                  << request->getResourceUri() << std::endl;
-
-        // Check for query params (if any)
-        QueryParamsMap queries = request->getQueryParameters();
-        if (!queries.empty())
-        {
-            std::cout << "\nQuery processing up to entityHandler" << std::endl;
-        }
-        for (auto it : queries)
-        {
-            std::cout << "Query key: " << it.first << " value : " << it.second
-                    << std::endl;
-        }
-        // get the value, so that we can AND it to check which flags are set
-        int requestFlag = request->getRequestHandlerFlag();
-
-        if(requestFlag & RequestHandlerFlag::RequestFlag)
-        {
-            // request flag is set
-            auto pResponse = std::make_shared<OC::OCResourceResponse>();
-            pResponse->setRequestHandle(request->getRequestHandle());
-            pResponse->setResourceHandle(request->getResourceHandle());
-
-            if(request->getRequestType() == "GET")
-            {
-                std::cout<<"CommslightResource Get Request"<< std::endl;
-
-                pResponse->setResourceRepresentation(get(queries), "");
-                if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                {
-                    ehResult = OC_EH_OK;
-                }
-            }
-
-            else if(request->getRequestType() == "POST")
-            {
-                std::cout <<"CommslightResource Post Request"<<std::endl;
-                bool  handle_post = true;
-
-                if (queries.size() > 0)
-                {
-                    for (const auto &eachQuery : queries)
-                    {
-                        std::string key = eachQuery.first;
-                        if (key.compare(INTERFACE_KEY) == 0)
-                        {
-                            std::string value = eachQuery.second;
-                            if (in_updatable_interfaces(value) == false)
-                            {
-                                std::cout << "Update request received via interface: " << value
-                                            << " . This interface is not authorized to update resource!!" << std::endl;
-                                pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_FORBIDDEN);
-                                handle_post = false;
-                                ehResult = OC_EH_ERROR;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (handle_post)
-                {
-                    ehResult = post(queries, request->getResourceRepresentation());
-                    if (ehResult == OC_EH_OK)
-                    {
-                        pResponse->setResourceRepresentation(get(queries), "");
-                        if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                        {
-                            if (OC_STACK_OK != sendNotification(pResponse) )
-                            {
-                                std::cerr << "NOTIFY failed." << std::endl;
-                            }
-                        }
-                    }
-                    else
-                    {
-                         pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_ERROR);
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "CommslightResource unsupported request type (delete,put,..)"
-                    << request->getRequestType() << std::endl;
-                pResponse->setResponseResult(OC_EH_ERROR);
-                OCPlatform::sendResponse(pResponse);
-                ehResult = OC_EH_ERROR;
-            }
-        }
-
-        if(requestFlag & RequestHandlerFlag::ObserverFlag)
-        {
-            // observe flag is set
-            ObservationInfo observationInfo = request->getObservationInfo();
-            std::cout << "\t\trequestFlag : observer ";
-            if (ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                std::cout << "register" << std::endl;
-            }
-            else
-            {
-                std::cout << "unregister" << std::endl;
-            }
-
-            if(ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                // add observer
-                m_interestedObservers.push_back(observationInfo.obsId);
-            }
-            else if(ObserveAction::ObserveUnregister == observationInfo.action)
-            {
-                // delete observer
-                m_interestedObservers.erase(std::remove(
-                                            m_interestedObservers.begin(),
-                                            m_interestedObservers.end(),
-                                            observationInfo.obsId),
-                                            m_interestedObservers.end());
-            }
-            ehResult = OC_EH_OK;
-        }
-    }
-    return ehResult;
-}
-
-
-/*
- * class definition for class that handles /PowerLight
- *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
- * A value of 'true' means that the switch is on.
- * A value of 'false' means that the switch is off.
-*/
-class PowerlightResource : public Resource
-{
-    public:
-        /*
-         * constructor
-         *
-         * @param resourceUri the uri for this resource
-         */
-        PowerlightResource(std::string resourceUri = "/PowerLight");
-
-        /*
-         * destructor
-         */
-         virtual ~PowerlightResource(void);
-
-        /*
-         * Register the resource with the server
-         *
-         * setting resourceProperty as OC_DISCOVERABLE will allow Discovery of this resource
-         * setting resourceProperty as OC_OBSERVABLE will allow observation
-         * setting resourceProperty as OC_DISCOVERABLE | OC_OBSERVABLE will allow both discovery and observation
-         * setting resourceProperty as OC_SECURE the resource supports access via secure endpoints
-         * setting resourceProperty as OC_NONSECURE the resource supports access via non-secure endpoints
-         * setting resourceProperty as OC_SECURE | OC_NONSECURE will allow access via secure and non-secure endpoints
-         *
-         * @param resourceProperty indicates the property of the resource. Defined in octypes.h.
-         */
-        OCStackResult registerResource(uint8_t resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE);
-
-        /*
-         * Attempt to send out notifications to observing clients
-         * if no value on the device has been changed no notification
-         * will be sent.
-         *
-         * @return OC_STACK_OK on success
-         */
-        OCStackResult sendNotification();
-        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-    private:
-
-        /*
-         * Make the payload for the retrieve function (e.g. GET) /PowerLight
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
-         * A value of 'true' means that the switch is on.
-         * A value of 'false' means that the switch is off.
-         * @param queries  the query parameters for this call
-         */
-        OCRepresentation get(OC::QueryParamsMap queries);
-
-        /*
-         * Parse the payload for the update function (e.g. POST) /PowerLight
-
-         * @param queries  the query parameters for this call
-         * @param rep  the response to get the property values from
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        OCEntityHandlerResult post(OC::QueryParamsMap queries, const OC::OCRepresentation& rep);
-
-
-        std::string m_resourceUri;
-        // resource types and interfaces as array..
-        std::string m_RESOURCE_TYPE[1] = {"oic.r.switch.binary"}; // rt value (as an array)
-        std::string m_RESOURCE_INTERFACE[2] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
-        std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
-        ObservationIds m_interestedObservers;
-
-        // member variables for path: "/PowerLight"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
-        std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
-        std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
-        std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
-        std::string m_var_name_value = "value"; // the name for the attribute "value"
-
-    protected:
-        /*
-         * Check if the interface is
-         * @param  interface_name the interface name used during the request
-         * @return true: updatable interface
-         */
-        bool in_updatable_interfaces(std::string interface_name);
-
-        /*
-         * the entity handler for this resource
-         * @param request the incoming request to handle
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request);
-};
-
-/*
-* Constructor code
-*/
-PowerlightResource::PowerlightResource(std::string resourceUri)
-{
-    std::cout << "- Running: PowerlightResource constructor" << std::endl;
-
-    m_resourceUri = resourceUri;
-    // initialize member variables /PowerLight
-    // initialize vector if  The interface set supported by this resource
-    m_var_value_if.push_back("oic.if.baseline");
-    m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
-    m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
-    }
-
-/*
-* Destructor code
-*/
-PowerlightResource::~PowerlightResource() { }
-
-OCStackResult PowerlightResource::registerResource(uint8_t resourceProperty)
-{
-    OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&PowerlightResource::entityHandler, this,PH::_1);
-    result = OCPlatform::registerResource(m_resourceHandle,
-                                          m_resourceUri,
-                                          m_RESOURCE_TYPE[0],
-                                          m_RESOURCE_INTERFACE[0],
-                                          cb,
-                                          resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        std::cerr << "Failed to register PowerlightResource." << std::endl;
-        return result;
-    }
-
-    /// add the additional resource types
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0])); a++ )
-    {
-        result = OCPlatform::bindTypeToResource(m_resourceHandle, m_RESOURCE_TYPE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind resource type:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-    // add the additional interfaces
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0])); a++)
-    {
-        result = OCPlatform::bindInterfaceToResource(m_resourceHandle, m_RESOURCE_INTERFACE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind interface:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-
-    std::cout << "PowerlightResource:" << std::endl;
-    std::cout << "\t" << "# resource interfaces: "
-              << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
-    std::cout << "\t" << "# resource types     : "
-              << sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0]) << std::endl;
-
-    return result;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /PowerLight
-*/
-OCStackResult PowerlightResource::sendNotification(void)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        auto pResponse = std::make_shared<OC::OCResourceResponse>();
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /PowerLight
-* @param pResponse  the response to use for the observe
-*/
-OCStackResult PowerlightResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-
-/*
-* Make the payload for the retrieve function (e.g. GET) /PowerLight
-* @param queries  the query parameters for this call
-*/
-OCRepresentation PowerlightResource::get(QueryParamsMap queries)
-{
-    OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-
-    std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-    std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
-
-    return m_rep;
-}
-
-/*
-* Parse the payload for the update function (e.g. POST) /PowerLight
-* @param queries  the query parameters for this call
-* @param rep  the response to get the property values from
-* @return OCEntityHandlerResult ok or not ok indication
-*/
-OCEntityHandlerResult PowerlightResource::post(QueryParamsMap queries, const OCRepresentation& rep)
-{
-    OCEntityHandlerResult ehResult = OC_EH_OK;
-    OC_UNUSED(queries);
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_if))
-        {
-            // value exist in payload
-
-            // check if "if" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_n))
-        {
-            // value exist in payload
-
-            // check if "n" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_rt))
-        {
-            // value exist in payload
-
-            // check if "rt" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    try {
-        if (rep.hasAttribute(m_var_name_value))
-        {
-            // value exist in payload
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    if (ehResult == OC_EH_OK)
-    {
-        // no error: assign the variables
-        // array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_if))
-            {
-                rep.getValue(m_var_name_if, m_var_value_if);
-                int first = 1;
-                std::cout << "\t\t" << "property 'if' UPDATED: " ;
-                for(auto myvar: m_var_value_if)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'if' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            std::string temp;
-            if (rep.getValue(m_var_name_n, temp ))
-            {
-                m_var_value_n = temp;
-                std::cout << "\t\t" << "property 'n' UPDATED: " << m_var_value_n << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'n' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_rt))
-            {
-                rep.getValue(m_var_name_rt, m_var_value_rt);
-                int first = 1;
-                std::cout << "\t\t" << "property 'rt' UPDATED: " ;
-                for(auto myvar: m_var_value_rt)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'rt' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            bool temp;
-            if (rep.getValue(m_var_name_value, temp ))
-            {
-                m_var_value_value = temp;
-                std::cout << "\t\t" << "property 'value' UPDATED: " << ((m_var_value_value) ? "true" : "false") << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'value' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-	    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	    // one can use the member variables as input to those calls
-	    // the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writePowerLight", 1, testAutomationHat->myParamArgs);
-    }
-    return ehResult;
-}
-/*
-* Check if the interface name is an registered interface name
-*/
-bool PowerlightResource::in_updatable_interfaces(std::string interface_name)
-{
-    for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
-    {
-        if (m_IF_UPDATE[i].compare(interface_name) == 0)
-            return true;
-    }
-    return false;
-}
-
-/*
-* the entity handler
-*/
-OCEntityHandlerResult PowerlightResource::entityHandler(std::shared_ptr<OCResourceRequest> request)
-{
-    OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for PowerlightResource " << std::endl;
-
-    if(request)
-    {
-        std::cout << "In entity handler for PowerlightResource, URI is : "
-                  << request->getResourceUri() << std::endl;
-
-        // Check for query params (if any)
-        QueryParamsMap queries = request->getQueryParameters();
-        if (!queries.empty())
-        {
-            std::cout << "\nQuery processing up to entityHandler" << std::endl;
-        }
-        for (auto it : queries)
-        {
-            std::cout << "Query key: " << it.first << " value : " << it.second
-                    << std::endl;
-        }
-        // get the value, so that we can AND it to check which flags are set
-        int requestFlag = request->getRequestHandlerFlag();
-
-        if(requestFlag & RequestHandlerFlag::RequestFlag)
-        {
-            // request flag is set
-            auto pResponse = std::make_shared<OC::OCResourceResponse>();
-            pResponse->setRequestHandle(request->getRequestHandle());
-            pResponse->setResourceHandle(request->getResourceHandle());
-
-            if(request->getRequestType() == "GET")
-            {
-                std::cout<<"PowerlightResource Get Request"<< std::endl;
-
-                pResponse->setResourceRepresentation(get(queries), "");
-                if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                {
-                    ehResult = OC_EH_OK;
-                }
-            }
-
-            else if(request->getRequestType() == "POST")
-            {
-                std::cout <<"PowerlightResource Post Request"<<std::endl;
-                bool  handle_post = true;
-
-                if (queries.size() > 0)
-                {
-                    for (const auto &eachQuery : queries)
-                    {
-                        std::string key = eachQuery.first;
-                        if (key.compare(INTERFACE_KEY) == 0)
-                        {
-                            std::string value = eachQuery.second;
-                            if (in_updatable_interfaces(value) == false)
-                            {
-                                std::cout << "Update request received via interface: " << value
-                                            << " . This interface is not authorized to update resource!!" << std::endl;
-                                pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_FORBIDDEN);
-                                handle_post = false;
-                                ehResult = OC_EH_ERROR;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (handle_post)
-                {
-                    ehResult = post(queries, request->getResourceRepresentation());
-                    if (ehResult == OC_EH_OK)
-                    {
-                        pResponse->setResourceRepresentation(get(queries), "");
-                        if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                        {
-                            if (OC_STACK_OK != sendNotification(pResponse) )
-                            {
-                                std::cerr << "NOTIFY failed." << std::endl;
-                            }
-                        }
-                    }
-                    else
-                    {
-                         pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_ERROR);
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "PowerlightResource unsupported request type (delete,put,..)"
-                    << request->getRequestType() << std::endl;
-                pResponse->setResponseResult(OC_EH_ERROR);
-                OCPlatform::sendResponse(pResponse);
-                ehResult = OC_EH_ERROR;
-            }
-        }
-
-        if(requestFlag & RequestHandlerFlag::ObserverFlag)
-        {
-            // observe flag is set
-            ObservationInfo observationInfo = request->getObservationInfo();
-            std::cout << "\t\trequestFlag : observer ";
-            if (ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                std::cout << "register" << std::endl;
-            }
-            else
-            {
-                std::cout << "unregister" << std::endl;
-            }
-
-            if(ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                // add observer
-                m_interestedObservers.push_back(observationInfo.obsId);
-            }
-            else if(ObserveAction::ObserveUnregister == observationInfo.action)
-            {
-                // delete observer
-                m_interestedObservers.erase(std::remove(
-                                            m_interestedObservers.begin(),
-                                            m_interestedObservers.end(),
-                                            observationInfo.obsId),
-                                            m_interestedObservers.end());
-            }
-            ehResult = OC_EH_OK;
-        }
-    }
-    return ehResult;
-}
-
-
-/*
- * class definition for class that handles /WarnLight
- *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
- * A value of 'true' means that the switch is on.
- * A value of 'false' means that the switch is off.
-*/
-class WarnlightResource : public Resource
-{
-    public:
-        /*
-         * constructor
-         *
-         * @param resourceUri the uri for this resource
-         */
-        WarnlightResource(std::string resourceUri = "/WarnLight");
-
-        /*
-         * destructor
-         */
-         virtual ~WarnlightResource(void);
-
-        /*
-         * Register the resource with the server
-         *
-         * setting resourceProperty as OC_DISCOVERABLE will allow Discovery of this resource
-         * setting resourceProperty as OC_OBSERVABLE will allow observation
-         * setting resourceProperty as OC_DISCOVERABLE | OC_OBSERVABLE will allow both discovery and observation
-         * setting resourceProperty as OC_SECURE the resource supports access via secure endpoints
-         * setting resourceProperty as OC_NONSECURE the resource supports access via non-secure endpoints
-         * setting resourceProperty as OC_SECURE | OC_NONSECURE will allow access via secure and non-secure endpoints
-         *
-         * @param resourceProperty indicates the property of the resource. Defined in octypes.h.
-         */
-        OCStackResult registerResource(uint8_t resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE);
-
-        /*
-         * Attempt to send out notifications to observing clients
-         * if no value on the device has been changed no notification
-         * will be sent.
-         *
-         * @return OC_STACK_OK on success
-         */
-        OCStackResult sendNotification();
-        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-    private:
-
-        /*
-         * Make the payload for the retrieve function (e.g. GET) /WarnLight
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
-         * A value of 'true' means that the switch is on.
-         * A value of 'false' means that the switch is off.
-         * @param queries  the query parameters for this call
-         */
-        OCRepresentation get(OC::QueryParamsMap queries);
-
-        /*
-         * Parse the payload for the update function (e.g. POST) /WarnLight
-
-         * @param queries  the query parameters for this call
-         * @param rep  the response to get the property values from
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        OCEntityHandlerResult post(OC::QueryParamsMap queries, const OC::OCRepresentation& rep);
-
-
-        std::string m_resourceUri;
-        // resource types and interfaces as array..
-        std::string m_RESOURCE_TYPE[1] = {"oic.r.switch.binary"}; // rt value (as an array)
-        std::string m_RESOURCE_INTERFACE[2] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
-        std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
-        ObservationIds m_interestedObservers;
-
-        // member variables for path: "/WarnLight"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
-        std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
-        std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
-        std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
-        std::string m_var_name_value = "value"; // the name for the attribute "value"
-
-    protected:
-        /*
-         * Check if the interface is
-         * @param  interface_name the interface name used during the request
-         * @return true: updatable interface
-         */
-        bool in_updatable_interfaces(std::string interface_name);
-
-        /*
-         * the entity handler for this resource
-         * @param request the incoming request to handle
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request);
-};
-
-/*
-* Constructor code
-*/
-WarnlightResource::WarnlightResource(std::string resourceUri)
-{
-    std::cout << "- Running: WarnlightResource constructor" << std::endl;
-
-    m_resourceUri = resourceUri;
-    // initialize member variables /WarnLight
-    // initialize vector if  The interface set supported by this resource
-    m_var_value_if.push_back("oic.if.baseline");
-    m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
-    m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
-    }
-
-/*
-* Destructor code
-*/
-WarnlightResource::~WarnlightResource() { }
-
-OCStackResult WarnlightResource::registerResource(uint8_t resourceProperty)
-{
-    OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&WarnlightResource::entityHandler, this,PH::_1);
-    result = OCPlatform::registerResource(m_resourceHandle,
-                                          m_resourceUri,
-                                          m_RESOURCE_TYPE[0],
-                                          m_RESOURCE_INTERFACE[0],
-                                          cb,
-                                          resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        std::cerr << "Failed to register WarnlightResource." << std::endl;
-        return result;
-    }
-
-    /// add the additional resource types
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0])); a++ )
-    {
-        result = OCPlatform::bindTypeToResource(m_resourceHandle, m_RESOURCE_TYPE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind resource type:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-    // add the additional interfaces
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0])); a++)
-    {
-        result = OCPlatform::bindInterfaceToResource(m_resourceHandle, m_RESOURCE_INTERFACE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind interface:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-
-    std::cout << "WarnlightResource:" << std::endl;
-    std::cout << "\t" << "# resource interfaces: "
-              << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
-    std::cout << "\t" << "# resource types     : "
-              << sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0]) << std::endl;
-
-    return result;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /WarnLight
-*/
-OCStackResult WarnlightResource::sendNotification(void)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        auto pResponse = std::make_shared<OC::OCResourceResponse>();
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /WarnLight
-* @param pResponse  the response to use for the observe
-*/
-OCStackResult WarnlightResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-
-/*
-* Make the payload for the retrieve function (e.g. GET) /WarnLight
-* @param queries  the query parameters for this call
-*/
-OCRepresentation WarnlightResource::get(QueryParamsMap queries)
-{
-    OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-
-    std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-    std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
-
-    return m_rep;
-}
-
-/*
-* Parse the payload for the update function (e.g. POST) /WarnLight
-* @param queries  the query parameters for this call
-* @param rep  the response to get the property values from
-* @return OCEntityHandlerResult ok or not ok indication
-*/
-OCEntityHandlerResult WarnlightResource::post(QueryParamsMap queries, const OCRepresentation& rep)
-{
-    OCEntityHandlerResult ehResult = OC_EH_OK;
-    OC_UNUSED(queries);
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_if))
-        {
-            // value exist in payload
-
-            // check if "if" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_n))
-        {
-            // value exist in payload
-
-            // check if "n" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_rt))
-        {
-            // value exist in payload
-
-            // check if "rt" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    try {
-        if (rep.hasAttribute(m_var_name_value))
-        {
-            // value exist in payload
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    if (ehResult == OC_EH_OK)
-    {
-        // no error: assign the variables
-        // array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_if))
-            {
-                rep.getValue(m_var_name_if, m_var_value_if);
-                int first = 1;
-                std::cout << "\t\t" << "property 'if' UPDATED: " ;
-                for(auto myvar: m_var_value_if)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'if' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            std::string temp;
-            if (rep.getValue(m_var_name_n, temp ))
-            {
-                m_var_value_n = temp;
-                std::cout << "\t\t" << "property 'n' UPDATED: " << m_var_value_n << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'n' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_rt))
-            {
-                rep.getValue(m_var_name_rt, m_var_value_rt);
-                int first = 1;
-                std::cout << "\t\t" << "property 'rt' UPDATED: " ;
-                for(auto myvar: m_var_value_rt)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'rt' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            bool temp;
-            if (rep.getValue(m_var_name_value, temp ))
-            {
-                m_var_value_value = temp;
-                std::cout << "\t\t" << "property 'value' UPDATED: " << ((m_var_value_value) ? "true" : "false") << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'value' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-    	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-    	// the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeWarnLight", 1, testAutomationHat->myParamArgs);
-    }
-    return ehResult;
-}
-/*
-* Check if the interface name is an registered interface name
-*/
-bool WarnlightResource::in_updatable_interfaces(std::string interface_name)
-{
-    for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
-    {
-        if (m_IF_UPDATE[i].compare(interface_name) == 0)
-            return true;
-    }
-    return false;
-}
-
-/*
-* the entity handler
-*/
-OCEntityHandlerResult WarnlightResource::entityHandler(std::shared_ptr<OCResourceRequest> request)
-{
-    OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for WarnlightResource " << std::endl;
-
-    if(request)
-    {
-        std::cout << "In entity handler for WarnlightResource, URI is : "
-                  << request->getResourceUri() << std::endl;
-
-        // Check for query params (if any)
-        QueryParamsMap queries = request->getQueryParameters();
-        if (!queries.empty())
-        {
-            std::cout << "\nQuery processing up to entityHandler" << std::endl;
-        }
-        for (auto it : queries)
-        {
-            std::cout << "Query key: " << it.first << " value : " << it.second
-                    << std::endl;
-        }
-        // get the value, so that we can AND it to check which flags are set
-        int requestFlag = request->getRequestHandlerFlag();
-
-        if(requestFlag & RequestHandlerFlag::RequestFlag)
-        {
-            // request flag is set
-            auto pResponse = std::make_shared<OC::OCResourceResponse>();
-            pResponse->setRequestHandle(request->getRequestHandle());
-            pResponse->setResourceHandle(request->getResourceHandle());
-
-            if(request->getRequestType() == "GET")
-            {
-                std::cout<<"WarnlightResource Get Request"<< std::endl;
-
-                pResponse->setResourceRepresentation(get(queries), "");
-                if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                {
-                    ehResult = OC_EH_OK;
-                }
-            }
-
-            else if(request->getRequestType() == "POST")
-            {
-                std::cout <<"WarnlightResource Post Request"<<std::endl;
-                bool  handle_post = true;
-
-                if (queries.size() > 0)
-                {
-                    for (const auto &eachQuery : queries)
-                    {
-                        std::string key = eachQuery.first;
-                        if (key.compare(INTERFACE_KEY) == 0)
-                        {
-                            std::string value = eachQuery.second;
-                            if (in_updatable_interfaces(value) == false)
-                            {
-                                std::cout << "Update request received via interface: " << value
-                                            << " . This interface is not authorized to update resource!!" << std::endl;
-                                pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_FORBIDDEN);
-                                handle_post = false;
-                                ehResult = OC_EH_ERROR;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (handle_post)
-                {
-                    ehResult = post(queries, request->getResourceRepresentation());
-                    if (ehResult == OC_EH_OK)
-                    {
-                        pResponse->setResourceRepresentation(get(queries), "");
-                        if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                        {
-                            if (OC_STACK_OK != sendNotification(pResponse) )
-                            {
-                                std::cerr << "NOTIFY failed." << std::endl;
-                            }
-                        }
-                    }
-                    else
-                    {
-                         pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_ERROR);
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "WarnlightResource unsupported request type (delete,put,..)"
-                    << request->getRequestType() << std::endl;
-                pResponse->setResponseResult(OC_EH_ERROR);
-                OCPlatform::sendResponse(pResponse);
-                ehResult = OC_EH_ERROR;
-            }
-        }
-
-        if(requestFlag & RequestHandlerFlag::ObserverFlag)
-        {
-            // observe flag is set
-            ObservationInfo observationInfo = request->getObservationInfo();
-            std::cout << "\t\trequestFlag : observer ";
-            if (ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3269,7 +1489,7 @@ class Input1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3395,21 +1615,18 @@ OCStackResult Input1Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Input1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testAutomationHat->myParamArgs[0] = 1;
-    testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, testAutomationHat->myParamArgs);
-    m_var_value_value = (bool)testAutomationHat->returnLong;
+	
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -3487,8 +1704,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3590,7 +1807,7 @@ class Input2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3716,21 +1933,18 @@ OCStackResult Input2Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Input2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testAutomationHat->myParamArgs[0] = 2;
-    testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, testAutomationHat->myParamArgs);
-    m_var_value_value = (bool)testAutomationHat->returnLong;
+	
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -3808,8 +2022,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3911,7 +2125,7 @@ class Input3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -4037,21 +2251,18 @@ OCStackResult Input3Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Input3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testAutomationHat->myParamArgs[0] = 3;
-    testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, testAutomationHat->myParamArgs);
-    m_var_value_value = (bool)testAutomationHat->returnLong;
+	
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -4129,8 +2340,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -4241,7 +2452,7 @@ class Output1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -4367,18 +2578,18 @@ OCStackResult Output1Resource::sendNotification(const std::shared_ptr< OCResourc
 OCRepresentation Output1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -4393,52 +2604,52 @@ OCEntityHandlerResult Output1Resource::post(QueryParamsMap queries, const OCRepr
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -4449,7 +2660,7 @@ OCEntityHandlerResult Output1Resource::post(QueryParamsMap queries, const OCRepr
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -4553,12 +2764,9 @@ OCEntityHandlerResult Output1Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-    	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-    	// the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = 1;
-      testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -4682,8 +2890,8 @@ OCEntityHandlerResult Output1Resource::entityHandler(std::shared_ptr<OCResourceR
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -4794,7 +3002,7 @@ class Output2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -4920,18 +3128,18 @@ OCStackResult Output2Resource::sendNotification(const std::shared_ptr< OCResourc
 OCRepresentation Output2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -4946,52 +3154,52 @@ OCEntityHandlerResult Output2Resource::post(QueryParamsMap queries, const OCRepr
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -5002,7 +3210,7 @@ OCEntityHandlerResult Output2Resource::post(QueryParamsMap queries, const OCRepr
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -5106,12 +3314,9 @@ OCEntityHandlerResult Output2Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 2;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -5235,8 +3440,8 @@ OCEntityHandlerResult Output2Resource::entityHandler(std::shared_ptr<OCResourceR
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -5347,7 +3552,7 @@ class Output3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -5473,18 +3678,18 @@ OCStackResult Output3Resource::sendNotification(const std::shared_ptr< OCResourc
 OCRepresentation Output3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -5499,52 +3704,52 @@ OCEntityHandlerResult Output3Resource::post(QueryParamsMap queries, const OCRepr
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -5555,7 +3760,7 @@ OCEntityHandlerResult Output3Resource::post(QueryParamsMap queries, const OCRepr
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -5659,12 +3864,9 @@ OCEntityHandlerResult Output3Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 3;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -5788,8 +3990,8 @@ OCEntityHandlerResult Output3Resource::entityHandler(std::shared_ptr<OCResourceR
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -5817,14 +4019,14 @@ OCEntityHandlerResult Output3Resource::entityHandler(std::shared_ptr<OCResourceR
 
 
 /*
- * class definition for class that handles /relay1
+ * class definition for class that handles /relay
  *
  * This resource describes a binary switch (on/off).
  * The value is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
-class Relay1Resource : public Resource
+class RelayResource : public Resource
 {
     public:
         /*
@@ -5832,12 +4034,12 @@ class Relay1Resource : public Resource
          *
          * @param resourceUri the uri for this resource
          */
-        Relay1Resource(std::string resourceUri = "/relay1");
+        RelayResource(std::string resourceUri = "/relay");
 
         /*
          * destructor
          */
-         virtual ~Relay1Resource(void);
+         virtual ~RelayResource(void);
 
         /*
          * Register the resource with the server
@@ -5865,7 +4067,7 @@ class Relay1Resource : public Resource
     private:
 
         /*
-         * Make the payload for the retrieve function (e.g. GET) /relay1
+         * Make the payload for the retrieve function (e.g. GET) /relay
          * This resource describes a binary switch (on/off).
          * The value is a boolean.
          * A value of 'true' means that the switch is on.
@@ -5875,7 +4077,7 @@ class Relay1Resource : public Resource
         OCRepresentation get(OC::QueryParamsMap queries);
 
         /*
-         * Parse the payload for the update function (e.g. POST) /relay1
+         * Parse the payload for the update function (e.g. POST) /relay
 
          * @param queries  the query parameters for this call
          * @param rep  the response to get the property values from
@@ -5891,7 +4093,7 @@ class Relay1Resource : public Resource
         std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
         ObservationIds m_interestedObservers;
 
-        // member variables for path: "/relay1"
+        // member variables for path: "/relay"
         std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
         std::string m_var_name_if = "if"; // the name for the attribute "if"
         std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
@@ -5900,7 +4102,7 @@ class Relay1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -5920,12 +4122,12 @@ class Relay1Resource : public Resource
 /*
 * Constructor code
 */
-Relay1Resource::Relay1Resource(std::string resourceUri)
+RelayResource::RelayResource(std::string resourceUri)
 {
-    std::cout << "- Running: Relay1Resource constructor" << std::endl;
+    std::cout << "- Running: RelayResource constructor" << std::endl;
 
     m_resourceUri = resourceUri;
-    // initialize member variables /relay1
+    // initialize member variables /relay
     // initialize vector if  The interface set supported by this resource
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
@@ -5938,12 +4140,12 @@ Relay1Resource::Relay1Resource(std::string resourceUri)
 /*
 * Destructor code
 */
-Relay1Resource::~Relay1Resource() { }
+RelayResource::~RelayResource() { }
 
-OCStackResult Relay1Resource::registerResource(uint8_t resourceProperty)
+OCStackResult RelayResource::registerResource(uint8_t resourceProperty)
 {
     OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&Relay1Resource::entityHandler, this,PH::_1);
+    EntityHandler cb = std::bind(&RelayResource::entityHandler, this,PH::_1);
     result = OCPlatform::registerResource(m_resourceHandle,
                                           m_resourceUri,
                                           m_RESOURCE_TYPE[0],
@@ -5952,7 +4154,7 @@ OCStackResult Relay1Resource::registerResource(uint8_t resourceProperty)
                                           resourceProperty);
     if(OC_STACK_OK != result)
     {
-        std::cerr << "Failed to register Relay1Resource." << std::endl;
+        std::cerr << "Failed to register RelayResource." << std::endl;
         return result;
     }
 
@@ -5977,7 +4179,7 @@ OCStackResult Relay1Resource::registerResource(uint8_t resourceProperty)
         }
     }
 
-    std::cout << "Relay1Resource:" << std::endl;
+    std::cout << "RelayResource:" << std::endl;
     std::cout << "\t" << "# resource interfaces: "
               << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
     std::cout << "\t" << "# resource types     : "
@@ -5987,9 +4189,9 @@ OCStackResult Relay1Resource::registerResource(uint8_t resourceProperty)
 }
 
 /*
-* Make the payload for the observe function (e.g. GET) /relay1
+* Make the payload for the observe function (e.g. GET) /relay
 */
-OCStackResult Relay1Resource::sendNotification(void)
+OCStackResult RelayResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
     if ( m_interestedObservers.size() > 0) {
@@ -6003,10 +4205,10 @@ OCStackResult Relay1Resource::sendNotification(void)
 }
 
 /*
-* Make the payload for the observe function (e.g. GET) /relay1
+* Make the payload for the observe function (e.g. GET) /relay
 * @param pResponse  the response to use for the observe
 */
-OCStackResult Relay1Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+OCStackResult RelayResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
 {
     OCStackResult sResult = OC_STACK_OK;
     if ( m_interestedObservers.size() > 0) {
@@ -6020,84 +4222,84 @@ OCStackResult Relay1Resource::sendNotification(const std::shared_ptr< OCResource
 
 
 /*
-* Make the payload for the retrieve function (e.g. GET) /relay1
+* Make the payload for the retrieve function (e.g. GET) /relay
 * @param queries  the query parameters for this call
 */
-OCRepresentation Relay1Resource::get(QueryParamsMap queries)
+OCRepresentation RelayResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
 
 /*
-* Parse the payload for the update function (e.g. POST) /relay1
+* Parse the payload for the update function (e.g. POST) /relay
 * @param queries  the query parameters for this call
 * @param rep  the response to get the property values from
 * @return OCEntityHandlerResult ok or not ok indication
 */
-OCEntityHandlerResult Relay1Resource::post(QueryParamsMap queries, const OCRepresentation& rep)
+OCEntityHandlerResult RelayResource::post(QueryParamsMap queries, const OCRepresentation& rep)
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -6108,7 +4310,7 @@ OCEntityHandlerResult Relay1Resource::post(QueryParamsMap queries, const OCRepre
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -6212,19 +4414,16 @@ OCEntityHandlerResult Relay1Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-    	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-    	// the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = 1;
-      testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
 /*
 * Check if the interface name is an registered interface name
 */
-bool Relay1Resource::in_updatable_interfaces(std::string interface_name)
+bool RelayResource::in_updatable_interfaces(std::string interface_name)
 {
     for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
     {
@@ -6237,14 +4436,14 @@ bool Relay1Resource::in_updatable_interfaces(std::string interface_name)
 /*
 * the entity handler
 */
-OCEntityHandlerResult Relay1Resource::entityHandler(std::shared_ptr<OCResourceRequest> request)
+OCEntityHandlerResult RelayResource::entityHandler(std::shared_ptr<OCResourceRequest> request)
 {
     OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for Relay1Resource " << std::endl;
+    //std::cout << "In entity handler for RelayResource " << std::endl;
 
     if(request)
     {
-        std::cout << "In entity handler for Relay1Resource, URI is : "
+        std::cout << "In entity handler for RelayResource, URI is : "
                   << request->getResourceUri() << std::endl;
 
         // Check for query params (if any)
@@ -6270,7 +4469,7 @@ OCEntityHandlerResult Relay1Resource::entityHandler(std::shared_ptr<OCResourceRe
 
             if(request->getRequestType() == "GET")
             {
-                std::cout<<"Relay1Resource Get Request"<< std::endl;
+                std::cout<<"RelayResource Get Request"<< std::endl;
 
                 pResponse->setResourceRepresentation(get(queries), "");
                 if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
@@ -6281,7 +4480,7 @@ OCEntityHandlerResult Relay1Resource::entityHandler(std::shared_ptr<OCResourceRe
 
             else if(request->getRequestType() == "POST")
             {
-                std::cout <<"Relay1Resource Post Request"<<std::endl;
+                std::cout <<"RelayResource Post Request"<<std::endl;
                 bool  handle_post = true;
 
                 if (queries.size() > 0)
@@ -6326,7 +4525,7 @@ OCEntityHandlerResult Relay1Resource::entityHandler(std::shared_ptr<OCResourceRe
             }
             else
             {
-                std::cout << "Relay1Resource unsupported request type (delete,put,..)"
+                std::cout << "RelayResource unsupported request type (delete,put,..)"
                     << request->getRequestType() << std::endl;
                 pResponse->setResponseResult(OC_EH_ERROR);
                 OCPlatform::sendResponse(pResponse);
@@ -6341,1114 +4540,8 @@ OCEntityHandlerResult Relay1Resource::entityHandler(std::shared_ptr<OCResourceRe
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
-            else
-            {
-                std::cout << "unregister" << std::endl;
-            }
-
-            if(ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                // add observer
-                m_interestedObservers.push_back(observationInfo.obsId);
-            }
-            else if(ObserveAction::ObserveUnregister == observationInfo.action)
-            {
-                // delete observer
-                m_interestedObservers.erase(std::remove(
-                                            m_interestedObservers.begin(),
-                                            m_interestedObservers.end(),
-                                            observationInfo.obsId),
-                                            m_interestedObservers.end());
-            }
-            ehResult = OC_EH_OK;
-        }
-    }
-    return ehResult;
-}
-
-
-/*
- * class definition for class that handles /relay2
- *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
- * A value of 'true' means that the switch is on.
- * A value of 'false' means that the switch is off.
-*/
-class Relay2Resource : public Resource
-{
-    public:
-        /*
-         * constructor
-         *
-         * @param resourceUri the uri for this resource
-         */
-        Relay2Resource(std::string resourceUri = "/relay2");
-
-        /*
-         * destructor
-         */
-         virtual ~Relay2Resource(void);
-
-        /*
-         * Register the resource with the server
-         *
-         * setting resourceProperty as OC_DISCOVERABLE will allow Discovery of this resource
-         * setting resourceProperty as OC_OBSERVABLE will allow observation
-         * setting resourceProperty as OC_DISCOVERABLE | OC_OBSERVABLE will allow both discovery and observation
-         * setting resourceProperty as OC_SECURE the resource supports access via secure endpoints
-         * setting resourceProperty as OC_NONSECURE the resource supports access via non-secure endpoints
-         * setting resourceProperty as OC_SECURE | OC_NONSECURE will allow access via secure and non-secure endpoints
-         *
-         * @param resourceProperty indicates the property of the resource. Defined in octypes.h.
-         */
-        OCStackResult registerResource(uint8_t resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE);
-
-        /*
-         * Attempt to send out notifications to observing clients
-         * if no value on the device has been changed no notification
-         * will be sent.
-         *
-         * @return OC_STACK_OK on success
-         */
-        OCStackResult sendNotification();
-        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-    private:
-
-        /*
-         * Make the payload for the retrieve function (e.g. GET) /relay2
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
-         * A value of 'true' means that the switch is on.
-         * A value of 'false' means that the switch is off.
-         * @param queries  the query parameters for this call
-         */
-        OCRepresentation get(OC::QueryParamsMap queries);
-
-        /*
-         * Parse the payload for the update function (e.g. POST) /relay2
-
-         * @param queries  the query parameters for this call
-         * @param rep  the response to get the property values from
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        OCEntityHandlerResult post(OC::QueryParamsMap queries, const OC::OCRepresentation& rep);
-
-
-        std::string m_resourceUri;
-        // resource types and interfaces as array..
-        std::string m_RESOURCE_TYPE[1] = {"oic.r.switch.binary"}; // rt value (as an array)
-        std::string m_RESOURCE_INTERFACE[2] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
-        std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
-        ObservationIds m_interestedObservers;
-
-        // member variables for path: "/relay2"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
-        std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
-        std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
-        std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
-        std::string m_var_name_value = "value"; // the name for the attribute "value"
-
-    protected:
-        /*
-         * Check if the interface is
-         * @param  interface_name the interface name used during the request
-         * @return true: updatable interface
-         */
-        bool in_updatable_interfaces(std::string interface_name);
-
-        /*
-         * the entity handler for this resource
-         * @param request the incoming request to handle
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request);
-};
-
-/*
-* Constructor code
-*/
-Relay2Resource::Relay2Resource(std::string resourceUri)
-{
-    std::cout << "- Running: Relay2Resource constructor" << std::endl;
-
-    m_resourceUri = resourceUri;
-    // initialize member variables /relay2
-    // initialize vector if  The interface set supported by this resource
-    m_var_value_if.push_back("oic.if.baseline");
-    m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
-    m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
-    }
-
-/*
-* Destructor code
-*/
-Relay2Resource::~Relay2Resource() { }
-
-OCStackResult Relay2Resource::registerResource(uint8_t resourceProperty)
-{
-    OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&Relay2Resource::entityHandler, this,PH::_1);
-    result = OCPlatform::registerResource(m_resourceHandle,
-                                          m_resourceUri,
-                                          m_RESOURCE_TYPE[0],
-                                          m_RESOURCE_INTERFACE[0],
-                                          cb,
-                                          resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        std::cerr << "Failed to register Relay2Resource." << std::endl;
-        return result;
-    }
-
-    /// add the additional resource types
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0])); a++ )
-    {
-        result = OCPlatform::bindTypeToResource(m_resourceHandle, m_RESOURCE_TYPE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind resource type:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-    // add the additional interfaces
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0])); a++)
-    {
-        result = OCPlatform::bindInterfaceToResource(m_resourceHandle, m_RESOURCE_INTERFACE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind interface:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-
-    std::cout << "Relay2Resource:" << std::endl;
-    std::cout << "\t" << "# resource interfaces: "
-              << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
-    std::cout << "\t" << "# resource types     : "
-              << sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0]) << std::endl;
-
-    return result;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /relay2
-*/
-OCStackResult Relay2Resource::sendNotification(void)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        auto pResponse = std::make_shared<OC::OCResourceResponse>();
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /relay2
-* @param pResponse  the response to use for the observe
-*/
-OCStackResult Relay2Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-
-/*
-* Make the payload for the retrieve function (e.g. GET) /relay2
-* @param queries  the query parameters for this call
-*/
-OCRepresentation Relay2Resource::get(QueryParamsMap queries)
-{
-    OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-
-    std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-    std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
-
-    return m_rep;
-}
-
-/*
-* Parse the payload for the update function (e.g. POST) /relay2
-* @param queries  the query parameters for this call
-* @param rep  the response to get the property values from
-* @return OCEntityHandlerResult ok or not ok indication
-*/
-OCEntityHandlerResult Relay2Resource::post(QueryParamsMap queries, const OCRepresentation& rep)
-{
-    OCEntityHandlerResult ehResult = OC_EH_OK;
-    OC_UNUSED(queries);
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_if))
-        {
-            // value exist in payload
-
-            // check if "if" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_n))
-        {
-            // value exist in payload
-
-            // check if "n" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_rt))
-        {
-            // value exist in payload
-
-            // check if "rt" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    try {
-        if (rep.hasAttribute(m_var_name_value))
-        {
-            // value exist in payload
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    if (ehResult == OC_EH_OK)
-    {
-        // no error: assign the variables
-        // array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_if))
-            {
-                rep.getValue(m_var_name_if, m_var_value_if);
-                int first = 1;
-                std::cout << "\t\t" << "property 'if' UPDATED: " ;
-                for(auto myvar: m_var_value_if)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'if' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            std::string temp;
-            if (rep.getValue(m_var_name_n, temp ))
-            {
-                m_var_value_n = temp;
-                std::cout << "\t\t" << "property 'n' UPDATED: " << m_var_value_n << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'n' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_rt))
-            {
-                rep.getValue(m_var_name_rt, m_var_value_rt);
-                int first = 1;
-                std::cout << "\t\t" << "property 'rt' UPDATED: " ;
-                for(auto myvar: m_var_value_rt)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'rt' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            bool temp;
-            if (rep.getValue(m_var_name_value, temp ))
-            {
-                m_var_value_value = temp;
-                std::cout << "\t\t" << "property 'value' UPDATED: " << ((m_var_value_value) ? "true" : "false") << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'value' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 2;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, testAutomationHat->myParamArgs);
-    }
-    return ehResult;
-}
-/*
-* Check if the interface name is an registered interface name
-*/
-bool Relay2Resource::in_updatable_interfaces(std::string interface_name)
-{
-    for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
-    {
-        if (m_IF_UPDATE[i].compare(interface_name) == 0)
-            return true;
-    }
-    return false;
-}
-
-/*
-* the entity handler
-*/
-OCEntityHandlerResult Relay2Resource::entityHandler(std::shared_ptr<OCResourceRequest> request)
-{
-    OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for Relay2Resource " << std::endl;
-
-    if(request)
-    {
-        std::cout << "In entity handler for Relay2Resource, URI is : "
-                  << request->getResourceUri() << std::endl;
-
-        // Check for query params (if any)
-        QueryParamsMap queries = request->getQueryParameters();
-        if (!queries.empty())
-        {
-            std::cout << "\nQuery processing up to entityHandler" << std::endl;
-        }
-        for (auto it : queries)
-        {
-            std::cout << "Query key: " << it.first << " value : " << it.second
-                    << std::endl;
-        }
-        // get the value, so that we can AND it to check which flags are set
-        int requestFlag = request->getRequestHandlerFlag();
-
-        if(requestFlag & RequestHandlerFlag::RequestFlag)
-        {
-            // request flag is set
-            auto pResponse = std::make_shared<OC::OCResourceResponse>();
-            pResponse->setRequestHandle(request->getRequestHandle());
-            pResponse->setResourceHandle(request->getResourceHandle());
-
-            if(request->getRequestType() == "GET")
-            {
-                std::cout<<"Relay2Resource Get Request"<< std::endl;
-
-                pResponse->setResourceRepresentation(get(queries), "");
-                if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                {
-                    ehResult = OC_EH_OK;
-                }
-            }
-
-            else if(request->getRequestType() == "POST")
-            {
-                std::cout <<"Relay2Resource Post Request"<<std::endl;
-                bool  handle_post = true;
-
-                if (queries.size() > 0)
-                {
-                    for (const auto &eachQuery : queries)
-                    {
-                        std::string key = eachQuery.first;
-                        if (key.compare(INTERFACE_KEY) == 0)
-                        {
-                            std::string value = eachQuery.second;
-                            if (in_updatable_interfaces(value) == false)
-                            {
-                                std::cout << "Update request received via interface: " << value
-                                            << " . This interface is not authorized to update resource!!" << std::endl;
-                                pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_FORBIDDEN);
-                                handle_post = false;
-                                ehResult = OC_EH_ERROR;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (handle_post)
-                {
-                    ehResult = post(queries, request->getResourceRepresentation());
-                    if (ehResult == OC_EH_OK)
-                    {
-                        pResponse->setResourceRepresentation(get(queries), "");
-                        if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                        {
-                            if (OC_STACK_OK != sendNotification(pResponse) )
-                            {
-                                std::cerr << "NOTIFY failed." << std::endl;
-                            }
-                        }
-                    }
-                    else
-                    {
-                         pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_ERROR);
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "Relay2Resource unsupported request type (delete,put,..)"
-                    << request->getRequestType() << std::endl;
-                pResponse->setResponseResult(OC_EH_ERROR);
-                OCPlatform::sendResponse(pResponse);
-                ehResult = OC_EH_ERROR;
-            }
-        }
-
-        if(requestFlag & RequestHandlerFlag::ObserverFlag)
-        {
-            // observe flag is set
-            ObservationInfo observationInfo = request->getObservationInfo();
-            std::cout << "\t\trequestFlag : observer ";
-            if (ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                std::cout << "register" << std::endl;
-            }
-            else
-            {
-                std::cout << "unregister" << std::endl;
-            }
-
-            if(ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                // add observer
-                m_interestedObservers.push_back(observationInfo.obsId);
-            }
-            else if(ObserveAction::ObserveUnregister == observationInfo.action)
-            {
-                // delete observer
-                m_interestedObservers.erase(std::remove(
-                                            m_interestedObservers.begin(),
-                                            m_interestedObservers.end(),
-                                            observationInfo.obsId),
-                                            m_interestedObservers.end());
-            }
-            ehResult = OC_EH_OK;
-        }
-    }
-    return ehResult;
-}
-
-
-/*
- * class definition for class that handles /relay3
- *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
- * A value of 'true' means that the switch is on.
- * A value of 'false' means that the switch is off.
-*/
-class Relay3Resource : public Resource
-{
-    public:
-        /*
-         * constructor
-         *
-         * @param resourceUri the uri for this resource
-         */
-        Relay3Resource(std::string resourceUri = "/relay3");
-
-        /*
-         * destructor
-         */
-         virtual ~Relay3Resource(void);
-
-        /*
-         * Register the resource with the server
-         *
-         * setting resourceProperty as OC_DISCOVERABLE will allow Discovery of this resource
-         * setting resourceProperty as OC_OBSERVABLE will allow observation
-         * setting resourceProperty as OC_DISCOVERABLE | OC_OBSERVABLE will allow both discovery and observation
-         * setting resourceProperty as OC_SECURE the resource supports access via secure endpoints
-         * setting resourceProperty as OC_NONSECURE the resource supports access via non-secure endpoints
-         * setting resourceProperty as OC_SECURE | OC_NONSECURE will allow access via secure and non-secure endpoints
-         *
-         * @param resourceProperty indicates the property of the resource. Defined in octypes.h.
-         */
-        OCStackResult registerResource(uint8_t resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE);
-
-        /*
-         * Attempt to send out notifications to observing clients
-         * if no value on the device has been changed no notification
-         * will be sent.
-         *
-         * @return OC_STACK_OK on success
-         */
-        OCStackResult sendNotification();
-        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-    private:
-
-        /*
-         * Make the payload for the retrieve function (e.g. GET) /relay3
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
-         * A value of 'true' means that the switch is on.
-         * A value of 'false' means that the switch is off.
-         * @param queries  the query parameters for this call
-         */
-        OCRepresentation get(OC::QueryParamsMap queries);
-
-        /*
-         * Parse the payload for the update function (e.g. POST) /relay3
-
-         * @param queries  the query parameters for this call
-         * @param rep  the response to get the property values from
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        OCEntityHandlerResult post(OC::QueryParamsMap queries, const OC::OCRepresentation& rep);
-
-
-        std::string m_resourceUri;
-        // resource types and interfaces as array..
-        std::string m_RESOURCE_TYPE[1] = {"oic.r.switch.binary"}; // rt value (as an array)
-        std::string m_RESOURCE_INTERFACE[2] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
-        std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
-        ObservationIds m_interestedObservers;
-
-        // member variables for path: "/relay3"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
-        std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
-        std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
-        std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
-        std::string m_var_name_value = "value"; // the name for the attribute "value"
-
-    protected:
-        /*
-         * Check if the interface is
-         * @param  interface_name the interface name used during the request
-         * @return true: updatable interface
-         */
-        bool in_updatable_interfaces(std::string interface_name);
-
-        /*
-         * the entity handler for this resource
-         * @param request the incoming request to handle
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request);
-};
-
-/*
-* Constructor code
-*/
-Relay3Resource::Relay3Resource(std::string resourceUri)
-{
-    std::cout << "- Running: Relay3Resource constructor" << std::endl;
-
-    m_resourceUri = resourceUri;
-    // initialize member variables /relay3
-    // initialize vector if  The interface set supported by this resource
-    m_var_value_if.push_back("oic.if.baseline");
-    m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
-    m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
-    }
-
-/*
-* Destructor code
-*/
-Relay3Resource::~Relay3Resource() { }
-
-OCStackResult Relay3Resource::registerResource(uint8_t resourceProperty)
-{
-    OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&Relay3Resource::entityHandler, this,PH::_1);
-    result = OCPlatform::registerResource(m_resourceHandle,
-                                          m_resourceUri,
-                                          m_RESOURCE_TYPE[0],
-                                          m_RESOURCE_INTERFACE[0],
-                                          cb,
-                                          resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        std::cerr << "Failed to register Relay3Resource." << std::endl;
-        return result;
-    }
-
-    /// add the additional resource types
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0])); a++ )
-    {
-        result = OCPlatform::bindTypeToResource(m_resourceHandle, m_RESOURCE_TYPE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind resource type:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-    // add the additional interfaces
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0])); a++)
-    {
-        result = OCPlatform::bindInterfaceToResource(m_resourceHandle, m_RESOURCE_INTERFACE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind interface:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-
-    std::cout << "Relay3Resource:" << std::endl;
-    std::cout << "\t" << "# resource interfaces: "
-              << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
-    std::cout << "\t" << "# resource types     : "
-              << sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0]) << std::endl;
-
-    return result;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /relay3
-*/
-OCStackResult Relay3Resource::sendNotification(void)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        auto pResponse = std::make_shared<OC::OCResourceResponse>();
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /relay3
-* @param pResponse  the response to use for the observe
-*/
-OCStackResult Relay3Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-
-/*
-* Make the payload for the retrieve function (e.g. GET) /relay3
-* @param queries  the query parameters for this call
-*/
-OCRepresentation Relay3Resource::get(QueryParamsMap queries)
-{
-    OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-
-    std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-    std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
-
-    return m_rep;
-}
-
-/*
-* Parse the payload for the update function (e.g. POST) /relay3
-* @param queries  the query parameters for this call
-* @param rep  the response to get the property values from
-* @return OCEntityHandlerResult ok or not ok indication
-*/
-OCEntityHandlerResult Relay3Resource::post(QueryParamsMap queries, const OCRepresentation& rep)
-{
-    OCEntityHandlerResult ehResult = OC_EH_OK;
-    OC_UNUSED(queries);
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_if))
-        {
-            // value exist in payload
-
-            // check if "if" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_n))
-        {
-            // value exist in payload
-
-            // check if "n" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_rt))
-        {
-            // value exist in payload
-
-            // check if "rt" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    try {
-        if (rep.hasAttribute(m_var_name_value))
-        {
-            // value exist in payload
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    if (ehResult == OC_EH_OK)
-    {
-        // no error: assign the variables
-        // array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_if))
-            {
-                rep.getValue(m_var_name_if, m_var_value_if);
-                int first = 1;
-                std::cout << "\t\t" << "property 'if' UPDATED: " ;
-                for(auto myvar: m_var_value_if)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'if' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            std::string temp;
-            if (rep.getValue(m_var_name_n, temp ))
-            {
-                m_var_value_n = temp;
-                std::cout << "\t\t" << "property 'n' UPDATED: " << m_var_value_n << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'n' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_rt))
-            {
-                rep.getValue(m_var_name_rt, m_var_value_rt);
-                int first = 1;
-                std::cout << "\t\t" << "property 'rt' UPDATED: " ;
-                for(auto myvar: m_var_value_rt)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'rt' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            bool temp;
-            if (rep.getValue(m_var_name_value, temp ))
-            {
-                m_var_value_value = temp;
-                std::cout << "\t\t" << "property 'value' UPDATED: " << ((m_var_value_value) ? "true" : "false") << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'value' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 3;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, testAutomationHat->myParamArgs);
-    }
-    return ehResult;
-}
-/*
-* Check if the interface name is an registered interface name
-*/
-bool Relay3Resource::in_updatable_interfaces(std::string interface_name)
-{
-    for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
-    {
-        if (m_IF_UPDATE[i].compare(interface_name) == 0)
-            return true;
-    }
-    return false;
-}
-
-/*
-* the entity handler
-*/
-OCEntityHandlerResult Relay3Resource::entityHandler(std::shared_ptr<OCResourceRequest> request)
-{
-    OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for Relay3Resource " << std::endl;
-
-    if(request)
-    {
-        std::cout << "In entity handler for Relay3Resource, URI is : "
-                  << request->getResourceUri() << std::endl;
-
-        // Check for query params (if any)
-        QueryParamsMap queries = request->getQueryParameters();
-        if (!queries.empty())
-        {
-            std::cout << "\nQuery processing up to entityHandler" << std::endl;
-        }
-        for (auto it : queries)
-        {
-            std::cout << "Query key: " << it.first << " value : " << it.second
-                    << std::endl;
-        }
-        // get the value, so that we can AND it to check which flags are set
-        int requestFlag = request->getRequestHandlerFlag();
-
-        if(requestFlag & RequestHandlerFlag::RequestFlag)
-        {
-            // request flag is set
-            auto pResponse = std::make_shared<OC::OCResourceResponse>();
-            pResponse->setRequestHandle(request->getRequestHandle());
-            pResponse->setResourceHandle(request->getResourceHandle());
-
-            if(request->getRequestType() == "GET")
-            {
-                std::cout<<"Relay3Resource Get Request"<< std::endl;
-
-                pResponse->setResourceRepresentation(get(queries), "");
-                if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                {
-                    ehResult = OC_EH_OK;
-                }
-            }
-
-            else if(request->getRequestType() == "POST")
-            {
-                std::cout <<"Relay3Resource Post Request"<<std::endl;
-                bool  handle_post = true;
-
-                if (queries.size() > 0)
-                {
-                    for (const auto &eachQuery : queries)
-                    {
-                        std::string key = eachQuery.first;
-                        if (key.compare(INTERFACE_KEY) == 0)
-                        {
-                            std::string value = eachQuery.second;
-                            if (in_updatable_interfaces(value) == false)
-                            {
-                                std::cout << "Update request received via interface: " << value
-                                            << " . This interface is not authorized to update resource!!" << std::endl;
-                                pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_FORBIDDEN);
-                                handle_post = false;
-                                ehResult = OC_EH_ERROR;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (handle_post)
-                {
-                    ehResult = post(queries, request->getResourceRepresentation());
-                    if (ehResult == OC_EH_OK)
-                    {
-                        pResponse->setResourceRepresentation(get(queries), "");
-                        if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                        {
-                            if (OC_STACK_OK != sendNotification(pResponse) )
-                            {
-                                std::cerr << "NOTIFY failed." << std::endl;
-                            }
-                        }
-                    }
-                    else
-                    {
-                         pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_ERROR);
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "Relay3Resource unsupported request type (delete,put,..)"
-                    << request->getRequestType() << std::endl;
-                pResponse->setResponseResult(OC_EH_ERROR);
-                OCPlatform::sendResponse(pResponse);
-                ehResult = OC_EH_ERROR;
-            }
-        }
-
-        if(requestFlag & RequestHandlerFlag::ObserverFlag)
-        {
-            // observe flag is set
-            ObservationInfo observationInfo = request->getObservationInfo();
-            std::cout << "\t\trequestFlag : observer ";
-            if (ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -7509,36 +4602,26 @@ class IoTServer
         Adc2Resource  m_ADC2Instance;
         Adc3Resource  m_ADC3Instance;
         Adc4Resource  m_ADC4Instance;
-        CommslightResource  m_CommsLightInstance;
-        PowerlightResource  m_PowerLightInstance;
-        WarnlightResource  m_WarnLightInstance;
         Input1Resource  m_input1Instance;
         Input2Resource  m_input2Instance;
         Input3Resource  m_input3Instance;
         Output1Resource  m_output1Instance;
         Output2Resource  m_output2Instance;
         Output3Resource  m_output3Instance;
-        Relay1Resource  m_relay1Instance;
-        Relay2Resource  m_relay2Instance;
-        Relay3Resource  m_relay3Instance;};
+        RelayResource  m_relayInstance;};
 
 IoTServer::IoTServer()
     :m_ADC1Instance(),
      m_ADC2Instance(),
      m_ADC3Instance(),
      m_ADC4Instance(),
-     m_CommsLightInstance(),
-     m_PowerLightInstance(),
-     m_WarnLightInstance(),
      m_input1Instance(),
      m_input2Instance(),
      m_input3Instance(),
      m_output1Instance(),
      m_output2Instance(),
      m_output3Instance(),
-     m_relay1Instance(),
-     m_relay2Instance(),
-     m_relay3Instance()
+     m_relayInstance()
 {
     std::cout << "Running IoTServer constructor" << std::endl;
 }
@@ -7567,21 +4650,6 @@ OCStackResult IoTServer::registerResources(uint8_t resourceProperty)
         return result;
     }
     result = m_ADC4Instance.registerResource(resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        return result;
-    }
-    result = m_CommsLightInstance.registerResource(resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        return result;
-    }
-    result = m_PowerLightInstance.registerResource(resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        return result;
-    }
-    result = m_WarnLightInstance.registerResource(resourceProperty);
     if(OC_STACK_OK != result)
     {
         return result;
@@ -7616,17 +4684,7 @@ OCStackResult IoTServer::registerResources(uint8_t resourceProperty)
     {
         return result;
     }
-    result = m_relay1Instance.registerResource(resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        return result;
-    }
-    result = m_relay2Instance.registerResource(resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        return result;
-    }
-    result = m_relay3Instance.registerResource(resourceProperty);
+    result = m_relayInstance.registerResource(resourceProperty);
     if(OC_STACK_OK != result)
     {
         return result;
@@ -7973,8 +5031,6 @@ int main(void)
     std::cout << "device type: " <<  platform.deviceType << std::endl;
     std::cout << "platformID: " <<  platform.getPlatformInfo()->platformID << std::endl;
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
-
-    testAutomationHat = new AutomationHat();
 
     // create the server
     IoTServer server;

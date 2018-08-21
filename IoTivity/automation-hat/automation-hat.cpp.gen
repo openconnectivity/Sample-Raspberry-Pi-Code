@@ -17,8 +17,6 @@
 // limitations under the License.
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include <Python.h>
-
 #include <signal.h>
 #include <functional>
 #include <string>
@@ -59,116 +57,6 @@ class Resource
 
 };
 
-class AutomationHat
-{
-    public:
-        /*
-         * constructor
-         */
-        AutomationHat();
-
-        /*
-         * destructor
-         */
-        virtual ~AutomationHat();
-
-        int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[]);
-
-        PyObject *pName, *pModule, *pDict, *pFunc;
-        PyObject *pArgs, *pValue;
-
-	int myParamArgs[2];
-        long returnLong = 0;
-        double returnDouble = 0.0;
-};
-
-/*
-* Constructor code
-*/
-AutomationHat::AutomationHat()
-{
-    Py_Initialize();
-}
-
-/*
-* Destructor code
-*/
-AutomationHat::~AutomationHat()
-{
-    Py_Finalize();
-}
-
-/*
-* Funcion to call Pimoroni python libraries
-*/
-int AutomationHat::CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[])
-{
-    int i;
-
-    printf("module = %s\n", moduleName);
-    pName = PyString_FromString(moduleName);
-    /* Error checking of pName left out */
-
-    pModule = PyImport_Import(pName);
-    Py_DECREF(pName);
-
-    if (pModule != NULL) {
-        printf("function = %s\n", functionName);
-        pFunc = PyObject_GetAttrString(pModule, functionName);
-        /* pFunc is a new reference */
-
-        if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(numArgs);
-            for (i = 0; i < numArgs; ++i) {
-                printf("arg%d = %d\n", i+1, args[i]);
-                pValue = PyInt_FromLong(args[i]);
-                if (!pValue) {
-                    Py_DECREF(pArgs);
-                    Py_DECREF(pModule);
-                    fprintf(stderr, "Cannot convert argument\n");
-                    return 1;
-                }
-                /* pValue reference stolen here: */
-                PyTuple_SetItem(pArgs, i, pValue);
-            }
-            pValue = PyObject_CallObject(pFunc, pArgs);
-            Py_DECREF(pArgs);
-            if (pValue != NULL) {
-                if (PyFloat_Check(pValue)) {
-                    returnDouble = PyFloat_AsDouble(pValue);
-                    printf("Result of call: %f\n", returnDouble);
-                } else {
-                    returnLong = PyInt_AsLong(pValue);
-                    printf("Result of call: %ld\n", PyInt_AsLong(pValue));
-                }
-                Py_DECREF(pValue);
-            }
-            else {
-                Py_DECREF(pFunc);
-                Py_DECREF(pModule);
-                PyErr_Print();
-                fprintf(stderr,"Call failed\n");
-                return 1;
-            }
-        }
-        else {
-            if (PyErr_Occurred())
-                PyErr_Print();
-            fprintf(stderr, "Cannot find function \"%s\"\n", functionName);
-        }
-        Py_XDECREF(pFunc);
-        Py_DECREF(pModule);
-    }
-    else {
-        PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", moduleName);
-        return 1;
-    }
-
-    return 0;
-}
-
-AutomationHat *testAutomationHat;
 
 /*
  * class definition for class that handles /ADC1
@@ -251,7 +139,7 @@ class Adc1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -382,13 +270,10 @@ OCStackResult Adc1Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 1;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -397,16 +282,16 @@ OCRepresentation Adc1Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -484,8 +369,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -593,7 +478,7 @@ class Adc2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -724,13 +609,10 @@ OCStackResult Adc2Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 2;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -739,16 +621,16 @@ OCRepresentation Adc2Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -826,8 +708,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -935,7 +817,7 @@ class Adc3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -1066,13 +948,10 @@ OCStackResult Adc3Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 3;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1081,16 +960,16 @@ OCRepresentation Adc3Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -1168,8 +1047,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -1277,7 +1156,7 @@ class Adc4Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -1408,13 +1287,10 @@ OCStackResult Adc4Resource::sendNotification(const std::shared_ptr< OCResourceRe
 OCRepresentation Adc4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
-  testAutomationHat->myParamArgs[0] = 4;
-  testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readADC", 1, testAutomationHat->myParamArgs);
-  m_var_value_voltage = testAutomationHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1423,16 +1299,16 @@ OCRepresentation Adc4Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -1510,8 +1386,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -1622,7 +1498,7 @@ class CommslightResource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -1748,18 +1624,18 @@ OCStackResult CommslightResource::sendNotification(const std::shared_ptr< OCReso
 OCRepresentation CommslightResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -1774,52 +1650,52 @@ OCEntityHandlerResult CommslightResource::post(QueryParamsMap queries, const OCR
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -1830,7 +1706,7 @@ OCEntityHandlerResult CommslightResource::post(QueryParamsMap queries, const OCR
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -1934,11 +1810,9 @@ OCEntityHandlerResult CommslightResource::post(QueryParamsMap queries, const OCR
         {
             std::cout << e.what() << std::endl;
         }
-	    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-	    // the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeCommsLight", 1, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -2062,8 +1936,8 @@ OCEntityHandlerResult CommslightResource::entityHandler(std::shared_ptr<OCResour
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -2174,7 +2048,7 @@ class PowerlightResource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -2300,18 +2174,18 @@ OCStackResult PowerlightResource::sendNotification(const std::shared_ptr< OCReso
 OCRepresentation PowerlightResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -2326,52 +2200,52 @@ OCEntityHandlerResult PowerlightResource::post(QueryParamsMap queries, const OCR
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -2382,7 +2256,7 @@ OCEntityHandlerResult PowerlightResource::post(QueryParamsMap queries, const OCR
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -2486,11 +2360,9 @@ OCEntityHandlerResult PowerlightResource::post(QueryParamsMap queries, const OCR
         {
             std::cout << e.what() << std::endl;
         }
-	    // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	    // one can use the member variables as input to those calls
-	    // the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writePowerLight", 1, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -2614,8 +2486,8 @@ OCEntityHandlerResult PowerlightResource::entityHandler(std::shared_ptr<OCResour
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -2726,7 +2598,7 @@ class WarnlightResource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -2852,18 +2724,18 @@ OCStackResult WarnlightResource::sendNotification(const std::shared_ptr< OCResou
 OCRepresentation WarnlightResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -2878,52 +2750,52 @@ OCEntityHandlerResult WarnlightResource::post(QueryParamsMap queries, const OCRe
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -2934,7 +2806,7 @@ OCEntityHandlerResult WarnlightResource::post(QueryParamsMap queries, const OCRe
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -3038,11 +2910,9 @@ OCEntityHandlerResult WarnlightResource::post(QueryParamsMap queries, const OCRe
         {
             std::cout << e.what() << std::endl;
         }
-    	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-    	// the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeWarnLight", 1, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -3166,8 +3036,8 @@ OCEntityHandlerResult WarnlightResource::entityHandler(std::shared_ptr<OCResourc
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3269,7 +3139,7 @@ class Input1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3395,21 +3265,18 @@ OCStackResult Input1Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Input1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testAutomationHat->myParamArgs[0] = 1;
-    testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, testAutomationHat->myParamArgs);
-    m_var_value_value = (bool)testAutomationHat->returnLong;
+	
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -3487,8 +3354,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3590,7 +3457,7 @@ class Input2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3716,21 +3583,18 @@ OCStackResult Input2Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Input2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testAutomationHat->myParamArgs[0] = 2;
-    testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, testAutomationHat->myParamArgs);
-    m_var_value_value = (bool)testAutomationHat->returnLong;
+	
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -3808,8 +3672,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3911,7 +3775,7 @@ class Input3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -4037,21 +3901,18 @@ OCStackResult Input3Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Input3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testAutomationHat->myParamArgs[0] = 3;
-    testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, testAutomationHat->myParamArgs);
-    m_var_value_value = (bool)testAutomationHat->returnLong;
+	
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -4129,8 +3990,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -4241,7 +4102,7 @@ class Output1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -4367,18 +4228,18 @@ OCStackResult Output1Resource::sendNotification(const std::shared_ptr< OCResourc
 OCRepresentation Output1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -4393,52 +4254,52 @@ OCEntityHandlerResult Output1Resource::post(QueryParamsMap queries, const OCRepr
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -4449,7 +4310,7 @@ OCEntityHandlerResult Output1Resource::post(QueryParamsMap queries, const OCRepr
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -4553,12 +4414,9 @@ OCEntityHandlerResult Output1Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-    	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-    	// the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = 1;
-      testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -4682,8 +4540,8 @@ OCEntityHandlerResult Output1Resource::entityHandler(std::shared_ptr<OCResourceR
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -4794,7 +4652,7 @@ class Output2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -4920,18 +4778,18 @@ OCStackResult Output2Resource::sendNotification(const std::shared_ptr< OCResourc
 OCRepresentation Output2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -4946,52 +4804,52 @@ OCEntityHandlerResult Output2Resource::post(QueryParamsMap queries, const OCRepr
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -5002,7 +4860,7 @@ OCEntityHandlerResult Output2Resource::post(QueryParamsMap queries, const OCRepr
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -5106,12 +4964,9 @@ OCEntityHandlerResult Output2Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 2;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -5235,8 +5090,8 @@ OCEntityHandlerResult Output2Resource::entityHandler(std::shared_ptr<OCResourceR
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -5347,7 +5202,7 @@ class Output3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -5473,18 +5328,18 @@ OCStackResult Output3Resource::sendNotification(const std::shared_ptr< OCResourc
 OCRepresentation Output3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -5499,52 +5354,52 @@ OCEntityHandlerResult Output3Resource::post(QueryParamsMap queries, const OCRepr
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -5555,7 +5410,7 @@ OCEntityHandlerResult Output3Resource::post(QueryParamsMap queries, const OCRepr
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -5659,12 +5514,9 @@ OCEntityHandlerResult Output3Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 3;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -5788,8 +5640,8 @@ OCEntityHandlerResult Output3Resource::entityHandler(std::shared_ptr<OCResourceR
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -5900,7 +5752,7 @@ class Relay1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -6026,18 +5878,18 @@ OCStackResult Relay1Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Relay1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -6052,52 +5904,52 @@ OCEntityHandlerResult Relay1Resource::post(QueryParamsMap queries, const OCRepre
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -6108,7 +5960,7 @@ OCEntityHandlerResult Relay1Resource::post(QueryParamsMap queries, const OCRepre
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -6212,12 +6064,9 @@ OCEntityHandlerResult Relay1Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-    	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-    	// one can use the member variables as input to those calls
-    	// the member values have been updated already with the request data
-      testAutomationHat->myParamArgs[0] = 1;
-      testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-      testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -6341,8 +6190,8 @@ OCEntityHandlerResult Relay1Resource::entityHandler(std::shared_ptr<OCResourceRe
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -6453,7 +6302,7 @@ class Relay2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -6579,18 +6428,18 @@ OCStackResult Relay2Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Relay2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -6605,52 +6454,52 @@ OCEntityHandlerResult Relay2Resource::post(QueryParamsMap queries, const OCRepre
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -6661,7 +6510,7 @@ OCEntityHandlerResult Relay2Resource::post(QueryParamsMap queries, const OCRepre
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -6765,12 +6614,9 @@ OCEntityHandlerResult Relay2Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 2;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -6894,8 +6740,8 @@ OCEntityHandlerResult Relay2Resource::entityHandler(std::shared_ptr<OCResourceRe
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -7006,7 +6852,7 @@ class Relay3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -7132,18 +6978,18 @@ OCStackResult Relay3Resource::sendNotification(const std::shared_ptr< OCResource
 OCRepresentation Relay3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -7158,52 +7004,52 @@ OCEntityHandlerResult Relay3Resource::post(QueryParamsMap queries, const OCRepre
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -7214,7 +7060,7 @@ OCEntityHandlerResult Relay3Resource::post(QueryParamsMap queries, const OCRepre
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -7318,12 +7164,9 @@ OCEntityHandlerResult Relay3Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testAutomationHat->myParamArgs[0] = 3;
-        testAutomationHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testAutomationHat->CallPythonFunction((char *)"automation-hat", (char *)"writeRelay", 2, testAutomationHat->myParamArgs);
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
     }
     return ehResult;
 }
@@ -7447,8 +7290,8 @@ OCEntityHandlerResult Relay3Resource::entityHandler(std::shared_ptr<OCResourceRe
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -7973,8 +7816,6 @@ int main(void)
     std::cout << "device type: " <<  platform.deviceType << std::endl;
     std::cout << "platformID: " <<  platform.getPlatformInfo()->platformID << std::endl;
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
-
-    testAutomationHat = new AutomationHat();
 
     // create the server
     IoTServer server;
