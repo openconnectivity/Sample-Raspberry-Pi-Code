@@ -40,7 +40,7 @@ namespace PH = std::placeholders;
 
 /*
  tool_version          : 20171123
- input_file            : ../device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/tmp/envirophattest/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20160519
  title of input_file   : Binary Switch
 */
@@ -56,6 +56,7 @@ class Resource
     OCResourceHandle m_resourceHandle;
     OC::OCRepresentation m_rep;
     virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request)=0;
+
 };
 
 class EnviroPhat
@@ -76,7 +77,7 @@ class EnviroPhat
         PyObject *pName, *pModule, *pDict, *pFunc;
         PyObject *pArgs, *pValue;
 
-	int myParamArgs[2];
+        int myParamArgs[2];
         long returnLong = 0;
         double returnDouble = 0.0;
 };
@@ -169,7 +170,6 @@ int EnviroPhat::CallPythonFunction(char moduleName[], char functionName[], int n
 
 EnviroPhat *testEnviroPhat;
 
-
 /*
  * class definition for class that handles /brightness
  *
@@ -178,7 +178,6 @@ EnviroPhat *testEnviroPhat;
  * A brightness of 0 is the minimum for the resource.
  * A brightness of 100 is the maximum for the resource.
  * Retrieves the current brightness level.
-
 */
 class BrightnessResource : public Resource
 {
@@ -217,6 +216,7 @@ class BrightnessResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -226,7 +226,6 @@ class BrightnessResource : public Resource
          * A brightness of 0 is the minimum for the resource.
          * A brightness of 100 is the maximum for the resource.
          * Retrieves the current brightness level.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -248,9 +247,7 @@ class BrightnessResource : public Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
         std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        void* m_var_value_value; // the value for the attribute "value": The value sensed or actuated by this Resource
-        std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -336,6 +333,9 @@ OCStackResult BrightnessResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /brightness
+*/
 OCStackResult BrightnessResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -350,24 +350,41 @@ OCStackResult BrightnessResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /brightness
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult BrightnessResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /brightness
 * @param queries  the query parameters for this call
 */
 OCRepresentation BrightnessResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'brightness' : "<< m_var_value_brightness << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-
-    m_rep.setValue(m_var_name_brightness, m_var_value_brightness );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
+    
+    m_rep.setValue(m_var_name_brightness, m_var_value_brightness ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
 
     return m_rep;
 }
@@ -445,8 +462,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -483,7 +500,6 @@ else
  * When range (from oic.r.baseresource) is omitted, then the range is [0,255].
  * Retrieves the current colour in RGB.
  * Value is an array of integer values in the order R,G,B.
-
 */
 class ColorResource : public Resource
 {
@@ -522,6 +538,7 @@ class ColorResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -533,7 +550,6 @@ class ColorResource : public Resource
          * When range (from oic.r.baseresource) is omitted, then the range is [0,255].
          * Retrieves the current colour in RGB.
          * Value is an array of integer values in the order R,G,B.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -555,9 +571,7 @@ class ColorResource : public Resource
         std::string m_var_name_rgbValue = "rgbValue"; // the name for the attribute "rgbValue"
         std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        void* m_var_value_value; // the value for the attribute "value": The value sensed or actuated by this Resource
-        std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -590,7 +604,7 @@ ColorResource::ColorResource(std::string resourceUri)
     // initialize vector rgbValue  RGB value; the first item is the R, second the G, third the B.m_var_value_rgbValue.push_back(255);
     m_var_value_rgbValue.push_back(255);
     m_var_value_rgbValue.push_back(255);
-
+    
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.colour.rgb");
     }
@@ -646,6 +660,9 @@ OCStackResult ColorResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /color
+*/
 OCStackResult ColorResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -660,23 +677,40 @@ OCStackResult ColorResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /color
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult ColorResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /color
 * @param queries  the query parameters for this call
 */
 OCRepresentation ColorResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rgbValue,  m_var_value_rgbValue );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rgbValue,  m_var_value_rgbValue ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
 
     return m_rep;
 }
@@ -754,8 +788,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -789,7 +823,6 @@ else
  * The value is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
-
 */
 class ColorsensorlightResource : public Resource
 {
@@ -828,6 +861,7 @@ class ColorsensorlightResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -836,7 +870,6 @@ class ColorsensorlightResource : public Resource
          * The value is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -867,7 +900,7 @@ class ColorsensorlightResource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -953,6 +986,9 @@ OCStackResult ColorsensorlightResource::registerResource(uint8_t resourcePropert
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /colorSensorLight
+*/
 OCStackResult ColorsensorlightResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -967,24 +1003,41 @@ OCStackResult ColorsensorlightResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /colorSensorLight
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult ColorsensorlightResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /colorSensorLight
 * @param queries  the query parameters for this call
 */
 OCRepresentation ColorsensorlightResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -999,52 +1052,52 @@ OCEntityHandlerResult ColorsensorlightResource::post(QueryParamsMap queries, con
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -1055,7 +1108,7 @@ OCEntityHandlerResult ColorsensorlightResource::post(QueryParamsMap queries, con
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -1162,8 +1215,8 @@ OCEntityHandlerResult ColorsensorlightResource::post(QueryParamsMap queries, con
 	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
 	// one can use the member variables as input to those calls
 	// the member values have been updated already with the request data
-  testEnviroPhat->myParamArgs[0] = m_var_value_value ? 1 : 0;
-  testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"writeLEDs", 1, testEnviroPhat->myParamArgs);
+        testEnviroPhat->myParamArgs[0] = m_var_value_value ? 1 : 0;
+        testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"writeLEDs", 1, testEnviroPhat->myParamArgs);
     }
     return ehResult;
 }
@@ -1258,7 +1311,7 @@ OCEntityHandlerResult ColorsensorlightResource::entityHandler(std::shared_ptr<OC
                         pResponse->setResourceRepresentation(get(queries), "");
                         if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
                         {
-                            if (OC_STACK_OK != sendNotification() )
+                            if (OC_STACK_OK != sendNotification(pResponse) )
                             {
                                 std::cerr << "NOTIFY failed." << std::endl;
                             }
@@ -1287,8 +1340,8 @@ OCEntityHandlerResult ColorsensorlightResource::entityHandler(std::shared_ptr<OC
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -1322,7 +1375,6 @@ OCEntityHandlerResult ColorsensorlightResource::entityHandler(std::shared_ptr<OC
  * Typical use case includes measurement of compass readings on a personal device.
  * The value is an array containing Hx, Hy, Hz (in that order) each of which are floats.
  * Each of Hx, Hy and Hz are expressed in A/m (Amperes per metre)
-
 */
 class HeadingResource : public Resource
 {
@@ -1361,6 +1413,7 @@ class HeadingResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -1369,7 +1422,6 @@ class HeadingResource : public Resource
          * Typical use case includes measurement of compass readings on a personal device.
          * The value is an array containing Hx, Hy, Hz (in that order) each of which are floats.
          * Each of Hx, Hy and Hz are expressed in A/m (Amperes per metre)
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -1391,7 +1443,7 @@ class HeadingResource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         std::vector<double>  m_var_value_value; // the value for the array attribute "value": Array containing Hx, Hy, Hz.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -1426,7 +1478,7 @@ HeadingResource::HeadingResource(std::string resourceUri)
     // initialize vector value  Array containing Hx, Hy, Hz.m_var_value_value.push_back(100.0);
     m_var_value_value.push_back(15.0);
     m_var_value_value.push_back(90.0);
-
+    
     }
 
 /*
@@ -1480,6 +1532,9 @@ OCStackResult HeadingResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /heading
+*/
 OCStackResult HeadingResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -1494,23 +1549,40 @@ OCStackResult HeadingResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /heading
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult HeadingResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /heading
 * @param queries  the query parameters for this call
 */
 OCRepresentation HeadingResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value,  m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value,  m_var_value_value ); 
 
     return m_rep;
 }
@@ -1588,8 +1660,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -1622,7 +1694,6 @@ else
  * This resource provides a measurement of Mean Sea Level Pressure experienced at the measuring point expressed in millibars.
  * The value is float which describes the atmospheric pressure in hPa (hectoPascals).
  * Note that hPa and the also commonly used unit of millibars (mbar) are numerically equivalent.
-
 */
 class PressureResource : public Resource
 {
@@ -1661,6 +1732,7 @@ class PressureResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -1668,7 +1740,6 @@ class PressureResource : public Resource
          * This resource provides a measurement of Mean Sea Level Pressure experienced at the measuring point expressed in millibars.
          * The value is float which describes the atmospheric pressure in hPa (hectoPascals).
          * Note that hPa and the also commonly used unit of millibars (mbar) are numerically equivalent.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -1692,7 +1763,7 @@ class PressureResource : public Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
         std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -1779,6 +1850,9 @@ OCStackResult PressureResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /pressure
+*/
 OCStackResult PressureResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -1793,13 +1867,30 @@ OCStackResult PressureResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /pressure
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult PressureResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /pressure
 * @param queries  the query parameters for this call
 */
 OCRepresentation PressureResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
@@ -1807,12 +1898,12 @@ OCRepresentation PressureResource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'atmosphericPressure' : "<< m_var_value_atmosphericPressure << std::endl;
     std::cout << "\t\t" << "property 'id' : "<< m_var_value_id << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-
-    m_rep.setValue(m_var_name_atmosphericPressure, m_var_value_atmosphericPressure );
-    m_rep.setValue(m_var_name_id, m_var_value_id );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
+    
+    m_rep.setValue(m_var_name_atmosphericPressure, m_var_value_atmosphericPressure ); 
+    m_rep.setValue(m_var_name_id, m_var_value_id ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
 
     return m_rep;
 }
@@ -1890,8 +1981,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -1932,7 +2023,6 @@ else
  * A client can specify the units for the requested temperature by use of a query parameter.
  * If no query parameter is provided the server provides its default measure or set value.
  * It is recommended to return always the units Property in the result.
-
 */
 class TemperatureResource : public Resource
 {
@@ -1971,6 +2061,7 @@ class TemperatureResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -1986,7 +2077,6 @@ class TemperatureResource : public Resource
          * A client can specify the units for the requested temperature by use of a query parameter.
          * If no query parameter is provided the server provides its default measure or set value.
          * It is recommended to return always the units Property in the result.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -2010,9 +2100,9 @@ class TemperatureResource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_temperature; // the value for the attribute "temperature": Current temperature setting or measurement
         std::string m_var_name_temperature = "temperature"; // the name for the attribute "temperature"
-        void* m_var_value_units; // the value for the attribute "units": Units for the temperature value
+        std::string m_var_value_units; // the value for the attribute "units": Units for the temperature value
         std::string m_var_name_units = "units"; // the name for the attribute "units"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -2046,6 +2136,7 @@ TemperatureResource::TemperatureResource(std::string resourceUri)
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.temperature");
     m_var_value_temperature = 20.0; // current value of property "temperature"  Current temperature setting or measurement
+    m_var_value_units = "C";  // current value of property "units" Units for the temperature value
     }
 
 /*
@@ -2099,6 +2190,9 @@ OCStackResult TemperatureResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /temperature
+*/
 OCStackResult TemperatureResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -2113,13 +2207,30 @@ OCStackResult TemperatureResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /temperature
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult TemperatureResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /temperature
 * @param queries  the query parameters for this call
 */
 OCRepresentation TemperatureResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
@@ -2127,12 +2238,14 @@ OCRepresentation TemperatureResource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'id' : "<< m_var_value_id << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'temperature' : "<< m_var_value_temperature << std::endl;
-
-    m_rep.setValue(m_var_name_id, m_var_value_id );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_temperature, m_var_value_temperature );
+    std::cout << "\t\t" << "property 'units' : "<< m_var_value_units << std::endl;
+    
+    m_rep.setValue(m_var_name_id, m_var_value_id ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_temperature, m_var_value_temperature ); 
+    m_rep.setValue(m_var_name_units, m_var_value_units ); 
 
     return m_rep;
 }
@@ -2210,8 +2323,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -2243,7 +2356,6 @@ else
  *
  * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
  * Retrieves the current energy.
-
 */
 class Voltage0Resource : public Resource
 {
@@ -2282,13 +2394,13 @@ class Voltage0Resource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /voltage0
          * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
          * Retrieves the current energy.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -2320,7 +2432,7 @@ class Voltage0Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -2411,6 +2523,9 @@ OCStackResult Voltage0Resource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /voltage0
+*/
 OCStackResult Voltage0Resource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -2425,19 +2540,36 @@ OCStackResult Voltage0Resource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /voltage0
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult Voltage0Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /voltage0
 * @param queries  the query parameters for this call
 */
 OCRepresentation Voltage0Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-  testEnviroPhat->myParamArgs[0] = 0;
-  testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
-  m_var_value_voltage = testEnviroPhat->returnDouble;
+	
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+    // the calls needs to fill in the member variable before it is returned.
+    // alternative is to have a callback from the hardware that sets the member variables
+    testEnviroPhat->myParamArgs[0] = 0;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
+    m_var_value_voltage = testEnviroPhat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -2446,16 +2578,16 @@ OCRepresentation Voltage0Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -2533,8 +2665,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -2566,7 +2698,6 @@ else
  *
  * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
  * Retrieves the current energy.
-
 */
 class Voltage1Resource : public Resource
 {
@@ -2605,13 +2736,13 @@ class Voltage1Resource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /voltage1
          * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
          * Retrieves the current energy.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -2643,7 +2774,7 @@ class Voltage1Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -2734,6 +2865,9 @@ OCStackResult Voltage1Resource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /voltage1
+*/
 OCStackResult Voltage1Resource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -2748,19 +2882,36 @@ OCStackResult Voltage1Resource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /voltage1
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult Voltage1Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /voltage1
 * @param queries  the query parameters for this call
 */
 OCRepresentation Voltage1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-  testEnviroPhat->myParamArgs[0] = 1;
-  testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
-  m_var_value_voltage = testEnviroPhat->returnDouble;
+	
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+    // the calls needs to fill in the member variable before it is returned.
+    // alternative is to have a callback from the hardware that sets the member variables
+    testEnviroPhat->myParamArgs[0] = 1;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
+    m_var_value_voltage = testEnviroPhat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -2769,16 +2920,16 @@ OCRepresentation Voltage1Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -2856,8 +3007,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -2889,7 +3040,6 @@ else
  *
  * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
  * Retrieves the current energy.
-
 */
 class Voltage2Resource : public Resource
 {
@@ -2928,13 +3078,13 @@ class Voltage2Resource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /voltage2
          * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
          * Retrieves the current energy.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -2966,7 +3116,7 @@ class Voltage2Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3057,6 +3207,9 @@ OCStackResult Voltage2Resource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /voltage2
+*/
 OCStackResult Voltage2Resource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -3071,19 +3224,36 @@ OCStackResult Voltage2Resource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /voltage2
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult Voltage2Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /voltage2
 * @param queries  the query parameters for this call
 */
 OCRepresentation Voltage2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-  testEnviroPhat->myParamArgs[0] = 2;
-  testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
-  m_var_value_voltage = testEnviroPhat->returnDouble;
+	
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+    // the calls needs to fill in the member variable before it is returned.
+    // alternative is to have a callback from the hardware that sets the member variables
+    testEnviroPhat->myParamArgs[0] = 2;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
+    m_var_value_voltage = testEnviroPhat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -3092,16 +3262,16 @@ OCRepresentation Voltage2Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -3179,8 +3349,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3212,7 +3382,6 @@ else
  *
  * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
  * Retrieves the current energy.
-
 */
 class Voltage3Resource : public Resource
 {
@@ -3251,13 +3420,13 @@ class Voltage3Resource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /voltage3
          * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
          * Retrieves the current energy.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -3289,7 +3458,7 @@ class Voltage3Resource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3380,6 +3549,9 @@ OCStackResult Voltage3Resource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /voltage3
+*/
 OCStackResult Voltage3Resource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -3394,19 +3566,36 @@ OCStackResult Voltage3Resource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /voltage3
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult Voltage3Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /voltage3
 * @param queries  the query parameters for this call
 */
 OCRepresentation Voltage3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-  testEnviroPhat->myParamArgs[0] = 3;
-  testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
-  m_var_value_voltage = testEnviroPhat->returnDouble;
+	
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+    // the calls needs to fill in the member variable before it is returned.
+    // alternative is to have a callback from the hardware that sets the member variables
+    testEnviroPhat->myParamArgs[0] = 3;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
+    m_var_value_voltage = testEnviroPhat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -3415,16 +3604,16 @@ OCRepresentation Voltage3Resource::get(QueryParamsMap queries)
     std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
+    
+    m_rep.setValue(m_var_name_current, m_var_value_current ); 
+    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent ); 
+    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency ); 
+    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage ); 
+    m_rep.setValue(m_var_name_frequency, m_var_value_frequency ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_voltage, m_var_value_voltage ); 
 
     return m_rep;
 }
@@ -3502,8 +3691,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3536,7 +3725,6 @@ else
  * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
  * (which is dependent on the co-ordinate system and the observer).
  * The value is a float which describes the acceleration experienced by the object in "g".
-
 */
 class XmotionResource : public Resource
 {
@@ -3575,6 +3763,7 @@ class XmotionResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -3582,7 +3771,6 @@ class XmotionResource : public Resource
          * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
          * (which is dependent on the co-ordinate system and the observer).
          * The value is a float which describes the acceleration experienced by the object in "g".
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -3604,7 +3792,7 @@ class XmotionResource : public Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
         std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3690,6 +3878,9 @@ OCStackResult XmotionResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /xmotion
+*/
 OCStackResult XmotionResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -3704,24 +3895,41 @@ OCStackResult XmotionResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /xmotion
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult XmotionResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /xmotion
 * @param queries  the query parameters for this call
 */
 OCRepresentation XmotionResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'acceleration' : "<< m_var_value_acceleration << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-
-    m_rep.setValue(m_var_name_acceleration, m_var_value_acceleration );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
+    
+    m_rep.setValue(m_var_name_acceleration, m_var_value_acceleration ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
 
     return m_rep;
 }
@@ -3799,8 +4007,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -3833,7 +4041,6 @@ else
  * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
  * (which is dependent on the co-ordinate system and the observer).
  * The value is a float which describes the acceleration experienced by the object in "g".
-
 */
 class YmotionResource : public Resource
 {
@@ -3872,6 +4079,7 @@ class YmotionResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -3879,7 +4087,6 @@ class YmotionResource : public Resource
          * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
          * (which is dependent on the co-ordinate system and the observer).
          * The value is a float which describes the acceleration experienced by the object in "g".
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -3901,7 +4108,7 @@ class YmotionResource : public Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
         std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -3987,6 +4194,9 @@ OCStackResult YmotionResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /ymotion
+*/
 OCStackResult YmotionResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -4001,24 +4211,41 @@ OCStackResult YmotionResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /ymotion
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult YmotionResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /ymotion
 * @param queries  the query parameters for this call
 */
 OCRepresentation YmotionResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'acceleration' : "<< m_var_value_acceleration << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-
-    m_rep.setValue(m_var_name_acceleration, m_var_value_acceleration );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
+    
+    m_rep.setValue(m_var_name_acceleration, m_var_value_acceleration ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
 
     return m_rep;
 }
@@ -4096,8 +4323,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
@@ -4130,7 +4357,6 @@ else
  * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
  * (which is dependent on the co-ordinate system and the observer).
  * The value is a float which describes the acceleration experienced by the object in "g".
-
 */
 class ZmotionResource : public Resource
 {
@@ -4169,6 +4395,7 @@ class ZmotionResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
     private:
 
         /*
@@ -4176,7 +4403,6 @@ class ZmotionResource : public Resource
          * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
          * (which is dependent on the co-ordinate system and the observer).
          * The value is a float which describes the acceleration experienced by the object in "g".
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -4198,7 +4424,7 @@ class ZmotionResource : public Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
         std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -4284,6 +4510,9 @@ OCStackResult ZmotionResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /zmotion
+*/
 OCStackResult ZmotionResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -4298,24 +4527,41 @@ OCStackResult ZmotionResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /zmotion
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult ZmotionResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /zmotion
 * @param queries  the query parameters for this call
 */
 OCRepresentation ZmotionResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'acceleration' : "<< m_var_value_acceleration << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-
-    m_rep.setValue(m_var_name_acceleration, m_var_value_acceleration );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
+    
+    m_rep.setValue(m_var_name_acceleration, m_var_value_acceleration ); 
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
 
     return m_rep;
 }
@@ -4393,8 +4639,8 @@ else
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
