@@ -42,7 +42,7 @@ namespace PH = std::placeholders;
 
 /*
  tool_version          : 20171123
- input_file            : ../device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/tmp/mraaexampletest/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20160519
  title of input_file   : Binary Switch
 */
@@ -58,6 +58,7 @@ class Resource
     OCResourceHandle m_resourceHandle;
     OC::OCRepresentation m_rep;
     virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request)=0;
+
 };
 
 
@@ -68,7 +69,6 @@ class Resource
  * The value is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
-
 */
 class BinaryswitchResource : public Resource
 {
@@ -107,6 +107,7 @@ class BinaryswitchResource : public Resource
          * @return OC_STACK_OK on success
          */
         OCStackResult sendNotification();
+        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
 
         mraa::Gpio *gpio;
         int ledPin = 7;
@@ -119,7 +120,6 @@ class BinaryswitchResource : public Resource
          * The value is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
-
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -150,7 +150,7 @@ class BinaryswitchResource : public Resource
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         bool m_var_value_value; // the value for the attribute "value": Status of the switch
         std::string m_var_name_value = "value"; // the name for the attribute "value"
-
+        
     protected:
         /*
          * Check if the interface is
@@ -247,6 +247,9 @@ OCStackResult BinaryswitchResource::registerResource(uint8_t resourceProperty)
     return result;
 }
 
+/*
+* Make the payload for the observe function (e.g. GET) /binaryswitch
+*/
 OCStackResult BinaryswitchResource::sendNotification(void)
 {
     OCStackResult sResult = OC_STACK_OK;
@@ -261,24 +264,41 @@ OCStackResult BinaryswitchResource::sendNotification(void)
 }
 
 /*
+* Make the payload for the observe function (e.g. GET) /binaryswitch
+* @param pResponse  the response to use for the observe
+*/
+OCStackResult BinaryswitchResource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
+{
+    OCStackResult sResult = OC_STACK_OK;
+    if ( m_interestedObservers.size() > 0) {
+        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
+        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
+                                                    m_interestedObservers,
+                                                    pResponse);
+    }
+    return sResult;
+}
+
+
+/*
 * Make the payload for the retrieve function (e.g. GET) /binaryswitch
 * @param queries  the query parameters for this call
 */
 OCRepresentation BinaryswitchResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
-
+	
 	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
 	// the calls needs to fill in the member variable before it is returned.
 	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
-
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+    
+    m_rep.setValue(m_var_name_if,  m_var_value_if ); 
+    m_rep.setValue(m_var_name_n, m_var_value_n ); 
+    m_rep.setValue(m_var_name_rt,  m_var_value_rt ); 
+    m_rep.setValue(m_var_name_value, m_var_value_value ); 
 
     return m_rep;
 }
@@ -293,52 +313,52 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
 {
     OCEntityHandlerResult ehResult = OC_EH_OK;
     OC_UNUSED(queries);
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_if))
         {
             // value exist in payload
-
+            
             // check if "if" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     try {
         if (rep.hasAttribute(m_var_name_n))
         {
             // value exist in payload
-
+            
             // check if "n" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
-
+    
     // TODO: missing code: add check on array contents out of range
 	// such a check is resource specific
     try {
         if (rep.hasAttribute(m_var_name_rt))
         {
             // value exist in payload
-
+            
             // check if "rt" is read only
             ehResult = OC_EH_ERROR;
             std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
+            
         }
     }
     catch (std::exception& e)
@@ -349,7 +369,7 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
         if (rep.hasAttribute(m_var_name_value))
         {
             // value exist in payload
-
+            
         }
     }
     catch (std::exception& e)
@@ -453,9 +473,9 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
         {
             std::cout << e.what() << std::endl;
         }
-      	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
+	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+	// one can use the member variables as input to those calls
+	// the member values have been updated already with the request data
         gpio->write(m_var_value_value);
     }
     return ehResult;
@@ -551,7 +571,7 @@ OCEntityHandlerResult BinaryswitchResource::entityHandler(std::shared_ptr<OCReso
                         pResponse->setResourceRepresentation(get(queries), "");
                         if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
                         {
-                            if (OC_STACK_OK != sendNotification() )
+                            if (OC_STACK_OK != sendNotification(pResponse) )
                             {
                                 std::cerr << "NOTIFY failed." << std::endl;
                             }
@@ -580,8 +600,8 @@ OCEntityHandlerResult BinaryswitchResource::entityHandler(std::shared_ptr<OCReso
             std::cout << "\t\trequestFlag : observer ";
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
-                std::cout << "register" << std::endl;
-            }
+                std::cout << "register" << std::endl; 
+            } 
             else
             {
                 std::cout << "unregister" << std::endl;
