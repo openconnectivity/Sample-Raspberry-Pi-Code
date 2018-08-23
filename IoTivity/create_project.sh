@@ -8,5 +8,5 @@ MY_COMMAND="mkdir -p ./$PROJNAME/bin"
 eval ${MY_COMMAND}
 MY_COMMAND="cp ${OCFPATH}/example.json ./$PROJNAME/$PROJNAME.json"
 eval ${MY_COMMAND}
-MY_COMMAND="cp ${OCFPATH}/iotivity/examples/OCFDeviceBuilder/SConscript ./$PROJNAME/src/"
+MY_COMMAND="cp ${OCFPATH}/iotivity/examples/OCFDeviceBuilder/SConscript ./$PROJNAME/"
 eval ${MY_COMMAND}

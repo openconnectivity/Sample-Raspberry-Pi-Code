@@ -10,7 +10,7 @@ MY_COMMAND="cp $CURPWD/src/$PROJNAME.cpp ${OCFPATH}/iotivity/examples/OCFDeviceB
 eval ${MY_COMMAND}
 
 # copying the SConscript file to the source folder
-MY_COMMAND="cp $CURPWD/src/SConscript ${OCFPATH}/iotivity/examples/OCFDeviceBuilder/"
+MY_COMMAND="cp $CURPWD/SConscript ${OCFPATH}/iotivity/examples/OCFDeviceBuilder/"
 eval ${MY_COMMAND}
 
 #scons resource/examples
