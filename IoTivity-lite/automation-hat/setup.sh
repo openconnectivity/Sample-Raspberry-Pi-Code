@@ -2,7 +2,7 @@
 CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/automation-hat/Makefile $CURPWD/src/"
+MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/automation-hat/Makefile $CURPWD/"
 eval ${MY_COMMAND}
 MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/automation-hat/automation-hat.json $CURPWD/$PROJNAME.json"
 eval ${MY_COMMAND}

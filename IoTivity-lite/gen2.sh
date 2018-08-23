@@ -11,7 +11,7 @@ eval ${MY_COMMAND}
 MY_COMMAND="cp $CURPWD/device_output/code/server_introspection.dat.h ${OCFPATH}/iotivity-constrained/include/"
 eval ${MY_COMMAND}
 
-MY_COMMAND="mkdir $CURPWD/bin/device_builder_server_creds"
+MY_COMMAND="mkdir $CURPWD/bin/${PROJNAME}_creds"
 eval ${MY_COMMAND}
 
 if [ -e $CURPWD/src/$PROJNAME.c ]
