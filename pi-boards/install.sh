@@ -26,7 +26,7 @@ if [[ ! -v PYTHONPATH ]]; then
 fi
 
 if [[ ! -v EXAMPLEPATH ]]; then
-    export EXAMPLEPATH='.'
+    export EXAMPLEPATH=$CURPWD
     echo "export EXAMPLEPATH=`pwd`" >> ~/.bashrc
 fi
 
