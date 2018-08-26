@@ -21,7 +21,7 @@ This command will do a number of things:
 - Clone the Sample-Raspberry-Pi-Code repository (which includes all the sample code described above). Each sample subdirectory includes the following files:
   - SConscript: A scons description file that will manage the compiling and linking of the project.
   - <sample>.json: The JSON device description file that is the input to DeviceBuilder and describes all the resources available on the device. Each of these resources will show up in the source code and introspection file created by DeviceBuilder.
-  - <sample>.cpp: The C++ code that includes all the resources plus the code to interface to the hardware. This code can be copied over the C++ code created by DeviceBuilder when the gen.sh script is run in order to control the hardware. If you run gen.sh again, <sample>.cpp will be overwritten. So if you change anything in <sample>.cpp, be sure to make a backup or avoid running gen.sh again. Otherwise, you will lose your work.
+  - <sample>.cpp: The C++ code that includes all the resources plus the code to interface to the hardware.
   - <sample>.py: The Python code that connects the C++ code to the Pimoroni python libraries. This code will be copied to the executable directory so it will be available at runtime to control the hardware.
 
 One other note:
@@ -31,17 +31,19 @@ The PYTHONPATH environment variable needs to be set so that the C++ server code 
 
 # Building and Running the samples
 
-A number of convenience scripts have been written to make the development cycle easier. These should be run from the ~/iot directory.
-1. Change to the development directory where the scripts are found:
-    1. cd ~/iot
-2. Run the following development cycle scripts as needed
-    1. ./gen.sh - generate the code, introspection file, PICS file, onboarding file
-        1. (optional) To load new a new example: ./gen.sh automation-phat (or whatever example you want) This will copy the correct device description code and generate the .cpp code, introspection file, etc. The currently available examples are: automation-phat, automation-hat, enviro-phat, mraa-example, and example (original simple single switch with no board interface code). It will also copy the completed sample code to run the board hardware and the Python interface code. So this is everything you need to run the sample. If you run gen.sh without a parameter, it will generate new code from the existing example.json device description file in the ~/iot directory. This is useful if you want new clean code to be generated (but it won't run the hardware).
-    2. ./build.sh - compile and link everything
-    3. ./edit_code.sh - edit the server source code. NOTE: This edits whatever server.cpp (or device_builder_server.c for IoTivity-lite) code is currently active. It does NOT edit the code in the example directories.
-    4. ./reset.sh - reset the sever to RFOTM by copying a fresh onboarding file
-    5. ./run.sh - run the currently compiled server in the appropriate directory
-3. When doing the client control described below, you should see nice debug messages in the server terminal confirming that the messages are getting through.
+A number of convenience scripts have been written to make the development cycle easier.
+1. Run the following development cycle as needed
+    1. create_project project_name - create a new project and name it anything you want.
+    2. This isn't a script, but you need to "cd project_name" to run all the other scripts.
+    3. Copy the setup.sh from the Emulator-Code/emulator/dimlight/ directory to the current project directory
+    4. ./setup.sh - This will load all the necessary stuff to build and run the sample emulator project.
+    5. edit_input2.sh - edit the device description input file (<project name>.json) if necessary.
+    6. gen2.sh - generate the code, introspection file, PICS file, and onboarding file from the device description file.
+    7. build2.sh - compile and link everything
+    8. edit_code2.sh - edit the server source code if necessary.
+    9. reset2.sh - reset the sever to RFOTM by copying a fresh onboarding file
+    10. run2.sh - run the currently compiled server in the appropriate directory
+2. To test the project, you will need to run a client. Here are some options.
     1. Discover, onboard and control the server using OTGC
     2. Discover, onboard and control the server using DeviceSpy
     3. Test the server using CTT

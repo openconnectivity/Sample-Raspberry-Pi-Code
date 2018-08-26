@@ -32,12 +32,6 @@ fi
 
 git clone https://github.com/openconnectivity/Sample-Raspberry-Pi-Code.git
 
-MY_COMMAND="cp ./Sample-Raspberry-Pi-Code/IoTivity/*.sh ${OCFPATH}/../iot/"
-eval ${MY_COMMAND}
-
-MY_COMMAND="cp ./Sample-Raspberry-Pi-Code/IoTivity-lite/*.sh ${OCFPATH}/../iot-lite/"
-eval ${MY_COMMAND}
-
 curl https://get.pimoroni.com/automationhat | bash
 curl https://get.pimoroni.com/envirophat | bash
 
