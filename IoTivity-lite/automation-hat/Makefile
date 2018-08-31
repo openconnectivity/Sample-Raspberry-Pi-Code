@@ -28,7 +28,7 @@ GTEST_CPPFLAGS += -isystem $(GTEST_DIR)/include
 TEST_CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x -fpermissive -DOC_SERVER -DOC_CLIENT -fprofile-arcs -ftest-coverage
 HEADER_DIR = -I$(ROOT_DIR)/include \
              -I$(ROOT_DIR) \
-             -I$(OUT_DIR) 
+             -I$(OUT_DIR)
 SECURITY_HEADERS = -I$(ROOT_DIR)/security \
                    -I$(MBEDTLS_DIR)/include
 API_TEST_DIR = $(ROOT_DIR)/api/unittest
@@ -220,14 +220,10 @@ temp_sensor: libiotivity-constrained-client.a
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/temp_sensor_client_linux.c libiotivity-constrained-client.a -DOC_CLIENT ${CFLAGS} ${LIBS}
 
-automationhatlite: libiotivity-constrained-server.a
-	@mkdir -p $@_creds
-	${CC} -o $@ ../../apps/automationhatlite.c libiotivity-constrained-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
-
 device_builder_server: libiotivity-constrained-server.a
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/device_builder_server.c libiotivity-constrained-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
-    
+
 simpleserver: libiotivity-constrained-server.a
 	@mkdir -p $@_creds
 	${CC} -o $@ ../../apps/simpleserver.c libiotivity-constrained-server.a -DOC_SERVER ${CFLAGS}  ${LIBS}
