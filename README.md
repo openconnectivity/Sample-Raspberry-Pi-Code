@@ -29,15 +29,24 @@ One other note:
 The PYTHONPATH environment variable needs to be set so that the C++ server code can find the Python interface code. When the curl command is run, the ~/.bashrc file will be modified so that PYTHONPATH is set on bootup. The system will need to be booted in order for ~/.bashrc to be run.
 - sudo reboot
 
-# Building and Running the samples
+# Setting the OCF Implementation to use
+
+- The following variables MUST be set to point to the directories related to the OCF implementation you want to use in order to run the convenience scripts described below.
+  - OCFPATH - This is the absolute directory where the OCF implementation is installed and where all the convenience scripts are found. (This is typically /home/my_user_name/iot or /home/my_user_name/iot-lite)
+  - OCFSUBPATH - This is just the final part of OCFPATH, but it is necessary as a way to get the set_implementaion.sh script to work correctly. (This is typically /iot or /iot-lite)
+  - PATH - This is the normal search PATH, but it will have OCFPATH prepended to it so the scripts can be found.
+
+- source set_implementation.sh (/iot or /iot-lite) - This will switch the implementation of OCF to use (IoTivity or IoTivity-lite right now). It sets some environment variables that MUST be set for all of the scripts. IT IS CRITICAL to use the "source" command to run this script. That makes it work in the current bash context rather that a temporary one.
+
+# Building and Running Projects
 
 A number of convenience scripts have been written to make the development cycle easier.
 1. Run the following development cycle as needed
     1. create_project project_name - create a new project and name it anything you want.
     2. This isn't a script, but you need to "cd project_name" to run all the other scripts.
-    3. Copy the setup.sh from the Emulator-Code/emulator/dimlight/ directory to the current project directory
-    4. ./setup.sh - This will load all the necessary stuff to build and run the sample emulator project.
-    5. edit_input2.sh - edit the device description input file (<project name>.json) if necessary.
+    3. Copy the setup.sh from the directory of the sample you want to install into the current project directory. (In the Sample-Raspberry-Pi-Code repository)
+    4. ./setup.sh - This will load all the necessary stuff to build and run the sample project.
+    5. edit_input2.sh - edit the device description input file (project_name.json) if necessary.
     6. gen2.sh - generate the code, introspection file, PICS file, and onboarding file from the device description file.
     7. build2.sh - compile and link everything
     8. edit_code2.sh - edit the server source code if necessary.
