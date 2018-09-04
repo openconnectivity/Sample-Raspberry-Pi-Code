@@ -126,6 +126,8 @@ void AmbientLight::stopObserve()
 void AmbientLight::onObserve(const HeaderOptions headerOptions, const OCRepresentation& rep,
                              int eCode, int sequenceNumber)
 {
+    HeaderOptions dummy = headerOptions;
+
     if (eCode == OC_STACK_OK)
     {
         int value;
@@ -148,6 +150,8 @@ void AmbientLight::get()
 void AmbientLight::onGet(const HeaderOptions& headerOptions, const OCRepresentation& representation,
                          int errCode)
 {
+    HeaderOptions dummy = headerOptions;
+
     if (errCode == OC_STACK_OK)
     {
         int value;
