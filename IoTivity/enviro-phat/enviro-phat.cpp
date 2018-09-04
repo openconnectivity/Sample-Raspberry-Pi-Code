@@ -515,6 +515,7 @@ OCEntityHandlerResult BrightnessResource::entityHandler(std::shared_ptr<OCResour
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
+                std::cout << "Stopping observer for brightness sensor" << endl;
                 m_brightnessObserverLoop->stop();
 
                 // delete observer
