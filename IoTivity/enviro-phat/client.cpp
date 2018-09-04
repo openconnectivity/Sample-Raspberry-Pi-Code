@@ -180,22 +180,13 @@ int main()
                 IoTClient::DisplayMenu();
                 break;
             case 1:
-                if (client.getTemperatureSensor())
-                    client.getTemperatureSensor()->get();
-                else
-                    cout << "Temperature sensor resource not yet discovered" << endl;
+                cout << "Temperature sensor resource not yet discovered" << endl;
                 break;
             case 2:
-                if (client.getTemperatureSensor())
-                    client.getTemperatureSensor()->startObserve();
-                else
-                    cout << "Temperature sensor resource not yet discovered" << endl;
+                cout << "Temperature sensor resource not yet discovered" << endl;
                 break;
             case 3:
-                if (client.getTemperatureSensor())
-                    client.getTemperatureSensor()->stopObserve();
-                else
-                    cout << "Temperature sensor resource not yet discovered" << endl;
+                cout << "Temperature sensor resource not yet discovered" << endl;
                 break;
             case 4:
                 if (client.getAmbientLightSensor())
@@ -216,16 +207,10 @@ int main()
                     cout << "Ambient light sensor resource not yet discovered" << endl;
                 break;
             case 7:
-                if (client.getPlatformLED())
-                    client.getPlatformLED()->put(1);
-                else
-                    cout << "LED resource not yet discovered" << endl;
+                cout << "LED resource not yet discovered" << endl;
                 break;
             case 8:
-                if (client.getPlatformLED())
-                    client.getPlatformLED()->put(0);
-                else
-                    cout << "LED resource not yet discovered" << endl;
+                cout << "LED resource not yet discovered" << endl;
                 break;
             case 9:
             default:
