@@ -286,7 +286,11 @@ BrightnessResource::BrightnessResource(std::string resourceUri)
     m_var_value_n = "";  // current value of property "n" Friendly name of the resource
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.light.brightness");
-    }
+
+    // set up the observation brightnessObserverLoop
+    IoTObserverCb brightnessObsCb = bind(&BrightnessResource::brightnessObserverLoop, this);
+    m_brightnessObserverLoop = make_shared<IoTObserver>(brightnessObsCb);
+}
 
 /*
 * Destructor code
