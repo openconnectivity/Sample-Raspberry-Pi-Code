@@ -52,17 +52,13 @@ public:
 
 class IoTClient
 {
-    shared_ptr<TemperatureSensor> m_temperatureSensor;
     shared_ptr<AmbientLight> m_ambientLightSensor;
-    shared_ptr<LED> m_platformLED;
     shared_ptr<PlatformConfig> m_platformConfig;
     FindCallback m_resourceDiscoveryCallback;
     void initializePlatform();
     void discoveredResource(shared_ptr<OCResource>);
 public:
-    shared_ptr<TemperatureSensor> getTemperatureSensor();
     shared_ptr<AmbientLight> getAmbientLightSensor();
-    shared_ptr<LED> getPlatformLED();
     void findResource();
     IoTClient();
     virtual ~IoTClient();
