@@ -390,7 +390,8 @@ void BrightnessResource::brightnessObserverLoop()
     //    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
     //    m_var_value_voltage = testEnviroPhat->returnDouble;
 
-    counter = ++counter % 10;
+    counter++;
+    counter = counter % 10;
     m_var_value_brightness = counter;
 
     std::cout << "\t\t" << "property 'brightness' : "<< m_var_value_brightness << std::endl;
