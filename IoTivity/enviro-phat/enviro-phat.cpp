@@ -219,6 +219,8 @@ class BrightnessResource : public Resource
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
 
+        const int MAX_BRIGHTNESS=65535;
+        
         //observer callback functions
         shared_ptr<IoTObserver> m_brightnessObserverLoop;
         void brightnessObserverLoop();
@@ -386,7 +388,7 @@ void BrightnessResource::brightnessObserverLoop()
 
     testEnviroPhat->myParamArgs[0] = 0;
     testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
-    m_var_value_brightness = testEnviroPhat->returnLong;
+    m_var_value_brightness = testEnviroPhat->returnLong / MAX_BRIGHTNESS;
 
     std::cout << "\t\t" << "property 'brightness' : "<< m_var_value_brightness << std::endl;
     m_rep.setValue(m_var_name_brightness, m_var_value_brightness);
@@ -406,7 +408,7 @@ OCRepresentation BrightnessResource::get(QueryParamsMap queries)
   	// alternative is to have a callback from the hardware that sets the member variables
     testEnviroPhat->myParamArgs[0] = 0;
     testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
-    m_var_value_brightness = testEnviroPhat->returnLong;
+    m_var_value_brightness = testEnviroPhat->returnLong / MAX_BRIGHTNESS;
 
     std::cout << "\t\t" << "property 'brightness' : "<< m_var_value_brightness << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
