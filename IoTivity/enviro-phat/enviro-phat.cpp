@@ -140,7 +140,7 @@ int EnviroPhat::CallPythonFunction(char moduleName[], char functionName[], int n
                     printf("Result of call: %f\n", returnDouble);
                 } else {
                     returnLong = PyInt_AsLong(pValue);
-                    printf("Result of call: %ld\n", PyInt_AsLong(pValue));
+                    printf("Result of call: %ld\n", returnLong);
                 }
                 Py_DECREF(pValue);
             }
@@ -386,7 +386,7 @@ void BrightnessResource::brightnessObserverLoop()
 
     testEnviroPhat->myParamArgs[0] = 0;
     testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
-    m_var_value_brightness = testEnviroPhat->returnDouble;
+    m_var_value_brightness = testEnviroPhat->returnLong;
 
     std::cout << "\t\t" << "property 'brightness' : "<< m_var_value_brightness << std::endl;
     m_rep.setValue(m_var_name_brightness, m_var_value_brightness);
@@ -404,10 +404,9 @@ OCRepresentation BrightnessResource::get(QueryParamsMap queries)
   	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   	// the calls needs to fill in the member variable before it is returned.
   	// alternative is to have a callback from the hardware that sets the member variables
-//    testEnviroPhat->myParamArgs[0] = 0;
-//    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
-//    m_var_value_voltage = testEnviroPhat->returnDouble;
-
+    testEnviroPhat->myParamArgs[0] = 0;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
+    m_var_value_brightness = testEnviroPhat->returnLong;
 
     std::cout << "\t\t" << "property 'brightness' : "<< m_var_value_brightness << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
