@@ -381,18 +381,12 @@ OCStackResult BrightnessResource::sendNotification(const std::shared_ptr< OCReso
 */
 void BrightnessResource::brightnessObserverLoop()
 {
-    static int counter=0;
-
     usleep(1500000);
     std::cout << "Brightness Observer Callback" << endl;
 
-    //    testEnviroPhat->myParamArgs[0] = 0;
-    //    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, testEnviroPhat->myParamArgs);
-    //    m_var_value_voltage = testEnviroPhat->returnDouble;
-
-    counter++;
-    counter = counter % 10;
-    m_var_value_brightness = counter;
+    testEnviroPhat->myParamArgs[0] = 0;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
+    m_var_value_brightness = testEnviroPhat->returnDouble;
 
     std::cout << "\t\t" << "property 'brightness' : "<< m_var_value_brightness << std::endl;
     m_rep.setValue(m_var_name_brightness, m_var_value_brightness);
