@@ -163,12 +163,12 @@
     "path" : "/motor1",
     "rt"   : [ "oic.r.energy.electrical" ],
     "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+    "remove_properties" : [ "range", "step", "value" , "id" , "precision"]
   },
   {
     "path" : "/motor2",
     "rt"   : [ "oic.r.energy.electrical" ],
     "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
-  },
+    "remove_properties" : [ "range", "step", "value" , "id" , "precision"]
+  }
 ]
