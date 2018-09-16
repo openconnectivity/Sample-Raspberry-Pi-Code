@@ -12,14 +12,8 @@ def readAnalog(channel):
     return float(voltage)
 
 def readInput(channel):
-    if channel == 1:
-        state = explorerhat.input.one.read()
-    elif channel == 2:
-        state = explorerhat.input.two.read()
-    elif channel == 3:
-        state = explorerhat.input.three.read()
-    elif channel == 4:
-        state = explorerhat.input.four.read()
+    if 0 < channel < 5:
+        state = explorerhat.input[channel - 1].read()
     else:
         state = False
         print "Specified input channel is out of range."
@@ -27,22 +21,8 @@ def readInput(channel):
     return int(state)
 
 def readTouch(channel):
-    if channel == 1:
-        state = explorerhat.touch.one.read()
-    elif channel == 2:
-        state = explorerhat.touch.two.read()
-    elif channel == 3:
-        state = explorerhat.touch.three.read()
-    elif channel == 4:
-        state = explorerhat.touch.four.read()
-    elif channel == 5:
-        state = explorerhat.touch.five.read()
-    elif channel == 6:
-        state = explorerhat.touch.six.read()
-    elif channel == 7:
-        state = explorerhat.touch.seven.read()
-    elif channel == 8:
-        state = explorerhat.touch.eight.read()
+    if 0 < channel < 9:
+        state = explorerhat.touch[channel - 1].read()
     else:
         state = False
         print "Specified touch channel is out of range."
@@ -50,22 +30,14 @@ def readTouch(channel):
     return int(state)
 
 def writeOutput(channel, state):
-    if channel == 1:
-        explorerhat.output.one.write(state)
-    elif channel == 2:
-        explorerhat.output.two.write(state)
-    elif channel == 3:
-        explorerhat.output.three.write(state)
-    elif channel == 4:
-        explorerhat.output.four.write(state)
+    if 0 < channel < 5:
+        explorerhat.output[channel - 1].write(state)
     else:
         print "Specified output channel is out of range."
     return 0
 
 def writeLight(channel, state):
-    print "in WriteLight"
     if 0 < channel < 5:
-        print "channel"
         explorerhat.light[channel - 1].write(state)
     else:
         print "Specified light channel is out of range."
