@@ -56,34 +56,6 @@
     "remove_methods" : ["post"]
   },
   {
-    "path" : "/analog1",
-    "rt"   : [ "oic.r.energy.electrical" ],
-    "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
-    "remove_methods" : ["post"]
-  },
-  {
-    "path" : "/analog2",
-    "rt"   : [ "oic.r.energy.electrical" ],
-    "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
-    "remove_methods" : ["post"]
-  },
-  {
-    "path" : "/analog3",
-    "rt"   : [ "oic.r.energy.electrical" ],
-    "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
-    "remove_methods" : ["post"]
-  },
-  {
-    "path" : "/analog4",
-    "rt"   : [ "oic.r.energy.electrical" ],
-    "if"   : ["oic.if.baseline", "oic.if.s" ],
-    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
-    "remove_methods" : ["post"]
-  },
-  {
     "path" : "/input1",
     "rt"   : [ "oic.r.switch.binary" ],
     "if"   : ["oic.if.baseline", "oic.if.a" ],
@@ -109,6 +81,34 @@
     "rt"   : [ "oic.r.switch.binary" ],
     "if"   : ["oic.if.baseline", "oic.if.a" ],
     "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+  {
+    "path" : "/analog1",
+    "rt"   : [ "oic.r.energy.electrical" ],
+    "if"   : ["oic.if.baseline", "oic.if.s" ],
+    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+    "remove_methods" : ["post"]
+  },
+  {
+    "path" : "/analog2",
+    "rt"   : [ "oic.r.energy.electrical" ],
+    "if"   : ["oic.if.baseline", "oic.if.s" ],
+    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+    "remove_methods" : ["post"]
+  },
+  {
+    "path" : "/analog3",
+    "rt"   : [ "oic.r.energy.electrical" ],
+    "if"   : ["oic.if.baseline", "oic.if.s" ],
+    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+    "remove_methods" : ["post"]
+  },
+  {
+    "path" : "/analog4",
+    "rt"   : [ "oic.r.energy.electrical" ],
+    "if"   : ["oic.if.baseline", "oic.if.s" ],
+    "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
     "remove_methods" : ["post"]
   },
   {
