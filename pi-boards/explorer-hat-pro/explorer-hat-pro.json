@@ -83,7 +83,6 @@
     "remove_properties" : [ "range", "step" , "id", "precision" ],
     "remove_methods" : ["post"]
   },
-
   {
     "path" : "/analog1",
     "rt"   : [ "oic.r.energy.electrical" ],
