@@ -35,7 +35,7 @@ def readTouch(channel):
         state = explorerhat.touch.three.read()
     elif channel == 4:
         state = explorerhat.touch.four.read()
-    elif channel == 5
+    elif channel == 5:
         state = explorerhat.touch.five.read()
     elif channel == 6:
         state = explorerhat.touch.six.read()
