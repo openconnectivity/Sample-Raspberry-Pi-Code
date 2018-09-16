@@ -63,7 +63,9 @@ def writeOutput(channel, state):
     return 0
 
 def writeLight(channel, state):
+    print "in WriteLight"
     if 0 < channel < 5:
+        print "channel"
         explorerhat.light[channel - 1].write(state)
     else:
         print "Specified light channel is out of range."
