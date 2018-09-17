@@ -11,18 +11,15 @@ def readAnalog(channel):
     print "voltage value = ", voltage
     return float(voltage)
 
-# def handleAnalogInput(input, voltage):
-#     channel = input.name()
-#     print("Analog input handler channel {} changed to {} volts.".format(channel, voltage))
-#     return 0
-#
-# def startObserveAnalogInput(channel):
-#     explorerhat.analog[channel - 1].changed(handleAnalogInput, 0.1)
-#     return 0
-#
-# def stopObserveAnalogInput(channel):
-#     explorerhat.analog[channel - 1].clear_events()
-#     return 0
+def handleAnalogInput(input, voltage):
+    channel = input.name()
+    print("Analog input handler channel {} changed to {} volts.".format(channel, voltage))
+
+def startObserveAnalogInput(channel):
+    explorerhat.analog[channel - 1].changed(handleAnalogInput, 0.1)
+
+def stopObserveAnalogInput(channel):
+    explorerhat.analog[channel - 1].clear_events()
 
 def readInput(channel):
     if 0 < channel < 5:
@@ -33,45 +30,40 @@ def readInput(channel):
     print "Input value = ", state
     return int(state)
 
-# def handleInput(input):
-#     state = input.read()
-#     channel = input.name()
-#     print("Input handler channel {} changed to {}.".format(channel, state))
-#     return 0
-#
-# def startObserveInput(channel):
-#     explorerhat.input[channel - 1].changed(handleInput, 25)
-#     return 0
-#
-# def stopObserveInput(channel):
-#     explorerhat.input[channel - 1].clear_events()
-#     return 0
+def handleInput(input):
+    state = input.read()
+    channel = input.name()
+    print("Input handler channel {} changed to {}.".format(channel, state))
+
+def startObserveInput(channel):
+    explorerhat.input[channel - 1].changed(handleInput, 25)
+
+
+def stopObserveInput(channel):
+    explorerhat.input[channel - 1].clear_events()
 
 def readTouch(channel):
     if 0 < channel < 9:
-        state = explorerhat.touch[channel - 1].read()
+        state = explorerhat.touch[channel - 1].is_pressed()
     else:
         state = False
         print "Specified touch channel is out of range."
     print "touch value = ", state
     return int(state)
 
-# def handleTouch(channel, event):
-#     if event == 'press':
-#         print "press"
-#     if event == 'release'
-#         print "release"
-#     print("Touch handler channel {} changed to {}.".format(channel, event))
-#     return 0
-#
-# def startObserveTouch(channel):
-#     explorerhat.touch[channel - 1].pressed(handleTouch)
-#     explorerhat.touch[channel - 1].released(handleTouch)
-#     return 0
-#
-# def stopObserveTouch(channel):
-#     explorerhat.touch[channel - 1].clear_events()
-#     return 0
+def handleTouch(channel, event):
+    if event == 'press':
+        print "press"
+    if event == 'release':
+        print "release"
+    print("Touch handler channel {} changed to {}.".format(channel, event))
+
+def startObserveTouch(channel):
+    explorerhat.touch[channel - 1].pressed(handleTouch)
+    explorerhat.touch[channel - 1].released(handleTouch)
+
+def stopObserveTouch(channel):
+    explorerhat.touch[channel - 1].clear_events()
 
 def writeOutput(channel, state):
     if 0 < channel < 5:
