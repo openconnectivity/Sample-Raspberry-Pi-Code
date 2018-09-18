@@ -9100,10 +9100,12 @@ else
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
                 std::cout << "register" << std::endl;
+                m_touch1ObserverLoop->start();
             }
             else
             {
                 std::cout << "unregister" << std::endl;
+                m_touch1ObserverLoop->stop();
             }
 
             if(ObserveAction::ObserveRegister == observationInfo.action)
