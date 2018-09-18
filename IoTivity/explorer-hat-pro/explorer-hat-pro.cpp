@@ -8828,6 +8828,10 @@ class Touch1Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch1ObserverLoop;
+        void touch1ObserverLoop();
     private:
 
         /*
@@ -8890,7 +8894,11 @@ Touch1Resource::Touch1Resource(std::string resourceUri)
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.sensor.touch");
     m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch1ObsCb = bind(&Touch1Resource::touch1ObserverLoop, this);
+    m_touch1ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -8975,6 +8983,21 @@ OCStackResult Touch1Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch1
+*/
+void Touch1Resource::touch1ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch1 Observer Callback" << endl;
+
+    testExplorerHat->myParamArgs[0] = 1;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+    std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch1

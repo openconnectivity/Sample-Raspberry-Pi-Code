@@ -4746,7 +4746,8 @@ class IoTServer
         Voltage3Resource  m_voltage3Instance;
         XmotionResource  m_xmotionInstance;
         YmotionResource  m_ymotionInstance;
-        ZmotionResource  m_zmotionInstance;};
+        ZmotionResource  m_zmotionInstance;
+};
 
 IoTServer::IoTServer()
     :m_brightnessInstance(),
