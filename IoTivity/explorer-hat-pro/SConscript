@@ -48,7 +48,7 @@ cpp_defines = ['__WITH_DTLS__', 'TB_LOG']
 libraries = ['octbstack']
 libraries.append('oc')
 #libraries.append('log')
-		
+
 platform_info = p.platform()
 joule = 'Linux' in platform_info and 'joule' in platform_info and \
 'Ubuntu' in platform_info
@@ -102,8 +102,8 @@ if target_os in ['linux']:
 ######################################################################
 # Source files and Targets
 ######################################################################
-#client = samples_env.Program('client', ['client.c'])
-server = samples_env.Program('server', ['server.cpp'])
+client = samples_env.Program('client', ['client.cpp'])
+server = samples_env.Program('server', ['server.cpp', 'observer.cpp'])
 examples_dir = '/examples/OCFDeviceBuilder/'
 #client_dat = samples_env.Install(
 #    build_dir + examples_dir, src_dir + examples_dir + 'ocf_svr_db_client.dat')
