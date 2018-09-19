@@ -27,7 +27,7 @@ def readInput(channel):
     else:
         state = False
         print "Specified input channel is out of range."
-    print "Input value = ", state
+    print "input value = ", state
     return int(state)
 
 def handleInput(input):
@@ -91,4 +91,4 @@ def writeMotor(channel, motorSpeed):
 
 def waitForEvent(dummy):
     print "waiting..."
-    explorerhat.pause(1000000)
+    explorerhat.pause()

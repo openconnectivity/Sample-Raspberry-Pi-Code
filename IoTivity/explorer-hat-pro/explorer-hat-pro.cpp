@@ -8989,18 +8989,21 @@ OCStackResult Touch1Resource::sendNotification(const std::shared_ptr< OCResource
 */
 void Touch1Resource::touch1ObserverLoop()
 {
-//    usleep(15000000);
-    std::cout << "Touch1 Observer Callback waiting for event" << endl;
-    testExplorerHat->myParamArgs[0] = 1;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"waitForEvent", 1, testExplorerHat->myParamArgs);
-    std::cout << "Touch1 Observer Callback got event" << endl;
+    static bool previousTouchState = False;
 
+    usleep(500000);
+//    std::cout << "Touch1 Observer Callback check for change" << endl;
     testExplorerHat->myParamArgs[0] = 1;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"touchChange", 1, testExplorerHat->myParamArgs);
     m_var_value_value = (bool)testExplorerHat->returnLong;
 
-    std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
-    m_rep.setValue(m_var_name_value, m_var_value_value);
+    if (previousTouchState != m_var_value_value) {
+      std::cout << "Touch1 Observer Callback value changed" << endl;
+      previousTouchState = m_var_value_value;
+
+      std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
+      m_rep.setValue(m_var_name_value, m_var_value_value);
+    }
 }
 
 /*
