@@ -8989,31 +8989,22 @@ OCStackResult Touch1Resource::sendNotification(const std::shared_ptr< OCResource
 */
 void Touch1Resource::touch1ObserverLoop()
 {
-//    static bool previousTouchState = false;
-
     usleep(1500000);
     std::cout << "Touch1 Observer Callback" << endl;
     testExplorerHat->myParamArgs[0] = 1;
     testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
     m_var_value_value = (bool)testExplorerHat->returnLong;
 
-    m_rep.setValue(m_var_name_value, m_var_value_value );
+//    OCStackResult result = sendNotification();
 
-    OCStackResult result = sendNotification();
-
-    if (result == OC_STACK_NO_OBSERVERS)
-    {
-        cout << "No more observers..Stopping observer loop..." << endl;
-        m_touch1ObserverLoop->stop();
-    }
-
-//    if (previousTouchState != m_var_value_value) {
-//      std::cout << "Touch1 Observer Callback value changed" << endl;
-//      previousTouchState = m_var_value_value;
-//
-//      std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
-//      m_rep.setValue(m_var_name_value, m_var_value_value);
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch1ObserverLoop->stop();
 //    }
+
+    std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
 }
 
 /*
@@ -9116,17 +9107,10 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
                 std::cout << "register" << std::endl;
-//                testExplorerHat->myParamArgs[0] = 1;
-//                testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"startObserveTouch", 1, testExplorerHat->myParamArgs);
-                m_interestedObservers.push_back(observationInfo.obsId);
-                m_touch1ObserverLoop->start();
             }
             else
             {
                 std::cout << "unregister" << std::endl;
-//                testExplorerHat->myParamArgs[0] = 1;
-//                testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"stopObserveTouch", 1, testExplorerHat->myParamArgs);
-                m_touch1ObserverLoop->stop();
             }
 
             if(ObserveAction::ObserveRegister == observationInfo.action)
