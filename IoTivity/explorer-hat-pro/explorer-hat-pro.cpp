@@ -103,10 +103,6 @@ class Analog1Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-
-        //observer callback functions
-        shared_ptr<IoTObserver> m_touch1ObserverLoop;
-        void touch1ObserverLoop();
     private:
 
         /*
@@ -269,15 +265,6 @@ OCStackResult Analog1Resource::sendNotification(const std::shared_ptr< OCResourc
 
 
 /*
-* Observer loop for the  observe function /touch1
-*/
-void Touch1Resource::touch1ObserverLoop()
-{
-    usleep(1500000);
-    std::cout << "Touch1 Observer Callback" << endl;
-}
-
-/*
 * Make the payload for the retrieve function (e.g. GET) /analog1
 * @param queries  the query parameters for this call
 */
@@ -394,7 +381,6 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
-                m_touch1ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -8677,6 +8663,10 @@ class Touch1Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch1ObserverLoop;
+        void touch1ObserverLoop();
     private:
 
         /*
@@ -8824,6 +8814,14 @@ OCStackResult Touch1Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch1
+*/
+void Touch1Resource::touch1ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch1 Observer Callback" << endl;
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch1
@@ -8932,6 +8930,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch1ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
