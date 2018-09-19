@@ -90,4 +90,5 @@ def writeMotor(channel, motorSpeed):
     return 0
 
 def waitForEvent(dummy):
-    explorerhat.pause()
+    print "waiting..."
+    explorerhat.pause(1)
