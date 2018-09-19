@@ -9085,7 +9085,7 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
                     ehResult = OC_EH_OK;
                 }
             }
-else
+            else
             {
                 std::cout << "Touch1Resource unsupported request type (delete,put,..)"
                     << request->getRequestType() << std::endl;
@@ -9103,11 +9103,15 @@ else
             if (ObserveAction::ObserveRegister == observationInfo.action)
             {
                 std::cout << "register" << std::endl;
+                testExplorerHat->myParamArgs[0] = 1;
+                testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"startObserveTouch", 1, testExplorerHat->myParamArgs);
                 m_touch1ObserverLoop->start();
             }
             else
             {
                 std::cout << "unregister" << std::endl;
+                testExplorerHat->myParamArgs[0] = 1;
+                testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"stopObserveTouch", 1, testExplorerHat->myParamArgs);
                 m_touch1ObserverLoop->stop();
             }
 
