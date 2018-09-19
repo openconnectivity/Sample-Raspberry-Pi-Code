@@ -9118,6 +9118,7 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
                 std::cout << "register" << std::endl;
 //                testExplorerHat->myParamArgs[0] = 1;
 //                testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"startObserveTouch", 1, testExplorerHat->myParamArgs);
+                m_interestedObservers.push_back(observationInfo.obsId);
                 m_touch1ObserverLoop->start();
             }
             else
