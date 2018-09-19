@@ -8993,9 +8993,9 @@ void Touch1Resource::touch1ObserverLoop()
 
     usleep(500000);
 //    std::cout << "Touch1 Observer Callback check for change" << endl;
-    testExplorerHat->myParamArgs[0] = 1;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+//    testExplorerHat->myParamArgs[0] = 1;
+//    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+//    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     if (previousTouchState != m_var_value_value) {
       std::cout << "Touch1 Observer Callback value changed" << endl;
