@@ -88,3 +88,6 @@ def writeMotor(channel, motorSpeed):
     else:
         print "Specified motor channel is out of range."
     return 0
+
+def waitForEvent(dummy):
+    explorerhat.pause()
