@@ -9118,13 +9118,14 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
                 std::cout << "register" << std::endl;
 //                testExplorerHat->myParamArgs[0] = 1;
 //                testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"startObserveTouch", 1, testExplorerHat->myParamArgs);
+                m_touch1ObserverLoop->start();
             }
             else
             {
                 std::cout << "unregister" << std::endl;
 //                testExplorerHat->myParamArgs[0] = 1;
 //                testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"stopObserveTouch", 1, testExplorerHat->myParamArgs);
-//                m_touch1ObserverLoop->stop();
+                m_touch1ObserverLoop->stop();
             }
 
             if(ObserveAction::ObserveRegister == observationInfo.action)
