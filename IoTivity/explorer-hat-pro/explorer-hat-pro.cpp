@@ -8989,8 +8989,11 @@ OCStackResult Touch1Resource::sendNotification(const std::shared_ptr< OCResource
 */
 void Touch1Resource::touch1ObserverLoop()
 {
-    usleep(1500000);
-    std::cout << "Touch1 Observer Callback" << endl;
+    usleep(15000000);
+    std::cout << "Touch1 Observer Callback waiting for event" << endl;
+    testExplorerHat->myParamArgs[0] = 1;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    std::cout << "Touch1 Observer Callback got event" << endl;
 
     testExplorerHat->myParamArgs[0] = 1;
     testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
