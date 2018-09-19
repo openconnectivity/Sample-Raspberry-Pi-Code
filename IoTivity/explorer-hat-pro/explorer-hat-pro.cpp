@@ -8989,7 +8989,7 @@ OCStackResult Touch1Resource::sendNotification(const std::shared_ptr< OCResource
 */
 void Touch1Resource::touch1ObserverLoop()
 {
-    static bool previousTouchState = False;
+    static bool previousTouchState = false;
 
     usleep(500000);
 //    std::cout << "Touch1 Observer Callback check for change" << endl;
