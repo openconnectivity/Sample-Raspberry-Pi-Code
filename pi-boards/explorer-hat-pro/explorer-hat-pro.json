@@ -170,7 +170,7 @@
     "rt"   : [ "oic.r.energy.electrical" ],
     "if"   : ["oic.if.baseline", "oic.if.s" ],
     "remove_properties" : [ "range", "step", "value" , "id" , "precision"]
-  }
+  },
   {
     "path" : "/oic/p",
     "rt"   : [ "oic.wk.p" ],
