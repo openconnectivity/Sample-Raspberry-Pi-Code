@@ -17,6 +17,8 @@
 // limitations under the License.
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#include <Python.h>
+
 #include <signal.h>
 #include <functional>
 #include <string>
@@ -39,7 +41,7 @@ namespace PH = std::placeholders;
 
 /*
  tool_version          : 20171123
- input_file            : /home/pi/workspace/explorerhat/device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/workExplorerHatrhat/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20160519
  title of input_file   : Touch Sensor
 */
@@ -58,6 +60,116 @@ class Resource
 
 };
 
+class ExplorerHat
+{
+    public:
+        /*
+         * constructor
+         */
+        ExplorerHat();
+
+        /*
+         * destructor
+         */
+        virtual ~ExplorerHat();
+
+        int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[]);
+
+        PyObject *pName, *pModule, *pDict, *pFunc;
+        PyObject *pArgs, *pValue;
+
+	int myParamArgs[2];
+        long returnLong = 0;
+        double returnDouble = 0.0;
+};
+
+/*
+* Constructor code
+*/
+ExplorerHat::ExplorerHat()
+{
+    Py_Initialize();
+}
+
+/*
+* Destructor code
+*/
+ExplorerHat::~ExplorerHat()
+{
+    Py_Finalize();
+}
+
+/*
+* Funcion to call Pimoroni python libraries
+*/
+int ExplorerHat::CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[])
+{
+    int i;
+
+    printf("module = %s\n", moduleName);
+    pName = PyString_FromString(moduleName);
+    /* Error checking of pName left out */
+
+    pModule = PyImport_Import(pName);
+    Py_DECREF(pName);
+
+    if (pModule != NULL) {
+        printf("function = %s\n", functionName);
+        pFunc = PyObject_GetAttrString(pModule, functionName);
+        /* pFunc is a new reference */
+
+        if (pFunc && PyCallable_Check(pFunc)) {
+            pArgs = PyTuple_New(numArgs);
+            for (i = 0; i < numArgs; ++i) {
+                printf("arg%d = %d\n", i+1, args[i]);
+                pValue = PyInt_FromLong(args[i]);
+                if (!pValue) {
+                    Py_DECREF(pArgs);
+                    Py_DECREF(pModule);
+                    fprintf(stderr, "Cannot convert argument\n");
+                    return 1;
+                }
+                /* pValue reference stolen here: */
+                PyTuple_SetItem(pArgs, i, pValue);
+            }
+            pValue = PyObject_CallObject(pFunc, pArgs);
+            Py_DECREF(pArgs);
+            if (pValue != NULL) {
+                if (PyFloat_Check(pValue)) {
+                    returnDouble = PyFloat_AsDouble(pValue);
+                    printf("Result of call: %f\n", returnDouble);
+                } else {
+                    returnLong = PyInt_AsLong(pValue);
+                    printf("Result of call: %ld\n", PyInt_AsLong(pValue));
+                }
+                Py_DECREF(pValue);
+            }
+            else {
+                Py_DECREF(pFunc);
+                Py_DECREF(pModule);
+                PyErr_Print();
+                fprintf(stderr,"Call failed\n");
+                return 1;
+            }
+        }
+        else {
+            if (PyErr_Occurred())
+                PyErr_Print();
+            fprintf(stderr, "Cannot find function \"%s\"\n", functionName);
+        }
+        Py_XDECREF(pFunc);
+        Py_DECREF(pModule);
+    }
+    else {
+        PyErr_Print();
+        fprintf(stderr, "Failed to load \"%s\"\n", moduleName);
+        return 1;
+    }
+
+    return 0;
+}
+
+ExplorerHat *testExplorerHat;
 
 /*
  * class definition for class that handles /analog1
@@ -272,9 +384,12 @@ OCRepresentation Analog1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 1;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+    m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -611,9 +726,12 @@ OCRepresentation Analog2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 2;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+    m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -950,9 +1068,12 @@ OCRepresentation Analog3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 3;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+    m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1289,9 +1410,12 @@ OCRepresentation Analog4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 4;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+    m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1617,9 +1741,12 @@ OCRepresentation Input1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 1;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -1935,9 +2062,12 @@ OCRepresentation Input2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 2;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -2253,9 +2383,12 @@ OCRepresentation Input3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 3;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -2571,9 +2704,12 @@ OCRepresentation Input4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 4;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -3083,9 +3219,12 @@ OCEntityHandlerResult Light1Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+      	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 1;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -3633,9 +3772,12 @@ OCEntityHandlerResult Light2Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 2;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -4183,9 +4325,12 @@ OCEntityHandlerResult Light3Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 3;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -4733,9 +4878,12 @@ OCEntityHandlerResult Light4Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 4;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -5498,9 +5646,12 @@ OCEntityHandlerResult Motor1Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 1;
+        testExplorerHat->myParamArgs[1] = m_var_value_voltage;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeMotor", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -6263,9 +6414,12 @@ OCEntityHandlerResult Motor2Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 1;
+        testExplorerHat->myParamArgs[1] = m_var_value_voltage;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeMotor", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -6813,9 +6967,12 @@ OCEntityHandlerResult Output1Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 1;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -7363,9 +7520,12 @@ OCEntityHandlerResult Output2Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 2;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -7913,9 +8073,12 @@ OCEntityHandlerResult Output3Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 3;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -8463,9 +8626,12 @@ OCEntityHandlerResult Output4Resource::post(QueryParamsMap queries, const OCRepr
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testExplorerHat->myParamArgs[0] = 4;
+        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -8729,7 +8895,11 @@ Touch1Resource::Touch1Resource(std::string resourceUri)
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.sensor.touch");
     m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch1ObsCb = bind(&Touch1Resource::touch1ObserverLoop, this);
+    m_touch1ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -8821,6 +8991,20 @@ void Touch1Resource::touch1ObserverLoop()
 {
     usleep(1500000);
     std::cout << "Touch1 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 1;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch1ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
 }
 
 /*
@@ -8831,9 +9015,12 @@ OCRepresentation Touch1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 1;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -8902,7 +9089,7 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
                     ehResult = OC_EH_OK;
                 }
             }
-else
+            else
             {
                 std::cout << "Touch1Resource unsupported request type (delete,put,..)"
                     << request->getRequestType() << std::endl;
@@ -8929,12 +9116,14 @@ else
             if(ObserveAction::ObserveRegister == observationInfo.action)
             {
                 // add observer
+                std::cout << "add observer" << std::endl;
                 m_interestedObservers.push_back(observationInfo.obsId);
                 m_touch1ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
                 // delete observer
+                std::cout << "delete observer" << std::endl;
                 m_interestedObservers.erase(std::remove(
                                             m_interestedObservers.begin(),
                                             m_interestedObservers.end(),
@@ -9150,9 +9339,12 @@ OCRepresentation Touch2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 2;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -9468,9 +9660,12 @@ OCRepresentation Touch3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 3;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -9786,9 +9981,12 @@ OCRepresentation Touch4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 4;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -10104,9 +10302,12 @@ OCRepresentation Touch5Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 5;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -10422,9 +10623,12 @@ OCRepresentation Touch6Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 6;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -10740,9 +10944,12 @@ OCRepresentation Touch7Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 7;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -11058,9 +11265,12 @@ OCRepresentation Touch8Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testExplorerHat->myParamArgs[0] = 8;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -11742,6 +11952,8 @@ int main(void)
     std::cout << "device type: " <<  platform.deviceType << std::endl;
     std::cout << "platformID: " <<  platform.getPlatformInfo()->platformID << std::endl;
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
+
+    testExplorerHat = new ExplorerHat();
 
     // create the server
     IoTServer server;
