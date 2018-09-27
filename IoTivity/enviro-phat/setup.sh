@@ -2,17 +2,10 @@
 CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/SConscript $CURPWD/"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/enviro-phat/enviro-phat.json $CURPWD/$PROJNAME.json"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/enviro-phat.cpp.gen $CURPWD/src/$PROJNAME.cpp.gen"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/*.cpp $CURPWD/src/"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/*.h $CURPWD/src/"
-eval ${MY_COMMAND}
-MY_COMMAND="mv -i $CURPWD/src/enviro-phat.cpp $CURPWD/src/$PROJNAME.cpp"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/enviro-phat/enviro-phat.py $CURPWD/bin/"
-eval ${MY_COMMAND}
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/SConscript ${CURPWD}/
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/enviro-phat/enviro-phat.json ${CURPWD}/${PROJNAME}.json
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/enviro-phat-gen.cpp ${CURPWD}/src/${PROJNAME}-gen.cpp
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/*.cpp ${CURPWD}/src/
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/enviro-phat/*.h ${CURPWD}/src/
+mv -i $CURPWD/src/enviro-phat.cpp ${CURPWD}/src/${PROJNAME}.cpp
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/enviro-phat/enviro-phat.py ${CURPWD}/bin/

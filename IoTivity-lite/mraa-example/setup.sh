@@ -2,11 +2,7 @@
 CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/mraa-example/Makefile $CURPWD/"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/mraa-example/mraa-example.json $CURPWD/$PROJNAME.json"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/mraa-example/mraa-example.c $CURPWD/src/$PROJNAME.c"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/mraa-example/mraa-example.c.gen $CURPWD/src/$PROJNAME.c.gen"
-eval ${MY_COMMAND}
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/mraa-example/Makefile ${CURPWD}/
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/mraa-example/mraa-example.json ${CURPWD}/${PROJNAME}.json
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/mraa-example/mraa-example.c ${CURPWD}/src/${PROJNAME}.c
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity-lite/mraa-example/mraa-example-gen.c ${CURPWD}/src/${PROJNAME}-gen.c

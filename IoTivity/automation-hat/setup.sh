@@ -2,13 +2,8 @@
 CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/automation-hat/SConscript $CURPWD/"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/automation-hat/automation-hat.json $CURPWD/$PROJNAME.json"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/automation-hat/automation-hat.cpp $CURPWD/src/$PROJNAME.cpp"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/automation-hat/automation-hat.cpp.gen $CURPWD/src/$PROJNAME.cpp.gen"
-eval ${MY_COMMAND}
-MY_COMMAND="cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/automation-hat/automation-hat.py $CURPWD/bin/"
-eval ${MY_COMMAND}
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/automation-hat/SConscript ${CURPWD}/
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/automation-hat/automation-hat.json ${CURPWD}/${PROJNAME}.json
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/automation-hat/automation-hat.cpp ${CURPWD}/src/${PROJNAME}.cpp
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/automation-hat/automation-hat-gen.cpp ${CURPWD}/src/${PROJNAME}-gen.cpp
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/automation-hat/automation-hat.py ${CURPWD}/bin/
