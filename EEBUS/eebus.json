@@ -1,0 +1,134 @@
+[
+  {
+    "path" : "/1",
+    "rt"   : [ "eebus.spine.r.smartEnergyManagementPsCollection" ],
+    "if"   : ["oic.if.baseline", "oic.if.b", "oic.if.ll"],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+  {
+    "path" : "/1/1",
+    "rt"   : [ "eebus.spine.r.powerSequenceAlternativesCollection" ],
+    "if"   : ["oic.if.baseline", "oic.if.b", "oic.if.ll"],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+  {
+    "path" : "/1/1/1",
+    "rt"   : [ "eebus.spine.r.powerSequenceCollection" ],
+    "if"   : ["oic.if.baseline", "oic.if.b", "oic.if.ll"],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+  {
+    "path" : "/1/1/1/1",
+    "rt"   : [ "eebus.spine.r.powerSequenceDescription" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+    {
+    "path" : "/1/1/1/2",
+    "rt"   : [ "eebus.spine.r.powerSequencePrice" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+    {
+    "path" : "/1/1/1/3",
+    "rt"   : [ "eebus.spine.r.powerSequenceSchedule" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+    {
+    "path" : "/1/1/1/4",
+    "rt"   : [ "eebus.spine.r.powerSequenceScheduleConstraints" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+    {
+    "path" : "/1/1/1/5",
+    "rt"   : [ "eebus.spine.r.powerSequenceSchedulePreference" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+      {
+    "path" : "/1/1/1/6",
+    "rt"   : [ "eebus.spine.r.powerSequenceState" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+      {
+    "path" : "/1/1/1/7",
+    "rt"   : [ "eebus.spine.r.powerSlotCollection" ],
+    "if"   : ["oic.if.baseline", "oic.if.b", "oic.if.ll" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+      {
+    "path" : "/1/1/1/7/1",
+    "rt"   : [ "eebus.spine.r.powerSlotSchedule" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+      {
+    "path" : "/1/1/1/7/2",
+    "rt"   : [ "eebus.spine.r.powerSlotScheduleConstraints" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+        {
+    "path" : "/1/1/1/7/3",
+    "rt"   : [ "eebus.spine.r.powerSlotValue" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+        {
+    "path" : "/1/1/1/8",
+    "rt"   : [ "eebus.spine.r.powerSlotCollection" ],
+    "if"   : ["oic.if.baseline", "oic.if.b", "oic.if.ll" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+      {
+    "path" : "/1/1/1/8/1",
+    "rt"   : [ "eebus.spine.r.powerSlotSchedule" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+      {
+    "path" : "/1/1/1/8/2",
+    "rt"   : [ "eebus.spine.r.powerSlotScheduleConstraints" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+        {
+    "path" : "/1/1/1/8/3",
+    "rt"   : [ "eebus.spine.r.powerSlotValue" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  },
+    {
+    "path" : "/1/2",
+    "rt"   : [ "eebus.spine.r.powerSequenceNodeScheduleInformation" ],
+    "if"   : ["oic.if.baseline", "oic.if.a" ],
+    "remove_properties" : [ "range", "step" , "id", "precision" ],
+    "remove_methods" : ["post"]
+  }
+  {
+    "path" : "/oic/p",
+    "rt"   : [ "oic.wk.p" ],
+    "if"   : ["oic.if.baseline", "oic.if.r" ],
+    "remove_properties" : [ "n", "range", "value", "step", "precision", "vid"  ]
+  }
+]

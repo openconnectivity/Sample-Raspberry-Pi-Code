@@ -102,7 +102,7 @@ if target_os in ['linux']:
 ######################################################################
 # Source files and Targets
 ######################################################################
-client = samples_env.Program('client', ['client.cpp'])
+#client = samples_env.Program('client', ['client.cpp'])
 server = samples_env.Program('server', ['server.cpp', 'observer.cpp'])
 examples_dir = '/examples/OCFDeviceBuilder/'
 #client_dat = samples_env.Install(
