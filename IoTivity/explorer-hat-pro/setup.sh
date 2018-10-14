@@ -3,6 +3,7 @@ CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
 cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/explorer-hat-pro/SConscript ${CURPWD}/
+cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/explorer-hat-pro/explorer-hat-pro-config.json ${CURPWD}/${PROJNAME}-config.json
 cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/pi-boards/explorer-hat-pro/explorer-hat-pro.json ${CURPWD}/${PROJNAME}.json
 cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/explorer-hat-pro/explorer-hat-pro.cpp ${CURPWD}/src/${PROJNAME}.cpp
 cp ${EXAMPLEPATH}/Sample-Raspberry-Pi-Code/IoTivity/explorer-hat-pro/explorer-hat-pro-gen.cpp ${CURPWD}/src/${PROJNAME}-gen.cpp

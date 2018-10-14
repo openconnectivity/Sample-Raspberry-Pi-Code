@@ -1,0 +1,183 @@
+{
+  "friendly_name" : "Cool Device",
+  "device_type" : "oic.d.cooldevice",
+  "ocf_base_path" : "~",
+  "implementation_paths" : [
+    "/iot",
+    "/iot-lite",
+    "~/new-imp"
+  ],
+  "platforms" : [
+    "linux",
+    "windows",
+    "android"
+  ],
+  "device_description" : [
+    {
+      "path" : "/touch1",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/touch2",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/touch3",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/touch4",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/touch5",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/touch6",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/touch7",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/touch8",
+      "rt"   : [ "oic.r.sensor.touch" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/input1",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/input2",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/input3",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/input4",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/analog1",
+      "rt"   : [ "oic.r.energy.electrical" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
+      "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/analog2",
+      "rt"   : [ "oic.r.energy.electrical" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
+      "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/analog3",
+      "rt"   : [ "oic.r.energy.electrical" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
+      "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/analog4",
+      "rt"   : [ "oic.r.energy.electrical" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
+      "remove_properties" : [ "range", "step", "value" , "id" , "precision"],
+      "remove_methods" : ["post"]
+    },
+    {
+      "path" : "/light1",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/light2",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/light3",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/light4",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/output1",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/output2",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/output3",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/output4",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/oic/p",
+      "rt"   : [ "oic.wk.p" ],
+      "if"   : ["oic.if.baseline", "oic.if.r" ],
+      "remove_properties" : [ "n", "range", "value", "step", "precision", "vid"  ]
+    }
+  ]
+}
