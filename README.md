@@ -18,7 +18,7 @@ To install all the samples described above, just type the following command. Typ
 
 This command will do a number of things:
 
-- Clone the Sample-Raspberry-Pi-Code repository (which includes all the sample code described above). Each sample subdirectory includes the following files:
+- Clone the Sample-Raspberry-Pi-Code repository (which includes all the sample code described above for both IoTivity and IoTivity-lite). Each sample subdirectory includes the following files:
   - SConscript: A scons description file that will manage the compiling and linking of the project.
   - <sample>.json: The JSON device description file that is the input to DeviceBuilder and describes all the resources available on the device. Each of these resources will show up in the source code and introspection file created by DeviceBuilder.
   - <sample>.cpp: The C++ code that includes all the resources plus the code to interface to the hardware.
