@@ -12,7 +12,7 @@ In addition to the Pimoroni sample code, there are two other samples.
 
 # Installation
 
-To install all the samples described above, just type the following command. Typically, this would be installed in the ~/iot directory.
+To install all the samples described above, just type the following command. Typically, this would be installed in the HOME (~) directory.
 
 - curl https://openconnectivity.github.io/Sample-Raspberry-Pi-Code/pi-boards/install.sh | bash
 
