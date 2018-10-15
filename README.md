@@ -19,9 +19,9 @@ To install all the samples described above, just type the following command. Typ
 This command will do a number of things:
 
 - Clone the Sample-Raspberry-Pi-Code repository (which includes all the sample code described above for both IoTivity and IoTivity-lite). Each sample subdirectory includes the following files:
-  - SConscript: A scons description file that will manage the compiling and linking of the project.
+  - SConscript or Makefile: A scons (or Makefile) description file that will manage the compiling and linking of the project.
   - <sample>.json: The JSON device description file that is the input to DeviceBuilder and describes all the resources available on the device. Each of these resources will show up in the source code and introspection file created by DeviceBuilder.
-  - <sample>.cpp: The C++ code that includes all the resources plus the code to interface to the hardware.
+  - <sample>.cpp (or .c): The C++ code that includes all the resources plus the code to interface to the hardware. If necessary, .h files needed to support the sample code are also included.
   - <sample>.py: The Python code that connects the C++ code to the Pimoroni python libraries. This code will be copied to the executable directory so it will be available at runtime to control the hardware.
 
 One other note:
@@ -29,6 +29,7 @@ One other note:
 The PYTHONPATH environment variable needs to be set so that the C++ server code can find the Python interface code. When the curl command is run, the ~/.bashrc file will be modified so that PYTHONPATH is set on bootup. The system will need to be booted in order for ~/.bashrc to be run.
 - sudo reboot
 
+NOTE: Some of the below is in transition. It will be updated for consistency soon.
 # Setting the OCF Implementation to use
 
 - The following variables MUST be set to point to the directories related to the OCF implementation you want to use in order to run the convenience scripts described below.
