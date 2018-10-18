@@ -943,7 +943,7 @@ OCRepresentation DimmingswitchResource::get(QueryParamsMap queries)
   	// alternative is to have a callback from the hardware that sets the member variables
     testEnviroPhat->myParamArgs[0] = 0;
     testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
-    m_var_value_brightness = testEnviroPhat->returnLong * 100 / MAX_BRIGHTNESS;
+    m_var_value_dimmingSetting = testEnviroPhat->returnLong;
 
     std::cout << "\t\t" << "property 'dimmingSetting' : "<< m_var_value_dimmingSetting << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
