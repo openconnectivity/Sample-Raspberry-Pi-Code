@@ -17,6 +17,8 @@
 // limitations under the License.
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#include <Python.h>
+
 #include <signal.h>
 #include <functional>
 #include <string>
@@ -57,6 +59,117 @@ class Resource
 
 };
 
+
+class EnviroPhat
+{
+    public:
+        /*
+         * constructor
+         */
+        EnviroPhat();
+
+        /*
+         * destructor
+         */
+        virtual ~EnviroPhat();
+
+        int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[]);
+
+        PyObject *pName, *pModule, *pDict, *pFunc;
+        PyObject *pArgs, *pValue;
+
+        int myParamArgs[2];
+        long returnLong = 0;
+        double returnDouble = 0.0;
+};
+
+/*
+* Constructor code
+*/
+EnviroPhat::EnviroPhat()
+{
+    Py_Initialize();
+}
+
+/*
+* Destructor code
+*/
+EnviroPhat::~EnviroPhat()
+{
+    Py_Finalize();
+}
+
+/*
+* Funcion to call Pimoroni python libraries
+*/
+int EnviroPhat::CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[])
+{
+    int i;
+
+    printf("module = %s\n", moduleName);
+    pName = PyString_FromString(moduleName);
+    /* Error checking of pName left out */
+
+    pModule = PyImport_Import(pName);
+    Py_DECREF(pName);
+
+    if (pModule != NULL) {
+        printf("function = %s\n", functionName);
+        pFunc = PyObject_GetAttrString(pModule, functionName);
+        /* pFunc is a new reference */
+
+        if (pFunc && PyCallable_Check(pFunc)) {
+            pArgs = PyTuple_New(numArgs);
+            for (i = 0; i < numArgs; ++i) {
+                printf("arg%d = %d\n", i+1, args[i]);
+                pValue = PyInt_FromLong(args[i]);
+                if (!pValue) {
+                    Py_DECREF(pArgs);
+                    Py_DECREF(pModule);
+                    fprintf(stderr, "Cannot convert argument\n");
+                    return 1;
+                }
+                /* pValue reference stolen here: */
+                PyTuple_SetItem(pArgs, i, pValue);
+            }
+            pValue = PyObject_CallObject(pFunc, pArgs);
+            Py_DECREF(pArgs);
+            if (pValue != NULL) {
+                if (PyFloat_Check(pValue)) {
+                    returnDouble = PyFloat_AsDouble(pValue);
+                    printf("Result of call: %f\n", returnDouble);
+                } else {
+                    returnLong = PyInt_AsLong(pValue);
+                    printf("Result of call: %ld\n", returnLong);
+                }
+                Py_DECREF(pValue);
+            }
+            else {
+                Py_DECREF(pFunc);
+                Py_DECREF(pModule);
+                PyErr_Print();
+                fprintf(stderr,"Call failed\n");
+                return 1;
+            }
+        }
+        else {
+            if (PyErr_Occurred())
+                PyErr_Print();
+            fprintf(stderr, "Cannot find function \"%s\"\n", functionName);
+        }
+        Py_XDECREF(pFunc);
+        Py_DECREF(pModule);
+    }
+    else {
+        PyErr_Print();
+        fprintf(stderr, "Failed to load \"%s\"\n", moduleName);
+        return 1;
+    }
+
+    return 0;
+}
+
+EnviroPhat *testEnviroPhat;
 
 /*
  * class definition for class that handles /binaryswitch
