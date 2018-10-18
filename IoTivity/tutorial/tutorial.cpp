@@ -771,10 +771,10 @@ class DimmingswitchResource : public Resource
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
 
-        const int MAX_BRIGHTNESS=65535;
+//        const int MAX_BRIGHTNESS=65535;
 
         //observer callback functions
-//        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
+        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
         void dimmingswitchObserverLoop();
 
     private:
