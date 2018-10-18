@@ -217,12 +217,6 @@ class BinaryswitchResource : public Resource
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
 
-        const int MAX_BRIGHTNESS=65535;
-
-        //observer callback functions
-        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
-        void dimmingswitchObserverLoop();
-
     private:
 
         /*
@@ -776,6 +770,13 @@ class DimmingswitchResource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        const int MAX_BRIGHTNESS=65535;
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
+        void dimmingswitchObserverLoop();
+
     private:
 
         /*
@@ -850,7 +851,7 @@ DimmingswitchResource::DimmingswitchResource(std::string resourceUri)
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.light.dimming");
 
-    // set up the observation brightnessObserverLoop
+    // set up the observation dimmingswitchObserverLoop
     IoTObserverCb dimmingswitchObsCb = bind(&DimmingswitchResource::dimmingswitchObserverLoop, this);
     m_dimmingswitchObserverLoop = make_shared<IoTObserver>(dimmingswitchObsCb);
 }
