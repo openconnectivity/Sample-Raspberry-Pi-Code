@@ -59,7 +59,6 @@ class Resource
 
 };
 
-
 class EnviroPhat
 {
     public:
@@ -2255,6 +2254,8 @@ int main(void)
     std::cout << "device type: " <<  platform.deviceType << std::endl;
     std::cout << "platformID: " <<  platform.getPlatformInfo()->platformID << std::endl;
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
+
+    testEnviroPhat = new EnviroPhat();
 
     // create the server
     IoTServer server;
