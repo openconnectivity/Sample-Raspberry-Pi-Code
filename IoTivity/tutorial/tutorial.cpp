@@ -216,6 +216,13 @@ class BinaryswitchResource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        const int MAX_BRIGHTNESS=65535;
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
+        void dimmingswitchObserverLoop();
+
     private:
 
         /*
@@ -371,7 +378,6 @@ OCStackResult BinaryswitchResource::sendNotification(const std::shared_ptr< OCRe
     }
     return sResult;
 }
-
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /binaryswitch
@@ -843,7 +849,11 @@ DimmingswitchResource::DimmingswitchResource(std::string resourceUri)
     m_var_value_n = "";  // current value of property "n" Friendly name of the resource
     // initialize vector rt  Resource Type
     m_var_value_rt.push_back("oic.r.light.dimming");
-    }
+
+    // set up the observation brightnessObserverLoop
+    IoTObserverCb dimmingswitchObsCb = bind(&DimmingswitchResource::dimmingswitchObserverLoop, this);
+    m_dimmingswitchObserverLoop = make_shared<IoTObserver>(dimmingswitchObsCb);
+}
 
 /*
 * Destructor code
@@ -928,6 +938,21 @@ OCStackResult DimmingswitchResource::sendNotification(const std::shared_ptr< OCR
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /Dimmingswitch
+*/
+void DimmingswitchResource::dimmingswitchObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Dimmingswitch Observer Callback" << endl;
+
+    testEnviroPhat->myParamArgs[0] = 0;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
+    m_var_value_dimmingSetting = testEnviroPhat->returnLong * 100 / MAX_BRIGHTNESS;
+
+    std::cout << "\t\t" << "property 'dimmingSetting' : "<< m_var_value_dimmingSetting << std::endl;
+    m_rep.setValue(m_var_name_dimmingSetting, m_var_value_dimmingSetting );
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /dimmingswitch
@@ -942,7 +967,7 @@ OCRepresentation DimmingswitchResource::get(QueryParamsMap queries)
   	// alternative is to have a callback from the hardware that sets the member variables
     testEnviroPhat->myParamArgs[0] = 0;
     testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
-    m_var_value_dimmingSetting = testEnviroPhat->returnLong;
+    m_var_value_dimmingSetting = testEnviroPhat->returnLong * 100 / MAX_BRIGHTNESS;
 
     std::cout << "\t\t" << "property 'dimmingSetting' : "<< m_var_value_dimmingSetting << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
@@ -1268,10 +1293,15 @@ OCEntityHandlerResult DimmingswitchResource::entityHandler(std::shared_ptr<OCRes
             if(ObserveAction::ObserveRegister == observationInfo.action)
             {
                 // add observer
+                std::cout << "Starting observer for dimmingswitch sensor" << endl;
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_dimmingswitchObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
+                std::cout << "Stopping observer for dimmingswitch sensor" << endl;
+                m_dimmingswitchObserverLoop->stop();
+
                 // delete observer
                 m_interestedObservers.erase(std::remove(
                                             m_interestedObservers.begin(),
