@@ -567,9 +567,11 @@ OCEntityHandlerResult BinaryswitchResource::post(QueryParamsMap queries, const O
         {
             std::cout << e.what() << std::endl;
         }
-	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-	// one can use the member variables as input to those calls
-	// the member values have been updated already with the request data
+      	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+      	// one can use the member variables as input to those calls
+      	// the member values have been updated already with the request data
+        testEnviroPhat->myParamArgs[0] = m_var_value_value ? 1 : 0;
+        testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"writeLEDs", 1, testEnviroPhat->myParamArgs);
     }
     return ehResult;
 }
@@ -936,9 +938,12 @@ OCRepresentation DimmingswitchResource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
+  	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+  	// the calls needs to fill in the member variable before it is returned.
+  	// alternative is to have a callback from the hardware that sets the member variables
+    testEnviroPhat->myParamArgs[0] = 0;
+    testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
+    m_var_value_brightness = testEnviroPhat->returnLong * 100 / MAX_BRIGHTNESS;
 
     std::cout << "\t\t" << "property 'dimmingSetting' : "<< m_var_value_dimmingSetting << std::endl;
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
