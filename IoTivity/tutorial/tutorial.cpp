@@ -771,11 +771,11 @@ class DimmingswitchResource : public Resource
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
 
-//        const int MAX_BRIGHTNESS=65535;
+        const int MAX_BRIGHTNESS=65535;
 
         //observer callback functions
-        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
-        void dimmingswitchObserverLoop();
+//        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
+//        void dimmingswitchObserverLoop();
 
     private:
 
@@ -852,8 +852,8 @@ DimmingswitchResource::DimmingswitchResource(std::string resourceUri)
     m_var_value_rt.push_back("oic.r.light.dimming");
 
     // set up the observation dimmingswitchObserverLoop
-    IoTObserverCb dimmingswitchObsCb = bind(&DimmingswitchResource::dimmingswitchObserverLoop, this);
-    m_dimmingswitchObserverLoop = make_shared<IoTObserver>(dimmingswitchObsCb);
+//    IoTObserverCb dimmingswitchObsCb = bind(&DimmingswitchResource::dimmingswitchObserverLoop, this);
+//    m_dimmingswitchObserverLoop = make_shared<IoTObserver>(dimmingswitchObsCb);
 }
 
 /*
@@ -942,6 +942,7 @@ OCStackResult DimmingswitchResource::sendNotification(const std::shared_ptr< OCR
 /*
 * Observer loop for the  observe function /Dimmingswitch
 */
+/*
 void DimmingswitchResource::dimmingswitchObserverLoop()
 {
     usleep(1500000);
@@ -954,6 +955,7 @@ void DimmingswitchResource::dimmingswitchObserverLoop()
     std::cout << "\t\t" << "property 'dimmingSetting' : "<< m_var_value_dimmingSetting << std::endl;
     m_rep.setValue(m_var_name_dimmingSetting, m_var_value_dimmingSetting );
 }
+*/
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /dimmingswitch
@@ -1296,12 +1298,12 @@ OCEntityHandlerResult DimmingswitchResource::entityHandler(std::shared_ptr<OCRes
                 // add observer
                 std::cout << "Starting observer for dimmingswitch sensor" << endl;
                 m_interestedObservers.push_back(observationInfo.obsId);
-                m_dimmingswitchObserverLoop->start();
+//                m_dimmingswitchObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
                 std::cout << "Stopping observer for dimmingswitch sensor" << endl;
-                m_dimmingswitchObserverLoop->stop();
+//                m_dimmingswitchObserverLoop->stop();
 
                 // delete observer
                 m_interestedObservers.erase(std::remove(
