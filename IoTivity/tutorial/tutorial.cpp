@@ -853,8 +853,8 @@ DimmingswitchResource::DimmingswitchResource(std::string resourceUri)
     m_var_value_rt.push_back("oic.r.light.dimming");
 
     // set up the observation dimmingswitchObserverLoop
-//    IoTObserverCb dimmingswitchObsCb = bind(&DimmingswitchResource::dimmingswitchObserverLoop, this);
-//    m_dimmingswitchObserverLoop = make_shared<IoTObserver>(dimmingswitchObsCb);
+    IoTObserverCb dimmingswitchObsCb = bind(&DimmingswitchResource::dimmingswitchObserverLoop, this);
+    m_dimmingswitchObserverLoop = make_shared<IoTObserver>(dimmingswitchObsCb);
 }
 
 /*
@@ -1298,12 +1298,12 @@ OCEntityHandlerResult DimmingswitchResource::entityHandler(std::shared_ptr<OCRes
                 // add observer
                 std::cout << "Starting observer for dimmingswitch sensor" << std::endl;
                 m_interestedObservers.push_back(observationInfo.obsId);
-//                m_dimmingswitchObserverLoop->start();
+                m_dimmingswitchObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
                 std::cout << "Stopping observer for dimmingswitch sensor" << std::endl;
-//                m_dimmingswitchObserverLoop->stop();
+                m_dimmingswitchObserverLoop->stop();
 
                 // delete observer
                 m_interestedObservers.erase(std::remove(
