@@ -1296,13 +1296,13 @@ OCEntityHandlerResult DimmingswitchResource::entityHandler(std::shared_ptr<OCRes
             if(ObserveAction::ObserveRegister == observationInfo.action)
             {
                 // add observer
-                std::cout << "Starting observer for dimmingswitch sensor" << endl;
+                std::cout << "Starting observer for dimmingswitch sensor" << std::endl;
                 m_interestedObservers.push_back(observationInfo.obsId);
 //                m_dimmingswitchObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
-                std::cout << "Stopping observer for dimmingswitch sensor" << endl;
+                std::cout << "Stopping observer for dimmingswitch sensor" << std::endl;
 //                m_dimmingswitchObserverLoop->stop();
 
                 // delete observer
