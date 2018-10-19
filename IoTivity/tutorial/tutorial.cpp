@@ -31,7 +31,7 @@
 #endif
 
 #include "ocstack.h"
-#include "obsesrver.h"
+#include "observer.h"
 #include "OCPlatform.h"
 #include "OCApi.h"
 #include "ocpayload.h"
