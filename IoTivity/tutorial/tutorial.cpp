@@ -774,7 +774,7 @@ class DimmingswitchResource : public Resource
         const int MAX_BRIGHTNESS=65535;
 
         //observer callback functions
-//        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
+        shared_ptr<IoTObserver> m_dimmingswitchObserverLoop;
         void dimmingswitchObserverLoop();
 
     private:
