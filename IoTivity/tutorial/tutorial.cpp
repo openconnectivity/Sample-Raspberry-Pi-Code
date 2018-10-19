@@ -945,7 +945,7 @@ OCStackResult DimmingswitchResource::sendNotification(const std::shared_ptr< OCR
 void DimmingswitchResource::dimmingswitchObserverLoop()
 {
     usleep(1500000);
-    std::cout << "Dimmingswitch Observer Callback" << endl;
+    std::cout << "Dimmingswitch Observer Callback" << std::endl;
 
     testEnviroPhat->myParamArgs[0] = 0;
     testEnviroPhat->CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, testEnviroPhat->myParamArgs);
