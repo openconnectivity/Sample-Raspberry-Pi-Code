@@ -29,31 +29,35 @@ One other note:
 The PYTHONPATH environment variable needs to be set so that the C++ server code can find the Python interface code. When the curl command is run, the ~/.bashrc file will be modified so that PYTHONPATH is set on bootup. The system will need to be booted in order for ~/.bashrc to be run.
 - sudo reboot
 
-NOTE: Some of the below is in transition. It will be updated for consistency soon.
-# Setting the OCF Implementation to use
+# Setting the PATH to find the Scripts
 
-- The following variables MUST be set to point to the directories related to the OCF implementation you want to use in order to run the convenience scripts described below.
-  - OCFPATH - This is the absolute directory where the OCF implementation is installed and where all the convenience scripts are found. (This is typically /home/my_user_name/iot or /home/my_user_name/iot-lite)
-  - OCFSUBPATH - This is just the final part of OCFPATH, but it is necessary as a way to get the set_implementaion.sh script to work correctly. (This is typically /iot or /iot-lite)
-  - PATH - This is the normal search PATH, but it will have OCFPATH prepended to it so the scripts can be found.
+The scripts are normally stored in the Project-Scripts directory under the HOME directory, but just add the Project-Scripts directory to the PATH. The ~/.bashrc file should have been modified provide the correct path every time you log in, but to get the PATH fixed immediately, the following command should do it:
 
-- source set_implementation.sh (/iot or /iot-lite) - This will switch the implementation of OCF to use (IoTivity or IoTivity-lite right now). It sets some environment variables that MUST be set for all of the scripts. IT IS CRITICAL to use the "source" command to run this script. That makes it work in the current bash context rather that a temporary one.
+- source ~/.bashrc
+
+This should also work:
+
+- cd ~/Project-Scripts
+- source ./set_path.sh
 
 # Building and Running Projects
 
+With the PATH set, the following tool chain should work.
+
 A number of convenience scripts have been written to make the development cycle easier.
 1. Run the following development cycle as needed
-    1. create_project project_name - create a new project and name it anything you want.
+    1. create_project project_name - Create a new project in a new directory directly under the current directory (working in a development directory (e.g. cd ~/workspace) is a good way to organize projects) and name it anything you want.
     2. This isn't a script, but you need to "cd project_name" to run all the other scripts.
-    3. Copy the setup.sh from the directory of the sample you want to install into the current project directory. (In the Sample-Raspberry-Pi-Code repository)
-    4. ./setup.sh - This will load all the necessary stuff to build and run the sample project.
-    5. edit_input2.sh - edit the device description input file (project_name.json) if necessary.
-    6. gen2.sh - generate the code, introspection file, PICS file, and onboarding file from the device description file.
-    7. build2.sh - compile and link everything
-    8. edit_code2.sh - edit the server source code if necessary.
-    9. reset2.sh - reset the sever to RFOTM by copying a fresh onboarding file
-    10. run2.sh - run the currently compiled server in the appropriate directory
+    3. (optional) Copy the setup.sh from the directory of the sample you want to install into the current project directory.
+    4. (optional) ./setup.sh - This will load all the necessary stuff to build and run the particular sample project.
+    5. edit_config.sh - Edit the project configuration file (project_name-config.json) if necessary. (e.g. to change the IoTivity version or target OS). NOTE: Temporarily, only the first entry in the configuration implementation and platform arrays is used.
+    6. edit_input.sh - Edit the input file (e.g. example.json). This is for convenience only as the input file is simply created from the config file.
+    7. gen.sh - Generate the code, introspection file, PICS file, and onboarding file from the device description file. The IoTivity version specified in the config file will be used.
+    8. build.sh - Compile and link everything. The IoTivity version in the config file will be used.
+    9. edit_code.sh - Edit the server source code if necessary.
+    10. reset.sh - Reset the sever to RFOTM.
+    11. run.sh - Run the currently compiled server in the appropriate directory.
 2. To test the project, you will need to run a client. Here are some options.
-    1. Discover, onboard and control the server using OTGC
-    2. Discover, onboard and control the server using DeviceSpy
-    3. Test the server using CTT
+    1. Discover, onboard and control the server using OTGC.
+    2. Discover, onboard and control the server using DeviceSpy.
+    3. Test the server using CTT.
