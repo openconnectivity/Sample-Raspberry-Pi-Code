@@ -283,7 +283,7 @@ get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // alternative is to have a callback from the hardware that sets the global variables.
   myParamArgs[0] = 1;
   CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, myParamArgs);
-  g_input1_value = returnLong;
+  g_switch_value = returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -360,7 +360,7 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
     myParamArgs[0] = 1;
-    myParamArgs[1] = g_output1_value ? 1 : 0;
+    myParamArgs[1] = g_light_value ? 1 : 0;
     CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
