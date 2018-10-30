@@ -59,6 +59,8 @@
  title of input_file   : Binary Switch
 */
 
+#include "/usr/include/python2.7/Python.h"
+
 #include "oc_api.h"
 #include "port/oc_clock.h"
 #include <signal.h>
@@ -80,6 +82,84 @@ static CRITICAL_SECTION cs;     // event loop variable
 
 #define MAX_STRING 65   // max size of the strings.
 volatile int quit = 0;  // stop variable, used by handle_signal
+
+//Python calling stuff
+static PyObject *pName, *pModule, *pFunc;
+static PyObject *pArgs, *pValue;
+
+int myParamArgs[2];
+long returnLong = 0;
+double returnDouble = 0.0;
+
+/*
+* Funcion to call Pimoroni python libraries
+*/
+int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[])
+{
+    int i;
+
+    printf("module = %s\n", moduleName);
+    pName = PyString_FromString(moduleName);
+    /* Error checking of pName left out */
+
+    pModule = PyImport_Import(pName);
+    Py_DECREF(pName);
+
+    if (pModule != NULL) {
+        printf("function = %s\n", functionName);
+        pFunc = PyObject_GetAttrString(pModule, functionName);
+        /* pFunc is a new reference */
+
+        if (pFunc && PyCallable_Check(pFunc)) {
+            pArgs = PyTuple_New(numArgs);
+            for (i = 0; i < numArgs; ++i) {
+                printf("arg%d = %d\n", i+1, args[i]);
+                pValue = PyInt_FromLong(args[i]);
+                if (!pValue) {
+                    Py_DECREF(pArgs);
+                    Py_DECREF(pModule);
+                    fprintf(stderr, "Cannot convert argument\n");
+                    return 1;
+                }
+                /* pValue reference stolen here: */
+                PyTuple_SetItem(pArgs, i, pValue);
+            }
+            pValue = PyObject_CallObject(pFunc, pArgs);
+            Py_DECREF(pArgs);
+            if (pValue != NULL) {
+                if (PyFloat_Check(pValue)) {
+                    returnDouble = PyFloat_AsDouble(pValue);
+                    printf("Result of call: %f\n", returnDouble);
+                } else {
+                    returnLong = PyInt_AsLong(pValue);
+                    printf("Result of call: %ld\n", PyInt_AsLong(pValue));
+                }
+                Py_DECREF(pValue);
+            }
+            else {
+                Py_DECREF(pFunc);
+                Py_DECREF(pModule);
+                PyErr_Print();
+                fprintf(stderr,"Call failed\n");
+                return 1;
+            }
+        }
+        else {
+            if (PyErr_Occurred())
+                PyErr_Print();
+            fprintf(stderr, "Cannot find function \"%s\"\n", functionName);
+        }
+        Py_XDECREF(pFunc);
+        Py_DECREF(pModule);
+    }
+    else {
+        PyErr_Print();
+        fprintf(stderr, "Failed to load \"%s\"\n", moduleName);
+        return 1;
+    }
+
+    return 0;
+}
 
 // global property variables for path: /light
 static char g_light_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
@@ -201,6 +281,9 @@ get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 1;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_switch_value = returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -276,6 +359,9 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 1;
+    myParamArgs[1] = g_light_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -436,6 +522,8 @@ int init;
   oc_storage_config("./device_builder_server_creds/");
 #endif /* OC_SECURITY */
 
+  Py_Initialize();
+
   // start the stack
   init = oc_main_init(&handler);
   if (init < 0)
@@ -469,6 +557,8 @@ int init;
     pthread_mutex_unlock(&mutex);
   }
 #endif
+
+  Py_Finalize();
 
   // shut down the stack
   oc_main_shutdown();
