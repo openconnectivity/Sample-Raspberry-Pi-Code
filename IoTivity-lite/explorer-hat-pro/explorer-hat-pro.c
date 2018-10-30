@@ -272,8 +272,7 @@ static char g_touch7_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for t
 bool g_touch7_value = true; // current value of property "value" true = sensed, false = not sensed.
 // global property variables for path: /touch8
 static char g_touch8_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-bool g_touch8_value = true; // current value of property "value" true = sensed, false = not sensed.// registration data variables for the res
-ources
+bool g_touch8_value = true; // current value of property "value" true = sensed, false = not sensed.
 
 // global resource variables for path: /analog1
 static char g_analog1_RESOURCE_ENDPOINT[] = "/analog1";  // used path for this resource
