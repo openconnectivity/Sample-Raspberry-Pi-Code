@@ -499,6 +499,9 @@ get_analog1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 1;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
+  g_analog1_voltage = returnDouble;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -555,6 +558,9 @@ get_analog2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 2;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
+  g_analog2_voltage = returnDouble;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -611,6 +617,9 @@ get_analog3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 3;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
+  g_analog3_voltage = returnDouble;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -667,6 +676,9 @@ get_analog4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 4;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
+  g_analog4_voltage = returnDouble;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -724,6 +736,9 @@ get_input1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 1;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
+  g_input1_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -766,6 +781,9 @@ get_input2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 2;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
+  g_input2_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -808,6 +826,9 @@ get_input3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 3;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
+  g_input3_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -850,6 +871,9 @@ get_input4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 4;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
+  g_input4_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1228,6 +1252,9 @@ get_touch1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 1;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch1_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1270,6 +1297,9 @@ get_touch2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 2;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch2_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1312,6 +1342,9 @@ get_touch3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 3;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch3_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1354,6 +1387,9 @@ get_touch4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 4;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch4_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1396,6 +1432,9 @@ get_touch5(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 5;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch5_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1438,6 +1477,9 @@ get_touch6(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 6;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch6_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1480,6 +1522,9 @@ get_touch7(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 7;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch7_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1522,6 +1567,9 @@ get_touch8(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
+  myParamArgs[0] = 8;
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
+  g_touch8_value = (bool)returnLong;
 
   // The implementation always return everything that belongs to the resource.
   // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
@@ -1597,6 +1645,9 @@ post_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 1;
+    myParamArgs[1] = g_light1_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -1660,6 +1711,9 @@ post_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 2;
+    myParamArgs[1] = g_light2_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -1723,6 +1777,9 @@ post_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 3;
+    myParamArgs[1] = g_light3_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -1786,6 +1843,9 @@ post_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 4;
+    myParamArgs[1] = g_light4_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -1849,6 +1909,9 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 1;
+    myParamArgs[1] = g_output1_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -1912,6 +1975,9 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 2;
+    myParamArgs[1] = g_output2_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -1975,6 +2041,9 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 3;
+    myParamArgs[1] = g_output3_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
@@ -2038,6 +2107,9 @@ post_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
+    myParamArgs[0] = 4;
+    myParamArgs[1] = g_output4_value ? 1 : 0;
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
