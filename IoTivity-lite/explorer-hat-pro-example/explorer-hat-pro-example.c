@@ -282,7 +282,7 @@ get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   // the call to the HW needs to fill in the global variable before it returns to this function here.
   // alternative is to have a callback from the hardware that sets the global variables.
   myParamArgs[0] = 1;
-  CallPythonFunction((char *)"automation-hat", (char *)"readInput", 1, myParamArgs);
+  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
   g_switch_value = returnLong;
 
   // The implementation always return everything that belongs to the resource.
@@ -361,7 +361,7 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     // the global values have been updated already with the data from the request
     myParamArgs[0] = 1;
     myParamArgs[1] = g_light_value ? 1 : 0;
-    CallPythonFunction((char *)"automation-hat", (char *)"writeOutput", 2, myParamArgs);
+    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
   }
