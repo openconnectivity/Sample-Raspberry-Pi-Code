@@ -30,12 +30,11 @@
 *  starts the stack, with the registered resources.
 *
 * Each endpoint has:
-*  global property variables (per resource path) for:
+*  global variables for:
 *    the property name
 *       naming convention: g_<path>_RESOURCE_PROPERTY_NAME_<propertyname>
 *    the actual value of the property, which is typed from the json data type
 *      naming convention: g_<path>_<propertyname>
-*  global resource variables (per path) for:
 *    the path in a variable:
 *      naming convention: g_<path>_RESOURCE_ENDPOINT
 *    array of interfaces, where by the first will be set as default interface
@@ -54,10 +53,12 @@
 */
 /*
  tool_version          : 20171123
- input_file            : /home/pi/workspace/mraaexamplelite2/device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/tmp/mraaexamplelite/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20160519
  title of input_file   : Binary Switch
 */
+
+#include <mraa.h>
 
 #include "oc_api.h"
 #include "port/oc_clock.h"
@@ -81,26 +82,19 @@ static CRITICAL_SECTION cs;     // event loop variable
 #define MAX_STRING 65   // max size of the strings.
 volatile int quit = 0;  // stop variable, used by handle_signal
 
-// global property variables for path: /light
-static char g_light_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-bool g_light_value = false; // current value of property "value" Status of the switch
-// global property variables for path: /switch
-static char g_switch_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
-bool g_switch_value = false; // current value of property "value" Status of the switch// registration data variables for the resources
+mraa_gpio_context gpio;
+int ledPin = 7;
+int value = 0;
 
-// global resource variables for path: /light
-static char g_light_RESOURCE_ENDPOINT[] = "/light";  // used path for this resource
-static char g_light_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.switch.binary"}; // rt value (as an array)
-int g_light_nr_resource_types = 1;
-static char g_light_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array) 
-int g_light_nr_resource_interfaces = 2;
+// global variables for path: /binaryswitch
+static char g_binaryswitch_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
+bool g_binaryswitch_value = false; // current value of property "value" Status of the switch// registration data variables for the resources
 
-// global resource variables for path: /switch
-static char g_switch_RESOURCE_ENDPOINT[] = "/switch";  // used path for this resource
-static char g_switch_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.switch.binary"}; // rt value (as an array)
-int g_switch_nr_resource_types = 1;
-static char g_switch_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array) 
-int g_switch_nr_resource_interfaces = 2;
+static char g_binaryswitch_RESOURCE_ENDPOINT[] = "/binaryswitch";  // used path for this resource
+static char g_binaryswitch_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.switch.binary"}; // rt value (as an array)
+int g_binaryswitch_nr_resource_types = 1;
+static char g_binaryswitch_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.a","oic.if.baseline"}; // interface if (as an array) 
+int g_binaryswitch_nr_resource_interfaces = 2;
 /**
 * function to set up the device.
 *
@@ -108,11 +102,15 @@ int g_switch_nr_resource_interfaces = 2;
 static int
 app_init(void)
 {
+  gpio = mraa_gpio_init(ledPin);
+  mraa_gpio_dir(gpio, MRAA_GPIO_OUT);
+  mraa_gpio_write(gpio,1);
+  sleep(1);
+  mraa_gpio_write(gpio,0);
+  PRINT("Lights should have flashed\n");
+
   int ret = oc_init_platform("ocf", NULL, NULL);
-  // the settings determine the appearance of the device on the network
-  // can be OCF1.3.1 or OCF2.0.0 (or even higher)
-  // supplied values are for OCF1.3.1  
-  ret |= oc_add_device("/oic/d", "oic.d.switchdevice", "Binary Switch", 
+  ret |= oc_add_device("/oic/d", "oic.d.light", "Binary Switch", 
                        "ocf.1.0.0", // icv value
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  // dmv value
                        NULL, NULL);
@@ -120,9 +118,8 @@ app_init(void)
 }
 
 /**
-* helper function to convert the interface string definition to the constant defintion used by the stack.
+*  function to convert the interface string definition to the constant
 * @param interface the interface string e.g. "oic.if.a"
-* @return the stack constant for the interface
 */
 static int
 convert_if_string(char *interface_name)
@@ -140,9 +137,7 @@ convert_if_string(char *interface_name)
 
  
 /**
-* get method for "/light" endpoint 
-* function is called to intialize the return values of the GET method 
-* initialisation of the returned values are done from the global property values
+* get method for "/binaryswitch" endpoint to intialize the returned values from the global values
 * This resource describes a binary switch (on/off).
 * The value is a boolean.
 * A value of 'true' means that the switch is on.
@@ -152,18 +147,18 @@ convert_if_string(char *interface_name)
 * @param user_data the user data.
 */
 static void
-get_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
+get_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)user_data;  // not used
   
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
   
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
   
-  PRINT("get_light: interface %d\n", interfaces);
+  PRINT("get_binaryswitch: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
   case OC_IF_BASELINE:
@@ -171,8 +166,8 @@ get_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_boolean(root, value, g_light_value); 
-    PRINT("   %s : %d\n", g_light_RESOURCE_PROPERTY_NAME_value,  g_light_value );
+    oc_rep_set_boolean(root, value, g_binaryswitch_value); 
+    PRINT("   %s : %d\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,  g_binaryswitch_value );
     break;
   default:
     break;
@@ -182,65 +177,20 @@ get_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data
 }
  
 /**
-* get method for "/switch" endpoint 
-* function is called to intialize the return values of the GET method 
-* initialisation of the returned values are done from the global property values
-* This resource describes a binary switch (on/off).
-* The value is a boolean.
-* A value of 'true' means that the switch is on.
-* A value of 'false' means that the switch is off.
-* @param request the request representation.
-* @param interfaces the interface used for this call
-* @param user_data the user data.
-*/
-static void
-get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
-{
-  (void)user_data;  // not used
-  
-  // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
-  
-  PRINT("get_switch: interface %d\n", interfaces);
-  oc_rep_start_root_object();
-  switch (interfaces) {
-  case OC_IF_BASELINE:
-    /* fall through */
-  case OC_IF_A:
-  PRINT("   Adding Baseline info\n" );
-    oc_process_baseline_interface(request->resource);
-    oc_rep_set_boolean(root, value, g_switch_value); 
-    PRINT("   %s : %d\n", g_switch_RESOURCE_PROPERTY_NAME_value,  g_switch_value );
-    break;
-  default:
-    break;
-  }
-  oc_rep_end_root_object();
-  oc_send_response(request, OC_STATUS_OK);
-}
- 
-/**
-* post method for "/light" endpoint 
-* the function has as input the request body, which are the input values of the POST method.
-* the input values (as a set) are checked if all supplied values are correct.
-* if the input values are correct, they will be assigned to the global  property values.
+* post method for "/binaryswitch" endpoint to assign the returned values to the global values.
 
 * @param requestRep the request representation.
 */
 static void
-post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
+post_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("post_light:\n");
+  PRINT("post_binaryswitch:\n");
   oc_rep_t *rep = request->request_payload;
   while (rep != NULL) {
-    PRINT("key: (check) %s ", oc_string(rep->name));if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value) == 0)
+    PRINT("key: (check) %s ", oc_string(rep->name));if (strcmp ( oc_string(rep->name), g_binaryswitch_RESOURCE_PROPERTY_NAME_value) == 0)
     {
       // value exist in payload
       
@@ -260,23 +210,24 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     while (rep != NULL) {
       PRINT("key: (assign) %s ", oc_string(rep->name));
       // no error: assign the variables
-      if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value)== 0)
+      if (strcmp ( oc_string(rep->name), g_binaryswitch_RESOURCE_PROPERTY_NAME_value)== 0)
       {
         // assign value
-        g_light_value = rep->value.boolean;
+        g_binaryswitch_value = rep->value.boolean;
       }
       rep = rep->next;
     }
     // set the response
     oc_rep_start_root_object();
     //oc_process_baseline_interface(request->resource);
-    oc_rep_set_boolean(root, value, g_light_value); 
+    oc_rep_set_boolean(root, value, g_binaryswitch_value); 
     oc_rep_end_root_object();
-    
+
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
-    
+    value = (g_binaryswitch_value) ? 1 : 0;    mraa_gpio_write(gpio,value);
+
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -286,66 +237,38 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
 }
 /**
-* register all the resources to the stack
-* this function registers all application level resources:
-* - each resource path is bind to a specific function for the supported methods (GET, POST, PUT)
-* - each resource is 
-*   - secure
-*   - observable
-*   - discoverable 
-*   - used interfaces (from the global variables).
+*  register all the resources
 */
 static void
 register_resources(void)
 {
 
-  PRINT("register resource with path /light\n");
-  oc_resource_t *res_light = oc_new_resource(NULL, g_light_RESOURCE_ENDPOINT, g_light_nr_resource_types, 0);
-  PRINT("     number of resource types: %d\n", g_light_nr_resource_types);
-  for( int a = 0; a < g_light_nr_resource_types; a++ )
+  PRINT("register resource with path /binaryswitch\n");
+  oc_resource_t *res_binaryswitch = oc_new_resource(NULL, g_binaryswitch_RESOURCE_ENDPOINT, g_binaryswitch_nr_resource_types, 0);
+  PRINT("     number of resource types: %d\n", g_binaryswitch_nr_resource_types);
+  for( int a = 0; a < g_binaryswitch_nr_resource_types; a++ )
   {
-    PRINT("     resource type: %s\n", g_light_RESOURCE_TYPE[a]);
-    oc_resource_bind_resource_type(res_light,g_light_RESOURCE_TYPE[a]);
+    PRINT("     resource type: %s\n", g_binaryswitch_RESOURCE_TYPE[a]);
+    oc_resource_bind_resource_type(res_binaryswitch,g_binaryswitch_RESOURCE_TYPE[a]);
   }
-  for( int a = 0; a < g_light_nr_resource_interfaces; a++ )
+  for( int a = 0; a < g_binaryswitch_nr_resource_interfaces; a++ )
   {
-    oc_resource_bind_resource_interface(res_light, convert_if_string(g_light_RESOURCE_INTERFACE[a]));
+    oc_resource_bind_resource_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_light, convert_if_string(g_light_RESOURCE_INTERFACE[0]));  
-  PRINT("     default interface: %d (%s)\n", convert_if_string(g_light_RESOURCE_INTERFACE[0]), g_light_RESOURCE_INTERFACE[0]);
-  oc_resource_set_discoverable(res_light, true);
-  oc_resource_set_periodic_observable(res_light, 1);
+  oc_resource_set_default_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[0]));  
+  PRINT("     default interface: %d (%s)\n", convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[0]), g_binaryswitch_RESOURCE_INTERFACE[0]);
+  oc_resource_set_discoverable(res_binaryswitch, true);
+  oc_resource_set_periodic_observable(res_binaryswitch, 1);
    
-  oc_resource_set_request_handler(res_light, OC_GET, get_light, NULL);
+  oc_resource_set_request_handler(res_binaryswitch, OC_GET, get_binaryswitch, NULL);
    
-  oc_resource_set_request_handler(res_light, OC_POST, post_light, NULL);
-  oc_add_resource(res_light);
-
-  PRINT("register resource with path /switch\n");
-  oc_resource_t *res_switch = oc_new_resource(NULL, g_switch_RESOURCE_ENDPOINT, g_switch_nr_resource_types, 0);
-  PRINT("     number of resource types: %d\n", g_switch_nr_resource_types);
-  for( int a = 0; a < g_switch_nr_resource_types; a++ )
-  {
-    PRINT("     resource type: %s\n", g_switch_RESOURCE_TYPE[a]);
-    oc_resource_bind_resource_type(res_switch,g_switch_RESOURCE_TYPE[a]);
-  }
-  for( int a = 0; a < g_switch_nr_resource_interfaces; a++ )
-  {
-    oc_resource_bind_resource_interface(res_switch, convert_if_string(g_switch_RESOURCE_INTERFACE[a]));
-  }
-  oc_resource_set_default_interface(res_switch, convert_if_string(g_switch_RESOURCE_INTERFACE[0]));  
-  PRINT("     default interface: %d (%s)\n", convert_if_string(g_switch_RESOURCE_INTERFACE[0]), g_switch_RESOURCE_INTERFACE[0]);
-  oc_resource_set_discoverable(res_switch, true);
-  oc_resource_set_periodic_observable(res_switch, 1);
-   
-  oc_resource_set_request_handler(res_switch, OC_GET, get_switch, NULL);
-  oc_add_resource(res_switch);
+  oc_resource_set_request_handler(res_binaryswitch, OC_POST, post_binaryswitch, NULL);
+  oc_add_resource(res_binaryswitch);
 }
 
 #ifdef WIN32
 /**
-* signal the event loop (windows version)
-* wakes up the main function to handle the next callback
+* signal the event loop
 */
 static void
 signal_event_loop(void)
@@ -355,8 +278,7 @@ signal_event_loop(void)
 #endif
 #ifdef __linux__
 /**
-* signal the event loop (Linux)
-* wakes up the main function to handle the next callback
+* signal the event loop
 */
 static void
 signal_event_loop(void)
@@ -407,11 +329,8 @@ int init;
   // install Ctrl-C
   sigaction(SIGINT, &sa, NULL);
 #endif
-  // initialize global variables for endpoint "/light"
-  g_light_value = false; // current value of property "value" Status of the switch
-  
-  // initialize global variables for endpoint "/switch"
-  g_switch_value = false; // current value of property "value" Status of the switch
+  // initialize global variables for endpoint "/binaryswitch"
+  g_binaryswitch_value = false; // current value of property "value" Status of the switch
    
   
   // no oic/con resource.
@@ -428,7 +347,7 @@ int init;
                                        };
   oc_clock_time_t next_event;
   
-  PRINT("file : /home/pi/workspace/mraaexamplelite2/device_output/out_codegeneration_merged.swagger.json\n");
+  PRINT("file : /home/pi/tmp/mraaexamplelite/device_output/out_codegeneration_merged.swagger.json\n");
   PRINT("title: Binary Switch\n");
 
 #ifdef OC_SECURITY
@@ -471,6 +390,7 @@ int init;
 #endif
 
   // shut down the stack
+  mraa_gpio_close(gpio);
   oc_main_shutdown();
   return 0;
 }
