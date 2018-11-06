@@ -296,7 +296,7 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
 
-    value = (g_binaryswitch_value) ? 1 : 0;
+    value = (g_light_value) ? 1 : 0;
     mraa_gpio_write(gpioLED, value);
 
     oc_send_response(request, OC_STATUS_CHANGED);
