@@ -14,10 +14,17 @@
   ],
   "device_description" : [
     {
-      "path" : "/binaryswitch",
+      "path" : "/light",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.a", "oic.if.baseline" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ]
+    },
+    {
+      "path" : "/switch",
+      "rt"   : [ "oic.r.switch.binary" ],
+      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_methods" : ["post"]
     },
     {
       "path" : "/oic/p",

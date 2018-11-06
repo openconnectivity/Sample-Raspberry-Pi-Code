@@ -558,9 +558,10 @@ int init;
   }
 #endif
 
-  Py_Finalize();
-
   // shut down the stack
   oc_main_shutdown();
+  
+  Py_Finalize();
+
   return 0;
 }
