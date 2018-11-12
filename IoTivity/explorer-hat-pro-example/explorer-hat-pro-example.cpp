@@ -832,9 +832,9 @@ SwitchResource::SwitchResource(std::string resourceUri)
     m_var_value_rt.push_back("oic.r.switch.binary");
     m_var_value_value = false; // current value of property "value" Status of the switch
 
-    // set up the observation touch1ObserverLoop
-    IoTObserverCb touch1ObsCb = bind(&Touch1Resource::touch1ObserverLoop, this);
-    m_touch1ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+    // set up the observation switchObserverLoop
+    IoTObserverCb switchObsCb = bind(&SwitchResource::switchObserverLoop, this);
+    m_switchObserverLoop = make_shared<IoTObserver>(switchObsCb);
 }
 
 /*
@@ -921,12 +921,12 @@ OCStackResult SwitchResource::sendNotification(const std::shared_ptr< OCResource
 }
 
 /*
-* Observer loop for the  observe function /touch1
+* Observer loop for the  observe function /switch
 */
-void Touch1Resource::touch1ObserverLoop()
+void SwitchResource::switchObserverLoop()
 {
     usleep(1500000);
-    std::cout << "Touch1 Observer Callback" << endl;
+    std::cout << "Switch Observer Callback" << endl;
     testExplorerHat->myParamArgs[0] = 1;
     testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
     m_var_value_value = (bool)testExplorerHat->returnLong;
@@ -936,10 +936,10 @@ void Touch1Resource::touch1ObserverLoop()
     if (result == OC_STACK_NO_OBSERVERS)
     {
         cout << "No more observers..Stopping observer loop..." << endl;
-        m_touch1ObserverLoop->stop();
+        m_switchObserverLoop->stop();
     }
 
-    std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
+    std::cout << "\t\t" << "property 'switch' : "<< m_var_value_value << std::endl;
     m_rep.setValue(m_var_name_value, m_var_value_value);
 }
 
@@ -1053,7 +1053,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
-                m_touch1ObserverLoop->start();
+                m_switchObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
