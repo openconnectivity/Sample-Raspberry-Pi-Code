@@ -769,6 +769,10 @@ class SwitchResource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_switchObserverLoop;
+        void switchObserverLoop();
     private:
 
         /*
