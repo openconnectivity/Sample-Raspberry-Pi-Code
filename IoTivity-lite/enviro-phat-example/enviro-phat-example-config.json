@@ -3,8 +3,8 @@
   "device_type" : "oic.d.switchdevice",
   "ocf_base_path" : "~",
   "implementation_paths" : [
-    "/iot",
     "/iot-lite",
+    "/iot",
     "~/new-imp"
   ],
   "platforms" : [
@@ -20,10 +20,10 @@
       "remove_properties" : [ "range", "step" , "id", "precision" ]
     },
     {
-      "path" : "/switch",
-      "rt"   : [ "oic.r.switch.binary" ],
+      "path" : "/brightness",
+      "rt"   : [ "oic.r.light.brightness" ],
       "if"   : ["oic.if.baseline", "oic.if.s" ],
-      "remove_properties" : [ "range", "step" , "id", "precision" ],
+      "remove_properties" : [ "range", "step" , "id", "precision", "value" ],
       "remove_methods" : ["post"]
     },
     {

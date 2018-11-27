@@ -22,7 +22,7 @@
     {
       "path" : "/switch",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
