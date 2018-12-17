@@ -54,7 +54,7 @@
 */
 /*
  tool_version          : 20171123
- input_file            : /home/pi/workspace/lightandswitchlite/device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/workspace/explorer-hat-pro-example/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20160519
  title of input_file   : Binary Switch
 */
@@ -99,7 +99,7 @@ int g_light_nr_resource_interfaces = 2;
 static char g_switch_RESOURCE_ENDPOINT[] = "/switch";  // used path for this resource
 static char g_switch_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.switch.binary"}; // rt value (as an array)
 int g_switch_nr_resource_types = 1;
-static char g_switch_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
+static char g_switch_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_switch_nr_resource_interfaces = 2;
 /**
 * function to set up the device.
@@ -210,7 +210,7 @@ get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   switch (interfaces) {
   case OC_IF_BASELINE:
     /* fall through */
-  case OC_IF_A:
+  case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
     oc_rep_set_boolean(root, value, g_switch_value);
@@ -428,7 +428,7 @@ int init;
                                        };
   oc_clock_time_t next_event;
 
-  PRINT("file : /home/pi/workspace/lightandswitchlite/device_output/out_codegeneration_merged.swagger.json\n");
+  PRINT("file : /home/pi/workspace/explorer-hat-pro-example/device_output/out_codegeneration_merged.swagger.json\n");
   PRINT("title: Binary Switch\n");
 
 #ifdef OC_SECURITY
