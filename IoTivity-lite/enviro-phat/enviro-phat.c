@@ -84,6 +84,8 @@ static CRITICAL_SECTION cs;     // event loop variable
 volatile int quit = 0;  // stop variable, used by handle_signal
 
 //Python calling stuff
+#define MAX_BRIGHTNESS 65535  // maximum brightness of light sensor
+
 static PyObject *pName, *pModule, *pFunc;
 static PyObject *pArgs, *pValue;
 
