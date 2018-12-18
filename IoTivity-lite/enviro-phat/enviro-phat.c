@@ -1607,7 +1607,7 @@ int init;
   oc_storage_config("./device_builder_server_creds/");
 #endif /* OC_SECURITY */
 
-Py_Initialize();
+  Py_Initialize();
 
   // start the stack
   init = oc_main_init(&handler);
