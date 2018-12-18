@@ -30,12 +30,11 @@
 *  starts the stack, with the registered resources.
 *
 * Each endpoint has:
-*  global property variables (per resource path) for:
+*  global variables for:
 *    the property name
 *       naming convention: g_<path>_RESOURCE_PROPERTY_NAME_<propertyname>
 *    the actual value of the property, which is typed from the json data type
 *      naming convention: g_<path>_<propertyname>
-*  global resource variables (per path) for:
 *    the path in a variable:
 *      naming convention: g_<path>_RESOURCE_ENDPOINT
 *    array of interfaces, where by the first will be set as default interface
@@ -54,7 +53,7 @@
 */
 /*
  tool_version          : 20171123
- input_file            : /home/pi/workspace/envirophatlite/device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/tmp/envirophatlite/device_output/out_codegeneration_merged.swagger.json
  version of input_file : v1.1.0-20160519
  title of input_file   : Binary Switch
 */
@@ -161,177 +160,164 @@ int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int 
     return 0;
 }
 
-// global property variables for path: /brightness
+// global variables for path: /brightness
 static char g_brightness_RESOURCE_PROPERTY_NAME_brightness[] = "brightness"; // the name for the attribute
 int g_brightness_brightness = 50; // current value of property "brightness" Quantized representation in the range 0-100 of the current sensed or set value for Brightness
-// global property variables for path: /color
+// global variables for path: /color
 static char g_color_RESOURCE_PROPERTY_NAME_rgbValue[] = "rgbValue"; // the name for the attribute
 // array not handled rgbValue  RGB value; the first item is the R, second the G, third the B.
-// global property variables for path: /colorSensorLight
+// global variables for path: /colorSensorLight
 static char g_colorSensorLight_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
 bool g_colorSensorLight_value = false; // current value of property "value" Status of the switch
-// global property variables for path: /heading
+// global variables for path: /heading
 static char g_heading_RESOURCE_PROPERTY_NAME_value[] = "value"; // the name for the attribute
 // array not handled value  Array containing Hx, Hy, Hz.
-// global property variables for path: /pressure
-static char g_pressure_RESOURCE_PROPERTY_NAME_atmosphericPressure[] = "atmosphericPressure"; // the name for the attribute
-double g_pressure_atmosphericPressure = 1000.4; // current value of property "atmosphericPressure"  Current atmospheric pressure in hPa.
+// global variables for path: /pressure
 static char g_pressure_RESOURCE_PROPERTY_NAME_id[] = "id"; // the name for the attribute
 char g_pressure_id[MAX_STRING] = "unique_example_id"; // current value of property "id" Instance ID of this specific resource
-// global property variables for path: /temperature
-static char g_temperature_RESOURCE_PROPERTY_NAME_temperature[] = "temperature"; // the name for the attribute
-double g_temperature_temperature = 20.0; // current value of property "temperature"  Current temperature setting or measurement
+static char g_pressure_RESOURCE_PROPERTY_NAME_atmosphericPressure[] = "atmosphericPressure"; // the name for the attribute
+double g_pressure_atmosphericPressure = 1000.4; // current value of property "atmosphericPressure"  Current atmospheric pressure in hPa.
+// global variables for path: /temperature
 static char g_temperature_RESOURCE_PROPERTY_NAME_units[] = "units"; // the name for the attribute
 char g_temperature_units[MAX_STRING] = "C"; // current value of property "units" Units for the temperature value
 static char g_temperature_RESOURCE_PROPERTY_NAME_id[] = "id"; // the name for the attribute
 char g_temperature_id[MAX_STRING] = "unique_example_id"; // current value of property "id" Instance ID of this specific resource
-// global property variables for path: /voltage0
-static char g_voltage0_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-double g_voltage0_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-static char g_voltage0_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-double g_voltage0_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_temperature_RESOURCE_PROPERTY_NAME_temperature[] = "temperature"; // the name for the attribute
+double g_temperature_temperature = 20.0; // current value of property "temperature"  Current temperature setting or measurement
+// global variables for path: /voltage0
 static char g_voltage0_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
 double g_voltage0_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-static char g_voltage0_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-double g_voltage0_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_voltage0_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-double g_voltage0_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_voltage0_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
 double g_voltage0_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// global property variables for path: /voltage1
-static char g_voltage1_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-double g_voltage1_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-static char g_voltage1_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-double g_voltage1_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_voltage0_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
+double g_voltage0_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_voltage0_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_voltage0_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_voltage0_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
+double g_voltage0_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+static char g_voltage0_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
+double g_voltage0_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
+// global variables for path: /voltage1
 static char g_voltage1_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
 double g_voltage1_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-static char g_voltage1_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-double g_voltage1_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_voltage1_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-double g_voltage1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_voltage1_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
 double g_voltage1_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// global property variables for path: /voltage2
-static char g_voltage2_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-double g_voltage2_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-static char g_voltage2_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-double g_voltage2_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_voltage1_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
+double g_voltage1_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_voltage1_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_voltage1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_voltage1_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
+double g_voltage1_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+static char g_voltage1_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
+double g_voltage1_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
+// global variables for path: /voltage2
 static char g_voltage2_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
 double g_voltage2_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-static char g_voltage2_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-double g_voltage2_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_voltage2_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-double g_voltage2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_voltage2_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
 double g_voltage2_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// global property variables for path: /voltage3
-static char g_voltage3_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
-double g_voltage3_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-static char g_voltage3_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
-double g_voltage3_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_voltage2_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
+double g_voltage2_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_voltage2_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_voltage2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_voltage2_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
+double g_voltage2_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+static char g_voltage2_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
+double g_voltage2_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
+// global variables for path: /voltage3
 static char g_voltage3_RESOURCE_PROPERTY_NAME_desiredvoltage[] = "desiredvoltage"; // the name for the attribute
 double g_voltage3_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-static char g_voltage3_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
-double g_voltage3_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-static char g_voltage3_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
-double g_voltage3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
 static char g_voltage3_RESOURCE_PROPERTY_NAME_frequency[] = "frequency"; // the name for the attribute
 double g_voltage3_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-// global property variables for path: /xmotion
+static char g_voltage3_RESOURCE_PROPERTY_NAME_current[] = "current"; // the name for the attribute
+double g_voltage3_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+static char g_voltage3_RESOURCE_PROPERTY_NAME_desiredcurrent[] = "desiredcurrent"; // the name for the attribute
+double g_voltage3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+static char g_voltage3_RESOURCE_PROPERTY_NAME_voltage[] = "voltage"; // the name for the attribute
+double g_voltage3_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+static char g_voltage3_RESOURCE_PROPERTY_NAME_desiredfrequency[] = "desiredfrequency"; // the name for the attribute
+double g_voltage3_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
+// global variables for path: /xmotion
 static char g_xmotion_RESOURCE_PROPERTY_NAME_acceleration[] = "acceleration"; // the name for the attribute
 double g_xmotion_acceleration = 0.5; // current value of property "acceleration"  sensed acceleration experienced in 'g'.
-// global property variables for path: /ymotion
+// global variables for path: /ymotion
 static char g_ymotion_RESOURCE_PROPERTY_NAME_acceleration[] = "acceleration"; // the name for the attribute
 double g_ymotion_acceleration = 0.5; // current value of property "acceleration"  sensed acceleration experienced in 'g'.
-// global property variables for path: /zmotion
+// global variables for path: /zmotion
 static char g_zmotion_RESOURCE_PROPERTY_NAME_acceleration[] = "acceleration"; // the name for the attribute
 double g_zmotion_acceleration = 0.5; // current value of property "acceleration"  sensed acceleration experienced in 'g'.// registration data variables for the resources
 
-// global resource variables for path: /brightness
 static char g_brightness_RESOURCE_ENDPOINT[] = "/brightness";  // used path for this resource
 static char g_brightness_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.light.brightness"}; // rt value (as an array)
 int g_brightness_nr_resource_types = 1;
 static char g_brightness_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_brightness_nr_resource_interfaces = 2;
 
-// global resource variables for path: /color
 static char g_color_RESOURCE_ENDPOINT[] = "/color";  // used path for this resource
 static char g_color_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.colour.rgb"}; // rt value (as an array)
 int g_color_nr_resource_types = 1;
 static char g_color_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_color_nr_resource_interfaces = 2;
 
-// global resource variables for path: /colorSensorLight
 static char g_colorSensorLight_RESOURCE_ENDPOINT[] = "/colorSensorLight";  // used path for this resource
 static char g_colorSensorLight_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.switch.binary"}; // rt value (as an array)
 int g_colorSensorLight_nr_resource_types = 1;
 static char g_colorSensorLight_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.a"}; // interface if (as an array)
 int g_colorSensorLight_nr_resource_interfaces = 2;
 
-// global resource variables for path: /heading
 static char g_heading_RESOURCE_ENDPOINT[] = "/heading";  // used path for this resource
 static char g_heading_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.magneticfielddirection"}; // rt value (as an array)
 int g_heading_nr_resource_types = 1;
 static char g_heading_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_heading_nr_resource_interfaces = 2;
 
-// global resource variables for path: /pressure
 static char g_pressure_RESOURCE_ENDPOINT[] = "/pressure";  // used path for this resource
 static char g_pressure_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.atmosphericpressure"}; // rt value (as an array)
 int g_pressure_nr_resource_types = 1;
 static char g_pressure_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_pressure_nr_resource_interfaces = 2;
 
-// global resource variables for path: /temperature
 static char g_temperature_RESOURCE_ENDPOINT[] = "/temperature";  // used path for this resource
 static char g_temperature_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.temperature"}; // rt value (as an array)
 int g_temperature_nr_resource_types = 1;
 static char g_temperature_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_temperature_nr_resource_interfaces = 2;
 
-// global resource variables for path: /voltage0
 static char g_voltage0_RESOURCE_ENDPOINT[] = "/voltage0";  // used path for this resource
 static char g_voltage0_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.energy.electrical"}; // rt value (as an array)
 int g_voltage0_nr_resource_types = 1;
 static char g_voltage0_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_voltage0_nr_resource_interfaces = 2;
 
-// global resource variables for path: /voltage1
 static char g_voltage1_RESOURCE_ENDPOINT[] = "/voltage1";  // used path for this resource
 static char g_voltage1_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.energy.electrical"}; // rt value (as an array)
 int g_voltage1_nr_resource_types = 1;
 static char g_voltage1_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_voltage1_nr_resource_interfaces = 2;
 
-// global resource variables for path: /voltage2
 static char g_voltage2_RESOURCE_ENDPOINT[] = "/voltage2";  // used path for this resource
 static char g_voltage2_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.energy.electrical"}; // rt value (as an array)
 int g_voltage2_nr_resource_types = 1;
 static char g_voltage2_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_voltage2_nr_resource_interfaces = 2;
 
-// global resource variables for path: /voltage3
 static char g_voltage3_RESOURCE_ENDPOINT[] = "/voltage3";  // used path for this resource
 static char g_voltage3_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.energy.electrical"}; // rt value (as an array)
 int g_voltage3_nr_resource_types = 1;
 static char g_voltage3_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_voltage3_nr_resource_interfaces = 2;
 
-// global resource variables for path: /xmotion
 static char g_xmotion_RESOURCE_ENDPOINT[] = "/xmotion";  // used path for this resource
 static char g_xmotion_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.acceleration"}; // rt value (as an array)
 int g_xmotion_nr_resource_types = 1;
 static char g_xmotion_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_xmotion_nr_resource_interfaces = 2;
 
-// global resource variables for path: /ymotion
 static char g_ymotion_RESOURCE_ENDPOINT[] = "/ymotion";  // used path for this resource
 static char g_ymotion_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.acceleration"}; // rt value (as an array)
 int g_ymotion_nr_resource_types = 1;
 static char g_ymotion_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
 int g_ymotion_nr_resource_interfaces = 2;
 
-// global resource variables for path: /zmotion
 static char g_zmotion_RESOURCE_ENDPOINT[] = "/zmotion";  // used path for this resource
 static char g_zmotion_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.acceleration"}; // rt value (as an array)
 int g_zmotion_nr_resource_types = 1;
@@ -345,10 +331,7 @@ static int
 app_init(void)
 {
   int ret = oc_init_platform("ocf", NULL, NULL);
-  // the settings determine the appearance of the device on the network
-  // can be OCF1.3.1 or OCF2.0.0 (or even higher)
-  // supplied values are for OCF1.3.1
-  ret |= oc_add_device("/oic/d", "oic.d.switchdevice", "Binary Switch",
+  ret |= oc_add_device("/oic/d", "oic.d.light", "Binary Switch",
                        "ocf.1.0.0", // icv value
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  // dmv value
                        NULL, NULL);
@@ -356,9 +339,8 @@ app_init(void)
 }
 
 /**
-* helper function to convert the interface string definition to the constant defintion used by the stack.
+*  function to convert the interface string definition to the constant
 * @param interface the interface string e.g. "oic.if.a"
-* @return the stack constant for the interface
 */
 static int
 convert_if_string(char *interface_name)
@@ -376,9 +358,7 @@ convert_if_string(char *interface_name)
 
 
 /**
-* get method for "/brightness" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/brightness" endpoint to intialize the returned values from the global values
 * This resource describes the brightness of a light or lamp.
 * brightness is an integer showing the current brightness level as a quantized representation in the range 0-100.
 * A brightness of 0 is the minimum for the resource.
@@ -394,14 +374,11 @@ get_brightness(oc_request_t *request, oc_interface_mask_t interfaces, void *user
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  myParamArgs[0] = 0;
-  CallPythonFunction((char *)"enviro-phat", (char *)"readBrightness", 0, myParamArgs);
-  g_brightness_brightness = returnLong * 100 / MAX_BRIGHTNESS;
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_brightness: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -422,9 +399,7 @@ get_brightness(oc_request_t *request, oc_interface_mask_t interfaces, void *user
 }
 
 /**
-* get method for "/color" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/color" endpoint to intialize the returned values from the global values
 * This resource specifies the actual colour in the RGB space represented as an array of integers.
 * Each colour value is described with a Red, Green, Blue component.
 * These colour values are encoded as an array of integer values ([R,G,B]).
@@ -442,11 +417,11 @@ get_color(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_color: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -466,9 +441,7 @@ get_color(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data
 }
 
 /**
-* get method for "/colorSensorLight" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/colorSensorLight" endpoint to intialize the returned values from the global values
 * This resource describes a binary switch (on/off).
 * The value is a boolean.
 * A value of 'true' means that the switch is on.
@@ -483,11 +456,11 @@ get_colorSensorLight(oc_request_t *request, oc_interface_mask_t interfaces, void
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_colorSensorLight: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -508,9 +481,7 @@ get_colorSensorLight(oc_request_t *request, oc_interface_mask_t interfaces, void
 }
 
 /**
-* get method for "/heading" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/heading" endpoint to intialize the returned values from the global values
 * This resource describes the direction of the Earth's magnetic field at the observer's current point in space.
 * Typical use case includes measurement of compass readings on a personal device.
 * The value is an array containing Hx, Hy, Hz (in that order) each of which are floats.
@@ -525,11 +496,11 @@ get_heading(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_heading: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -549,9 +520,7 @@ get_heading(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-* get method for "/pressure" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/pressure" endpoint to intialize the returned values from the global values
 * This resource provides a measurement of Mean Sea Level Pressure experienced at the measuring point expressed in millibars.
 * The value is float which describes the atmospheric pressure in hPa (hectoPascals).
 * Note that hPa and the also commonly used unit of millibars (mbar) are numerically equivalent.
@@ -565,15 +534,11 @@ get_pressure(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  myParamArgs[0] = 0;
-  CallPythonFunction((char *)"enviro-phat", (char *)"readPressure", 0, myParamArgs);
-  g_pressure_atmosphericPressure = returnDouble;
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_pressure: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -583,11 +548,11 @@ get_pressure(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_double(root, atmosphericPressure, g_pressure_atmosphericPressure );
-    PRINT("   %s : %f\n", g_pressure_RESOURCE_PROPERTY_NAME_atmosphericPressure, g_pressure_atmosphericPressure );
-
     oc_rep_set_text_string(root, id, g_pressure_id );
     PRINT("   %s : %s\n", g_pressure_RESOURCE_PROPERTY_NAME_id, g_pressure_id );
+
+    oc_rep_set_double(root, atmosphericPressure, g_pressure_atmosphericPressure );
+    PRINT("   %s : %f\n", g_pressure_RESOURCE_PROPERTY_NAME_atmosphericPressure, g_pressure_atmosphericPressure );
     break;
   default:
     break;
@@ -597,9 +562,7 @@ get_pressure(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-* get method for "/temperature" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/temperature" endpoint to intialize the returned values from the global values
 * This resource describes a sensed or actuated Temperature value.
 * The temperature describes the current value measured.
 * The units is a single value that is one of C, F or K.
@@ -621,15 +584,11 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  myParamArgs[0] = 0;
-  CallPythonFunction((char *)"enviro-phat", (char *)"readTemperature", 0, myParamArgs);
-  g_temperature_temperature = returnDouble;
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_temperature: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -639,14 +598,14 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_double(root, temperature, g_temperature_temperature );
-    PRINT("   %s : %f\n", g_temperature_RESOURCE_PROPERTY_NAME_temperature, g_temperature_temperature );
-
     oc_rep_set_text_string(root, units, g_temperature_units );
     PRINT("   %s : %s\n", g_temperature_RESOURCE_PROPERTY_NAME_units, g_temperature_units );
 
     oc_rep_set_text_string(root, id, g_temperature_id );
     PRINT("   %s : %s\n", g_temperature_RESOURCE_PROPERTY_NAME_id, g_temperature_id );
+
+    oc_rep_set_double(root, temperature, g_temperature_temperature );
+    PRINT("   %s : %f\n", g_temperature_RESOURCE_PROPERTY_NAME_temperature, g_temperature_temperature );
     break;
   default:
     break;
@@ -656,9 +615,7 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
 }
 
 /**
-* get method for "/voltage0" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/voltage0" endpoint to intialize the returned values from the global values
 * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
 * Retrieves the current energy.
 * @param request the request representation.
@@ -671,14 +628,14 @@ get_voltage0(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  myParamArgs[0] = 1;
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+  myParamArgs[0] = 0;
   CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, myParamArgs);
   g_voltage0_voltage = returnDouble;
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_voltage0: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -688,23 +645,23 @@ get_voltage0(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_double(root, voltage, g_voltage0_voltage );
-    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_voltage, g_voltage0_voltage );
+    oc_rep_set_double(root, desiredvoltage, g_voltage0_desiredvoltage );
+    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage0_desiredvoltage );
+
+    oc_rep_set_double(root, frequency, g_voltage0_frequency );
+    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_frequency, g_voltage0_frequency );
 
     oc_rep_set_double(root, current, g_voltage0_current );
     PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_current, g_voltage0_current );
 
-    oc_rep_set_double(root, desiredvoltage, g_voltage0_desiredvoltage );
-    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage0_desiredvoltage );
-
-    oc_rep_set_double(root, desiredfrequency, g_voltage0_desiredfrequency );
-    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage0_desiredfrequency );
-
     oc_rep_set_double(root, desiredcurrent, g_voltage0_desiredcurrent );
     PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_desiredcurrent, g_voltage0_desiredcurrent );
 
-    oc_rep_set_double(root, frequency, g_voltage0_frequency );
-    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_frequency, g_voltage0_frequency );
+    oc_rep_set_double(root, voltage, g_voltage0_voltage );
+    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_voltage, g_voltage0_voltage );
+
+    oc_rep_set_double(root, desiredfrequency, g_voltage0_desiredfrequency );
+    PRINT("   %s : %f\n", g_voltage0_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage0_desiredfrequency );
     break;
   default:
     break;
@@ -714,9 +671,7 @@ get_voltage0(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-* get method for "/voltage1" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/voltage1" endpoint to intialize the returned values from the global values
 * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
 * Retrieves the current energy.
 * @param request the request representation.
@@ -729,15 +684,14 @@ get_voltage1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  myParamArgs[0] = 2;
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+  myParamArgs[0] = 1;
   CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, myParamArgs);
-  g_voltage1_voltage = returnDouble;
+  g_voltage0_voltage = returnDouble;
 
-
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_voltage1: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -747,23 +701,23 @@ get_voltage1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_double(root, voltage, g_voltage1_voltage );
-    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_voltage, g_voltage1_voltage );
+    oc_rep_set_double(root, desiredvoltage, g_voltage1_desiredvoltage );
+    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage1_desiredvoltage );
+
+    oc_rep_set_double(root, frequency, g_voltage1_frequency );
+    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_frequency, g_voltage1_frequency );
 
     oc_rep_set_double(root, current, g_voltage1_current );
     PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_current, g_voltage1_current );
 
-    oc_rep_set_double(root, desiredvoltage, g_voltage1_desiredvoltage );
-    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage1_desiredvoltage );
-
-    oc_rep_set_double(root, desiredfrequency, g_voltage1_desiredfrequency );
-    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage1_desiredfrequency );
-
     oc_rep_set_double(root, desiredcurrent, g_voltage1_desiredcurrent );
     PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_desiredcurrent, g_voltage1_desiredcurrent );
 
-    oc_rep_set_double(root, frequency, g_voltage1_frequency );
-    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_frequency, g_voltage1_frequency );
+    oc_rep_set_double(root, voltage, g_voltage1_voltage );
+    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_voltage, g_voltage1_voltage );
+
+    oc_rep_set_double(root, desiredfrequency, g_voltage1_desiredfrequency );
+    PRINT("   %s : %f\n", g_voltage1_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage1_desiredfrequency );
     break;
   default:
     break;
@@ -773,9 +727,7 @@ get_voltage1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-* get method for "/voltage2" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/voltage2" endpoint to intialize the returned values from the global values
 * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
 * Retrieves the current energy.
 * @param request the request representation.
@@ -788,14 +740,14 @@ get_voltage2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  myParamArgs[0] = 3;
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables  myParamArgs[0] = 0;
+  myParamArgs[0] = 2;
   CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, myParamArgs);
-  g_voltage2_voltage = returnDouble;
+  g_voltage0_voltage = returnDouble;
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_voltage2: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -805,23 +757,23 @@ get_voltage2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_double(root, voltage, g_voltage2_voltage );
-    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_voltage, g_voltage2_voltage );
+    oc_rep_set_double(root, desiredvoltage, g_voltage2_desiredvoltage );
+    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage2_desiredvoltage );
+
+    oc_rep_set_double(root, frequency, g_voltage2_frequency );
+    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_frequency, g_voltage2_frequency );
 
     oc_rep_set_double(root, current, g_voltage2_current );
     PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_current, g_voltage2_current );
 
-    oc_rep_set_double(root, desiredvoltage, g_voltage2_desiredvoltage );
-    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage2_desiredvoltage );
-
-    oc_rep_set_double(root, desiredfrequency, g_voltage2_desiredfrequency );
-    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage2_desiredfrequency );
-
     oc_rep_set_double(root, desiredcurrent, g_voltage2_desiredcurrent );
     PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_desiredcurrent, g_voltage2_desiredcurrent );
 
-    oc_rep_set_double(root, frequency, g_voltage2_frequency );
-    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_frequency, g_voltage2_frequency );
+    oc_rep_set_double(root, voltage, g_voltage2_voltage );
+    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_voltage, g_voltage2_voltage );
+
+    oc_rep_set_double(root, desiredfrequency, g_voltage2_desiredfrequency );
+    PRINT("   %s : %f\n", g_voltage2_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage2_desiredfrequency );
     break;
   default:
     break;
@@ -831,9 +783,7 @@ get_voltage2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-* get method for "/voltage3" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/voltage3" endpoint to intialize the returned values from the global values
 * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
 * Retrieves the current energy.
 * @param request the request representation.
@@ -846,14 +796,14 @@ get_voltage3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
-  myParamArgs[0] = 4;
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
+  myParamArgs[0] = 3;
   CallPythonFunction((char *)"enviro-phat", (char *)"readADC", 1, myParamArgs);
-  g_voltage3_voltage = returnDouble;
+  g_voltage0_voltage = returnDouble;
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_voltage3: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -863,23 +813,23 @@ get_voltage3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-    oc_rep_set_double(root, voltage, g_voltage3_voltage );
-    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_voltage, g_voltage3_voltage );
+    oc_rep_set_double(root, desiredvoltage, g_voltage3_desiredvoltage );
+    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage3_desiredvoltage );
+
+    oc_rep_set_double(root, frequency, g_voltage3_frequency );
+    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_frequency, g_voltage3_frequency );
 
     oc_rep_set_double(root, current, g_voltage3_current );
     PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_current, g_voltage3_current );
 
-    oc_rep_set_double(root, desiredvoltage, g_voltage3_desiredvoltage );
-    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_desiredvoltage, g_voltage3_desiredvoltage );
-
-    oc_rep_set_double(root, desiredfrequency, g_voltage3_desiredfrequency );
-    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage3_desiredfrequency );
-
     oc_rep_set_double(root, desiredcurrent, g_voltage3_desiredcurrent );
     PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_desiredcurrent, g_voltage3_desiredcurrent );
 
-    oc_rep_set_double(root, frequency, g_voltage3_frequency );
-    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_frequency, g_voltage3_frequency );
+    oc_rep_set_double(root, voltage, g_voltage3_voltage );
+    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_voltage, g_voltage3_voltage );
+
+    oc_rep_set_double(root, desiredfrequency, g_voltage3_desiredfrequency );
+    PRINT("   %s : %f\n", g_voltage3_RESOURCE_PROPERTY_NAME_desiredfrequency, g_voltage3_desiredfrequency );
     break;
   default:
     break;
@@ -889,9 +839,7 @@ get_voltage3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 }
 
 /**
-* get method for "/xmotion" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/xmotion" endpoint to intialize the returned values from the global values
 * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
 * (which is dependent on the co-ordinate system and the observer).
 * The value is a float which describes the acceleration experienced by the object in "g".
@@ -905,11 +853,11 @@ get_xmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_xmotion: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -930,9 +878,7 @@ get_xmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-* get method for "/ymotion" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/ymotion" endpoint to intialize the returned values from the global values
 * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
 * (which is dependent on the co-ordinate system and the observer).
 * The value is a float which describes the acceleration experienced by the object in "g".
@@ -946,11 +892,11 @@ get_ymotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_ymotion: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -971,9 +917,7 @@ get_ymotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-* get method for "/zmotion" endpoint
-* function is called to intialize the return values of the GET method
-* initialisation of the returned values are done from the global property values
+* get method for "/zmotion" endpoint to intialize the returned values from the global values
 * This resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration
 * (which is dependent on the co-ordinate system and the observer).
 * The value is a float which describes the acceleration experienced by the object in "g".
@@ -987,11 +931,11 @@ get_zmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   (void)user_data;  // not used
 
   // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  // the call to the HW needs to fill in the global variable before it returns to this function here.
-  // alternative is to have a callback from the hardware that sets the global variables.
+  // the calls needs to fill in the global variable before it is returned.
+  // alternative is to have a callback from the hardware that sets the global variables
 
-  // The implementation always return everything that belongs to the resource.
-  // this implementation is not optimal, but is functionally correct and will pass CTT1.2.2
+  // the current implementation always return everything that belongs to the resource.
+  // this kind of implementation is not optimal, but is correct and will pass CTT1.2.2
 
   PRINT("get_zmotion: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -1012,10 +956,7 @@ get_zmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 }
 
 /**
-* post method for "/colorSensorLight" endpoint
-* the function has as input the request body, which are the input values of the POST method.
-* the input values (as a set) are checked if all supplied values are correct.
-* if the input values are correct, they will be assigned to the global  property values.
+* post method for "/colorSensorLight" endpoint to assign the returned values to the global values.
 
 * @param requestRep the request representation.
 */
@@ -1076,14 +1017,7 @@ post_colorSensorLight(oc_request_t *request, oc_interface_mask_t interfaces, voi
   }
 }
 /**
-* register all the resources to the stack
-* this function registers all application level resources:
-* - each resource path is bind to a specific function for the supported methods (GET, POST, PUT)
-* - each resource is
-*   - secure
-*   - observable
-*   - discoverable
-*   - used interfaces (from the global variables).
+*  register all the resources
 */
 static void
 register_resources(void)
@@ -1104,14 +1038,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_brightness, convert_if_string(g_brightness_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_brightness_RESOURCE_INTERFACE[0]), g_brightness_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_brightness, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_brightness, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_brightness, true);
 
   oc_resource_set_request_handler(res_brightness, OC_GET, get_brightness, NULL);
   oc_add_resource(res_brightness);
@@ -1131,14 +1058,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_color, convert_if_string(g_color_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_color_RESOURCE_INTERFACE[0]), g_color_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_color, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_color, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_color, true);
 
   oc_resource_set_request_handler(res_color, OC_GET, get_color, NULL);
   oc_add_resource(res_color);
@@ -1158,14 +1078,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_colorSensorLight, convert_if_string(g_colorSensorLight_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_colorSensorLight_RESOURCE_INTERFACE[0]), g_colorSensorLight_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_colorSensorLight, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_colorSensorLight, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_colorSensorLight, true);
 
   oc_resource_set_request_handler(res_colorSensorLight, OC_GET, get_colorSensorLight, NULL);
 
@@ -1187,14 +1100,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_heading, convert_if_string(g_heading_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_heading_RESOURCE_INTERFACE[0]), g_heading_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_heading, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_heading, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_heading, true);
 
   oc_resource_set_request_handler(res_heading, OC_GET, get_heading, NULL);
   oc_add_resource(res_heading);
@@ -1214,14 +1120,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_pressure, convert_if_string(g_pressure_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_pressure_RESOURCE_INTERFACE[0]), g_pressure_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_pressure, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_pressure, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_pressure, true);
 
   oc_resource_set_request_handler(res_pressure, OC_GET, get_pressure, NULL);
   oc_add_resource(res_pressure);
@@ -1241,14 +1140,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_temperature, convert_if_string(g_temperature_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_temperature_RESOURCE_INTERFACE[0]), g_temperature_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_temperature, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_temperature, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_temperature, true);
 
   oc_resource_set_request_handler(res_temperature, OC_GET, get_temperature, NULL);
   oc_add_resource(res_temperature);
@@ -1268,14 +1160,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_voltage0, convert_if_string(g_voltage0_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_voltage0_RESOURCE_INTERFACE[0]), g_voltage0_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_voltage0, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_voltage0, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_voltage0, true);
 
   oc_resource_set_request_handler(res_voltage0, OC_GET, get_voltage0, NULL);
   oc_add_resource(res_voltage0);
@@ -1295,14 +1180,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_voltage1, convert_if_string(g_voltage1_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_voltage1_RESOURCE_INTERFACE[0]), g_voltage1_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_voltage1, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_voltage1, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_voltage1, true);
 
   oc_resource_set_request_handler(res_voltage1, OC_GET, get_voltage1, NULL);
   oc_add_resource(res_voltage1);
@@ -1322,14 +1200,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_voltage2, convert_if_string(g_voltage2_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_voltage2_RESOURCE_INTERFACE[0]), g_voltage2_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_voltage2, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_voltage2, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_voltage2, true);
 
   oc_resource_set_request_handler(res_voltage2, OC_GET, get_voltage2, NULL);
   oc_add_resource(res_voltage2);
@@ -1349,14 +1220,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_voltage3, convert_if_string(g_voltage3_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_voltage3_RESOURCE_INTERFACE[0]), g_voltage3_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_voltage3, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_voltage3, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_voltage3, true);
 
   oc_resource_set_request_handler(res_voltage3, OC_GET, get_voltage3, NULL);
   oc_add_resource(res_voltage3);
@@ -1376,14 +1240,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_xmotion, convert_if_string(g_xmotion_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_xmotion_RESOURCE_INTERFACE[0]), g_xmotion_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_xmotion, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_xmotion, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_xmotion, true);
 
   oc_resource_set_request_handler(res_xmotion, OC_GET, get_xmotion, NULL);
   oc_add_resource(res_xmotion);
@@ -1403,14 +1260,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_ymotion, convert_if_string(g_ymotion_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_ymotion_RESOURCE_INTERFACE[0]), g_ymotion_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_ymotion, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_ymotion, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_ymotion, true);
 
   oc_resource_set_request_handler(res_ymotion, OC_GET, get_ymotion, NULL);
   oc_add_resource(res_ymotion);
@@ -1430,14 +1280,7 @@ register_resources(void)
   oc_resource_set_default_interface(res_zmotion, convert_if_string(g_zmotion_RESOURCE_INTERFACE[0]));
   PRINT("     default interface: %d (%s)\n", convert_if_string(g_zmotion_RESOURCE_INTERFACE[0]), g_zmotion_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_zmotion, true);
-  // periodic observabled
-  // to be used when one wants to send an event per time slice
-  // period is 1 second
   oc_resource_set_periodic_observable(res_zmotion, 1);
-  // set observable
-  // events are send when oc_notify_observers(oc_resource_t *resource) is called.
-  // this function must be called when the value changes, perferable on an interrupt when something is read from the hardware.
-  //oc_resource_set_observable(res_zmotion, true);
 
   oc_resource_set_request_handler(res_zmotion, OC_GET, get_zmotion, NULL);
   oc_add_resource(res_zmotion);
@@ -1445,8 +1288,7 @@ register_resources(void)
 
 #ifdef WIN32
 /**
-* signal the event loop (windows version)
-* wakes up the main function to handle the next callback
+* signal the event loop
 */
 static void
 signal_event_loop(void)
@@ -1456,8 +1298,7 @@ signal_event_loop(void)
 #endif
 #ifdef __linux__
 /**
-* signal the event loop (Linux)
-* wakes up the main function to handle the next callback
+* signal the event loop
 */
 static void
 signal_event_loop(void)
@@ -1533,45 +1374,45 @@ int init;
   //m_var_value_value.push_back(90.0);
 
   // initialize global variables for endpoint "/pressure"
-  g_pressure_atmosphericPressure = 1000.4; // current value of property "atmosphericPressure"  Current atmospheric pressure in hPa.
   strcpy(g_pressure_id,"unique_example_id");  // current value of property "id" Instance ID of this specific resource
+  g_pressure_atmosphericPressure = 1000.4; // current value of property "atmosphericPressure"  Current atmospheric pressure in hPa.
 
   // initialize global variables for endpoint "/temperature"
-  g_temperature_temperature = 20.0; // current value of property "temperature"  Current temperature setting or measurement
   strcpy(g_temperature_units,"C");  // current value of property "units" Units for the temperature value
   strcpy(g_temperature_id,"unique_example_id");  // current value of property "id" Instance ID of this specific resource
+  g_temperature_temperature = 20.0; // current value of property "temperature"  Current temperature setting or measurement
 
   // initialize global variables for endpoint "/voltage0"
-  g_voltage0_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-  g_voltage0_current = 5.0; // current value of property "current"  The electric current in Amps (A).
   g_voltage0_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-  g_voltage0_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_voltage0_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_voltage0_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
+  g_voltage0_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+  g_voltage0_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_voltage0_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+  g_voltage0_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
 
   // initialize global variables for endpoint "/voltage1"
-  g_voltage1_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-  g_voltage1_current = 5.0; // current value of property "current"  The electric current in Amps (A).
   g_voltage1_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-  g_voltage1_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_voltage1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_voltage1_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
+  g_voltage1_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+  g_voltage1_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_voltage1_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+  g_voltage1_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
 
   // initialize global variables for endpoint "/voltage2"
-  g_voltage2_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-  g_voltage2_current = 5.0; // current value of property "current"  The electric current in Amps (A).
   g_voltage2_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-  g_voltage2_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_voltage2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_voltage2_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
+  g_voltage2_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+  g_voltage2_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_voltage2_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+  g_voltage2_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
 
   // initialize global variables for endpoint "/voltage3"
-  g_voltage3_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-  g_voltage3_current = 5.0; // current value of property "current"  The electric current in Amps (A).
   g_voltage3_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-  g_voltage3_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-  g_voltage3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
   g_voltage3_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
+  g_voltage3_current = 5.0; // current value of property "current"  The electric current in Amps (A).
+  g_voltage3_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
+  g_voltage3_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
+  g_voltage3_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
 
   // initialize global variables for endpoint "/xmotion"
   g_xmotion_acceleration = 0.5; // current value of property "acceleration"  sensed acceleration experienced in 'g'.
@@ -1597,7 +1438,7 @@ int init;
                                        };
   oc_clock_time_t next_event;
 
-  PRINT("file : /home/pi/workspace/envirophatlite/device_output/out_codegeneration_merged.swagger.json\n");
+  PRINT("file : /home/pi/tmp/envirophatlite/device_output/out_codegeneration_merged.swagger.json\n");
   PRINT("title: Binary Switch\n");
 
 #ifdef OC_SECURITY
@@ -1605,7 +1446,7 @@ int init;
   oc_storage_config("./device_builder_server_creds/");
 #endif /* OC_SECURITY */
 
-Py_Initialize();
+  Py_Initialize();
 
   // start the stack
   init = oc_main_init(&handler);
@@ -1643,7 +1484,7 @@ Py_Initialize();
 
   // shut down the stack
   oc_main_shutdown();
-
+  
   Py_Finalize();
 
   return 0;
