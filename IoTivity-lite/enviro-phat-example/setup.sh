@@ -1,4 +1,4 @@
-enviro-phat-example-example#!/bin/bash
+#!/bin/bash
 CURPWD=`pwd`
 PROJNAME=${PWD##*/}
 
