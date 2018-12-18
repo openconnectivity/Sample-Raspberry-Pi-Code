@@ -362,7 +362,7 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
     // one can use the global variables as input to those calls
     // the global values have been updated already with the data from the request
-    myParamArgs[0] = g_colorSensorLight_value ? 1 : 0;
+    myParamArgs[0] = g_light_value ? 1 : 0;
     CallPythonFunction((char *)"enviro-phat", (char *)"writeLEDs", 1, myParamArgs);
 
     oc_send_response(request, OC_STATUS_CHANGED);
