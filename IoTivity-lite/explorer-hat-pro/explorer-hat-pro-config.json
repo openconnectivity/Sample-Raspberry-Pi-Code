@@ -1,5 +1,5 @@
 {
-  "friendly_name" : "Cool Device",
+  "friendly_name" : "Explorer Hat Pro",
   "device_type" : "oic.d.cooldevice",
   "ocf_base_path" : "~",
   "implementation_paths" : [
