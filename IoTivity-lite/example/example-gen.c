@@ -24,7 +24,7 @@
 * register_resources
 *  function that registers all endpoints, e.g. sets the RETRIEVE/UPDATE handlers for each end point
 *
-* main 
+* main
 *  starts the stack, with the registered resources.
 *
 * Each resource has:
@@ -76,7 +76,7 @@ static CONDITION_VARIABLE cv;   /* event loop variable */
 static CRITICAL_SECTION cs;     /* event loop variable */
 #endif
 
-#define MAX_STRING 30           /* max size of the strings. */
+#define MAX_STRING 65           /* max size of the strings. */
 #define MAX_PAYLOAD_STRING 65   /* max size strings in the payload */
 #define MAX_ARRAY 10            /* max size of the array */
 /* Note: Magic numbers are derived from the resource definition, either from the example or the definition.*/
@@ -105,7 +105,7 @@ app_init(void)
   /* the settings determine the appearance of the device on the network
      can be OCF1.3.1 or OCF2.0.0 (or even higher)
      supplied values are for OCF1.3.1 */
-  ret |= oc_add_device("/oic/d", "oic.d.switchdevice", "Binary Switch", 
+  ret |= oc_add_device("/oic/d", "oic.d.switchdevice", "Binary Switch",
                        "ocf.1.0.0", /* icv value */
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  /* dmv value */
                        NULL, NULL);
@@ -130,7 +130,7 @@ convert_if_string(char *interface_name)
   return OC_IF_A;
 }
 
- 
+
 /**
 * get method for "/binaryswitch" resource.
 * function is called to intialize the return values of the GET method.
@@ -152,10 +152,10 @@ get_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *us
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-  
+
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
-  
+
   PRINT("get_binaryswitch: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -165,7 +165,7 @@ get_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *us
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
     /* property "value" */
-    oc_rep_set_boolean(root, value, g_binaryswitch_value); 
+    oc_rep_set_boolean(root, value, g_binaryswitch_value);
     PRINT("   %s : %d\n", g_binaryswitch_RESOURCE_PROPERTY_NAME_value,  g_binaryswitch_value );  /* not handled value */
     break;
   default:
@@ -174,7 +174,7 @@ get_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *us
   oc_rep_end_root_object();
   oc_send_response(request, OC_STATUS_OK);
 }
- 
+
 /**
 * post method for "/binaryswitch" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -202,7 +202,7 @@ post_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *u
         PRINT ("   property 'value' is not of type bool %d \n", rep->type);
       }
     }
-    
+
     rep = rep->next;
   }
   /* if the input is ok, then process the input document and assign the global variables */
@@ -223,13 +223,13 @@ post_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *u
     PRINT("Set response \n");
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
-    oc_rep_set_boolean(root, value, g_binaryswitch_value); 
+    oc_rep_set_boolean(root, value, g_binaryswitch_value);
     oc_rep_end_root_object();
-    
+
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    
+
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -242,10 +242,10 @@ post_binaryswitch(oc_request_t *request, oc_interface_mask_t interfaces, void *u
 * register all the resources to the stack
 * this function registers all application level resources:
 * - each resource path is bind to a specific function for the supported methods (GET, POST, PUT)
-* - each resource is 
+* - each resource is
 *   - secure
 *   - observable
-*   - discoverable 
+*   - discoverable
 *   - used interfaces (from the global variables).
 */
 static void
@@ -262,7 +262,7 @@ register_resources(void)
   for( int a = 0; a < g_binaryswitch_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[0]));  
+  oc_resource_set_default_interface(res_binaryswitch, convert_if_string(g_binaryswitch_RESOURCE_INTERFACE[0]));
   PRINT("     Default OCF Interface: \"%s\"\n", g_binaryswitch_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_binaryswitch, true);
   /* periodic observable
@@ -273,9 +273,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_binaryswitch, true); */
-   
+
   oc_resource_set_request_handler(res_binaryswitch, OC_GET, get_binaryswitch, NULL);
-   
+
   oc_resource_set_request_handler(res_binaryswitch, OC_POST, post_binaryswitch, NULL);
   oc_add_resource(res_binaryswitch);
 }
@@ -356,11 +356,11 @@ int init;
                                        .register_resources = register_resources
 #ifdef OC_CLIENT
                                        ,
-                                       .requests_entry = 0 
+                                       .requests_entry = 0
 #endif
                                        };
   oc_clock_time_t next_event;
-  
+
   PRINT("Used input file : \"/home/pi/workspace/example/device_output/out_codegeneration_merged.swagger.json\"\n");
   PRINT("OCF Server name : \"Binary Switch\"\n");
 
@@ -376,7 +376,7 @@ int init;
     return init;
 
   PRINT("OCF server \"Binary Switch\" running, waiting on incomming connections.\n");
-    
+
 #ifdef WIN32
   /* windows specific loop */
   while (quit != 1) {
@@ -392,7 +392,7 @@ int init;
     }
   }
 #endif
-  
+
 #ifdef __linux__
   /* linux specific loop */
   while (quit != 1) {
