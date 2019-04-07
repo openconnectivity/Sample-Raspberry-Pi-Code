@@ -2347,7 +2347,7 @@ Py_Initialize();
   if (init < 0)
     return init;
 
-  PRINT("OCF server \"Energy\" running, waiting on incomming connections.\n");
+  PRINT("OCF server \"Automation Hat\" running, waiting on incomming connections.\n");
 
 #ifdef WIN32
   /* windows specific loop */
