@@ -78,7 +78,7 @@ static CONDITION_VARIABLE cv;   /* event loop variable */
 static CRITICAL_SECTION cs;     /* event loop variable */
 #endif
 
-#define MAX_STRING 65           /* max size of the strings. */
+#define MAX_STRING 30           /* max size of the strings. */
 #define MAX_PAYLOAD_STRING 65   /* max size strings in the payload */
 #define MAX_ARRAY 10            /* max size of the array */
 /* Note: Magic numbers are derived from the resource definition, either from the example or the definition.*/
