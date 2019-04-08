@@ -17,8 +17,7 @@
 // limitations under the License.
 //
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-#include "/usr/include/python2.7/Python.h"
-// #include <Python.h>
+#include <Python.h>
 
 #include <signal.h>
 #include <functional>
