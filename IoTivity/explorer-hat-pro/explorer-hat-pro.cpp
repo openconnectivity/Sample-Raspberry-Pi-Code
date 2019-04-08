@@ -7700,7 +7700,7 @@ Touch2Resource::Touch2Resource(std::string resourceUri)
     m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch2ObserverLoop
-    IoTObserverCb touch2ObsCb = bind(&Touch1Resource::touch2ObserverLoop, this);
+    IoTObserverCb touch2ObsCb = bind(&Touch2Resource::touch2ObserverLoop, this);
     m_touch2ObserverLoop = make_shared<IoTObserver>(touch2ObsCb);
 }
 
@@ -8049,7 +8049,7 @@ Touch3Resource::Touch3Resource(std::string resourceUri)
     m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch3ObserverLoop
-    IoTObserverCb touch3ObsCb = bind(&Touch1Resource::touch3ObserverLoop, this);
+    IoTObserverCb touch3ObsCb = bind(&Touch3Resource::touch3ObserverLoop, this);
     m_touch3ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
 }
 
@@ -8398,7 +8398,7 @@ Touch4Resource::Touch4Resource(std::string resourceUri)
     m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch4ObserverLoop
-    IoTObserverCb touch4ObsCb = bind(&Touch1Resource::touch4ObserverLoop, this);
+    IoTObserverCb touch4ObsCb = bind(&Touch4Resource::touch4ObserverLoop, this);
     m_touch4ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
 }
 
@@ -8747,7 +8747,7 @@ Touch5Resource::Touch5Resource(std::string resourceUri)
     m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch5ObserverLoop
-    IoTObserverCb touch5ObsCb = bind(&Touch1Resource::touch5ObserverLoop, this);
+    IoTObserverCb touch5ObsCb = bind(&Touch5Resource::touch5ObserverLoop, this);
     m_touch5ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
 }
 
@@ -9096,7 +9096,7 @@ Touch6Resource::Touch6Resource(std::string resourceUri)
     m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch6ObserverLoop
-    IoTObserverCb touch6ObsCb = bind(&Touch1Resource::touch6ObserverLoop, this);
+    IoTObserverCb touch6ObsCb = bind(&Touch6Resource::touch6ObserverLoop, this);
     m_touch6ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
 }
 
@@ -9445,7 +9445,7 @@ Touch7Resource::Touch7Resource(std::string resourceUri)
     m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch7ObserverLoop
-    IoTObserverCb touch7ObsCb = bind(&Touch1Resource::touch7ObserverLoop, this);
+    IoTObserverCb touch7ObsCb = bind(&Touch7Resource::touch7ObserverLoop, this);
     m_touch7ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
 }
 
@@ -9794,7 +9794,7 @@ Touch8Resource::Touch8Resource(std::string resourceUri)
     m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch8ObserverLoop
-    IoTObserverCb touch8ObsCb = bind(&Touch1Resource::touch8ObserverLoop, this);
+    IoTObserverCb touch8ObsCb = bind(&Touch8Resource::touch8ObserverLoop, this);
     m_touch8ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
 }
 
