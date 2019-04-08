@@ -8050,7 +8050,7 @@ Touch3Resource::Touch3Resource(std::string resourceUri)
 
     // set up the observation touch3ObserverLoop
     IoTObserverCb touch3ObsCb = bind(&Touch3Resource::touch3ObserverLoop, this);
-    m_touch3ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+    m_touch3ObserverLoop = make_shared<IoTObserver>(touch3ObsCb);
 }
 
 /*
@@ -8399,7 +8399,7 @@ Touch4Resource::Touch4Resource(std::string resourceUri)
 
     // set up the observation touch4ObserverLoop
     IoTObserverCb touch4ObsCb = bind(&Touch4Resource::touch4ObserverLoop, this);
-    m_touch4ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+    m_touch4ObserverLoop = make_shared<IoTObserver>(touch4ObsCb);
 }
 
 /*
@@ -8748,7 +8748,7 @@ Touch5Resource::Touch5Resource(std::string resourceUri)
 
     // set up the observation touch5ObserverLoop
     IoTObserverCb touch5ObsCb = bind(&Touch5Resource::touch5ObserverLoop, this);
-    m_touch5ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+    m_touch5ObserverLoop = make_shared<IoTObserver>(touch5ObsCb);
 }
 
 /*
@@ -9097,7 +9097,7 @@ Touch6Resource::Touch6Resource(std::string resourceUri)
 
     // set up the observation touch6ObserverLoop
     IoTObserverCb touch6ObsCb = bind(&Touch6Resource::touch6ObserverLoop, this);
-    m_touch6ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+    m_touch6ObserverLoop = make_shared<IoTObserver>(touch6ObsCb);
 }
 
 /*
@@ -9446,7 +9446,7 @@ Touch7Resource::Touch7Resource(std::string resourceUri)
 
     // set up the observation touch7ObserverLoop
     IoTObserverCb touch7ObsCb = bind(&Touch7Resource::touch7ObserverLoop, this);
-    m_touch7ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+    m_touch7ObserverLoop = make_shared<IoTObserver>(touch7ObsCb);
 }
 
 /*
@@ -9795,7 +9795,7 @@ Touch8Resource::Touch8Resource(std::string resourceUri)
 
     // set up the observation touch8ObserverLoop
     IoTObserverCb touch8ObsCb = bind(&Touch8Resource::touch8ObserverLoop, this);
-    m_touch8ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+    m_touch8ObserverLoop = make_shared<IoTObserver>(touch8ObsCb);
 }
 
 /*
