@@ -31,7 +31,6 @@
 #endif
 
 #include "ocstack.h"
-#include "observer.h"
 #include "OCPlatform.h"
 #include "OCApi.h"
 #include "ocpayload.h"
@@ -41,8 +40,8 @@ namespace PH = std::placeholders;
 
 /*
  tool_version          : 20171123
- input_file            : /home/pi/workExplorerHatrhat/device_output/out_codegeneration_merged.swagger.json
- version of input_file : v1.1.0-20160519
+ input_file            : /home/pi/workspace/explorerhatpro-o/device_output/out_codegeneration_merged.swagger.json
+ version of input_file : 20190215
  title of input_file   : Touch Sensor
 */
 
@@ -174,8 +173,7 @@ ExplorerHat *testExplorerHat;
 /*
  * class definition for class that handles /analog1
  *
- * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
- * Retrieves the current energy.
+ * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 */
 class Analog1Resource : public Resource
 {
@@ -219,8 +217,7 @@ class Analog1Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /analog1
-         * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
-         * Retrieves the current energy.
+         * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -244,11 +241,11 @@ class Analog1Resource : public Resource
         std::string m_var_name_desiredvoltage = "desiredvoltage"; // the name for the attribute "desiredvoltage"
         double m_var_value_frequency; // the value for the attribute "frequency": The electric frequency in Hertz (Hz).
         std::string m_var_name_frequency = "frequency"; // the name for the attribute "frequency"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
@@ -283,11 +280,11 @@ Analog1Resource::Analog1Resource(std::string resourceUri)
     m_var_value_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
     m_var_value_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
     m_var_value_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.s");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.energy.electrical");
     m_var_value_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
     }
@@ -384,12 +381,12 @@ OCRepresentation Analog1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 1;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
-    m_var_value_voltage = testExplorerHat->returnDouble;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
+  testExplorerHat->myParamArgs[0] = 1;
+  testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+  m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -516,8 +513,7 @@ else
 /*
  * class definition for class that handles /analog2
  *
- * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
- * Retrieves the current energy.
+ * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 */
 class Analog2Resource : public Resource
 {
@@ -561,8 +557,7 @@ class Analog2Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /analog2
-         * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
-         * Retrieves the current energy.
+         * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -586,11 +581,11 @@ class Analog2Resource : public Resource
         std::string m_var_name_desiredvoltage = "desiredvoltage"; // the name for the attribute "desiredvoltage"
         double m_var_value_frequency; // the value for the attribute "frequency": The electric frequency in Hertz (Hz).
         std::string m_var_name_frequency = "frequency"; // the name for the attribute "frequency"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
@@ -625,11 +620,11 @@ Analog2Resource::Analog2Resource(std::string resourceUri)
     m_var_value_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
     m_var_value_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
     m_var_value_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.s");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.energy.electrical");
     m_var_value_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
     }
@@ -726,12 +721,12 @@ OCRepresentation Analog2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 2;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
-    m_var_value_voltage = testExplorerHat->returnDouble;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
+  testExplorerHat->myParamArgs[0] = 2;
+  testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+  m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -858,8 +853,7 @@ else
 /*
  * class definition for class that handles /analog3
  *
- * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
- * Retrieves the current energy.
+ * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 */
 class Analog3Resource : public Resource
 {
@@ -903,8 +897,7 @@ class Analog3Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /analog3
-         * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
-         * Retrieves the current energy.
+         * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -928,11 +921,11 @@ class Analog3Resource : public Resource
         std::string m_var_name_desiredvoltage = "desiredvoltage"; // the name for the attribute "desiredvoltage"
         double m_var_value_frequency; // the value for the attribute "frequency": The electric frequency in Hertz (Hz).
         std::string m_var_name_frequency = "frequency"; // the name for the attribute "frequency"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
@@ -967,11 +960,11 @@ Analog3Resource::Analog3Resource(std::string resourceUri)
     m_var_value_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
     m_var_value_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
     m_var_value_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.s");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.energy.electrical");
     m_var_value_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
     }
@@ -1068,12 +1061,12 @@ OCRepresentation Analog3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 3;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
-    m_var_value_voltage = testExplorerHat->returnDouble;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
+  testExplorerHat->myParamArgs[0] = 3;
+  testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+  m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1200,8 +1193,7 @@ else
 /*
  * class definition for class that handles /analog4
  *
- * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
- * Retrieves the current energy.
+ * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 */
 class Analog4Resource : public Resource
 {
@@ -1245,8 +1237,7 @@ class Analog4Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /analog4
-         * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
-         * Retrieves the current energy.
+         * This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
          * @param queries  the query parameters for this call
          */
         OCRepresentation get(OC::QueryParamsMap queries);
@@ -1270,11 +1261,11 @@ class Analog4Resource : public Resource
         std::string m_var_name_desiredvoltage = "desiredvoltage"; // the name for the attribute "desiredvoltage"
         double m_var_value_frequency; // the value for the attribute "frequency": The electric frequency in Hertz (Hz).
         std::string m_var_name_frequency = "frequency"; // the name for the attribute "frequency"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
         double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
         std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
@@ -1309,11 +1300,11 @@ Analog4Resource::Analog4Resource(std::string resourceUri)
     m_var_value_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
     m_var_value_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
     m_var_value_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.s");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.energy.electrical");
     m_var_value_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
     }
@@ -1410,12 +1401,12 @@ OCRepresentation Analog4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 4;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
-    m_var_value_voltage = testExplorerHat->returnDouble;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
+  testExplorerHat->myParamArgs[0] = 4;
+  testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, testExplorerHat->myParamArgs);
+  m_var_value_voltage = testExplorerHat->returnDouble;
 
     std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
     std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
@@ -1542,8 +1533,8 @@ else
 /*
  * class definition for class that handles /input1
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -1589,8 +1580,8 @@ class Input1Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /input1
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -1606,13 +1597,13 @@ class Input1Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/input1"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -1640,13 +1631,13 @@ Input1Resource::Input1Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /input1
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -1741,12 +1732,12 @@ OCRepresentation Input1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 1;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
+  testExplorerHat->myParamArgs[0] = 1;
+  testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
+  m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -1863,8 +1854,8 @@ else
 /*
  * class definition for class that handles /input2
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -1910,8 +1901,8 @@ class Input2Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /input2
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -1927,13 +1918,13 @@ class Input2Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/input2"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -1961,13 +1952,13 @@ Input2Resource::Input2Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /input2
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -2062,12 +2053,9 @@ OCRepresentation Input2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 2;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -2184,8 +2172,8 @@ else
 /*
  * class definition for class that handles /input3
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -2231,8 +2219,8 @@ class Input3Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /input3
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -2248,13 +2236,13 @@ class Input3Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/input3"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -2282,13 +2270,13 @@ Input3Resource::Input3Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /input3
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -2383,12 +2371,12 @@ OCRepresentation Input3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 3;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
+  testExplorerHat->myParamArgs[0] = 3;
+  testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
+  m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -2505,8 +2493,8 @@ else
 /*
  * class definition for class that handles /input4
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -2552,8 +2540,8 @@ class Input4Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /input4
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -2569,13 +2557,13 @@ class Input4Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/input4"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -2603,13 +2591,13 @@ Input4Resource::Input4Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /input4
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -2704,12 +2692,12 @@ OCRepresentation Input4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 4;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
+  testExplorerHat->myParamArgs[0] = 4;
+  testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, testExplorerHat->myParamArgs);
+  m_var_value_value = (bool)testExplorerHat->returnLong;
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -2826,8 +2814,8 @@ else
 /*
  * class definition for class that handles /light1
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -2873,8 +2861,8 @@ class Light1Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /light1
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -2899,13 +2887,13 @@ class Light1Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/light1"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -2933,13 +2921,13 @@ Light1Resource::Light1Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /light1
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -3219,12 +3207,12 @@ OCEntityHandlerResult Light1Resource::post(QueryParamsMap queries, const OCRepre
         {
             std::cout << e.what() << std::endl;
         }
-      	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testExplorerHat->myParamArgs[0] = 1;
-        testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
-        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, testExplorerHat->myParamArgs);
+    	// TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+    	// one can use the member variables as input to those calls
+    	// the member values have been updated already with the request data
+      testExplorerHat->myParamArgs[0] = 1;
+      testExplorerHat->myParamArgs[1] = m_var_value_value ? 1 : 0;
+      testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, testExplorerHat->myParamArgs);
     }
     return ehResult;
 }
@@ -3379,8 +3367,8 @@ OCEntityHandlerResult Light1Resource::entityHandler(std::shared_ptr<OCResourceRe
 /*
  * class definition for class that handles /light2
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -3426,8 +3414,8 @@ class Light2Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /light2
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -3452,13 +3440,13 @@ class Light2Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/light2"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -3486,13 +3474,13 @@ Light2Resource::Light2Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /light2
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -3932,8 +3920,8 @@ OCEntityHandlerResult Light2Resource::entityHandler(std::shared_ptr<OCResourceRe
 /*
  * class definition for class that handles /light3
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -3979,8 +3967,8 @@ class Light3Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /light3
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -4005,13 +3993,13 @@ class Light3Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/light3"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -4039,13 +4027,13 @@ Light3Resource::Light3Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /light3
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -4485,8 +4473,8 @@ OCEntityHandlerResult Light3Resource::entityHandler(std::shared_ptr<OCResourceRe
 /*
  * class definition for class that handles /light4
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -4532,8 +4520,8 @@ class Light4Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /light4
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -4558,13 +4546,13 @@ class Light4Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/light4"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -4592,13 +4580,13 @@ Light4Resource::Light4Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /light4
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -5036,1546 +5024,10 @@ OCEntityHandlerResult Light4Resource::entityHandler(std::shared_ptr<OCResourceRe
 
 
 /*
- * class definition for class that handles /motor1
- *
- * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
- * Retrieves the current energy.
-*/
-class Motor1Resource : public Resource
-{
-    public:
-        /*
-         * constructor
-         *
-         * @param resourceUri the uri for this resource
-         */
-        Motor1Resource(std::string resourceUri = "/motor1");
-
-        /*
-         * destructor
-         */
-         virtual ~Motor1Resource(void);
-
-        /*
-         * Register the resource with the server
-         *
-         * setting resourceProperty as OC_DISCOVERABLE will allow Discovery of this resource
-         * setting resourceProperty as OC_OBSERVABLE will allow observation
-         * setting resourceProperty as OC_DISCOVERABLE | OC_OBSERVABLE will allow both discovery and observation
-         * setting resourceProperty as OC_SECURE the resource supports access via secure endpoints
-         * setting resourceProperty as OC_NONSECURE the resource supports access via non-secure endpoints
-         * setting resourceProperty as OC_SECURE | OC_NONSECURE will allow access via secure and non-secure endpoints
-         *
-         * @param resourceProperty indicates the property of the resource. Defined in octypes.h.
-         */
-        OCStackResult registerResource(uint8_t resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE);
-
-        /*
-         * Attempt to send out notifications to observing clients
-         * if no value on the device has been changed no notification
-         * will be sent.
-         *
-         * @return OC_STACK_OK on success
-         */
-        OCStackResult sendNotification();
-        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-    private:
-
-        /*
-         * Make the payload for the retrieve function (e.g. GET) /motor1
-         * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
-         * Retrieves the current energy.
-         * @param queries  the query parameters for this call
-         */
-        OCRepresentation get(OC::QueryParamsMap queries);
-
-        /*
-         * Parse the payload for the update function (e.g. POST) /motor1
-         * Sets the desired energy values
-         * @param queries  the query parameters for this call
-         * @param rep  the response to get the property values from
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        OCEntityHandlerResult post(OC::QueryParamsMap queries, const OC::OCRepresentation& rep);
-
-
-        std::string m_resourceUri;
-        // resource types and interfaces as array..
-        std::string m_RESOURCE_TYPE[1] = {"oic.r.energy.electrical"}; // rt value (as an array)
-        std::string m_RESOURCE_INTERFACE[2] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
-        std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
-        ObservationIds m_interestedObservers;
-
-        // member variables for path: "/motor1"
-        double m_var_value_current; // the value for the attribute "current": The electric current in Amps (A).
-        std::string m_var_name_current = "current"; // the name for the attribute "current"
-        double m_var_value_desiredcurrent; // the value for the attribute "desiredcurrent": The desired electric current in Amps (A).
-        std::string m_var_name_desiredcurrent = "desiredcurrent"; // the name for the attribute "desiredcurrent"
-        double m_var_value_desiredfrequency; // the value for the attribute "desiredfrequency": The desired electric frequency in Hertz (Hz).
-        std::string m_var_name_desiredfrequency = "desiredfrequency"; // the name for the attribute "desiredfrequency"
-        double m_var_value_desiredvoltage; // the value for the attribute "desiredvoltage": The desired electric voltage in Volts (V).
-        std::string m_var_name_desiredvoltage = "desiredvoltage"; // the name for the attribute "desiredvoltage"
-        double m_var_value_frequency; // the value for the attribute "frequency": The electric frequency in Hertz (Hz).
-        std::string m_var_name_frequency = "frequency"; // the name for the attribute "frequency"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
-        std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
-        std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
-        std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
-        std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
-    protected:
-        /*
-         * Check if the interface is
-         * @param  interface_name the interface name used during the request
-         * @return true: updatable interface
-         */
-        bool in_updatable_interfaces(std::string interface_name);
-
-        /*
-         * the entity handler for this resource
-         * @param request the incoming request to handle
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request);
-};
-
-/*
-* Constructor code
-*/
-Motor1Resource::Motor1Resource(std::string resourceUri)
-{
-    std::cout << "- Running: Motor1Resource constructor" << std::endl;
-
-    m_resourceUri = resourceUri;
-    // initialize member variables /motor1
-    m_var_value_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-    m_var_value_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
-    m_var_value_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-    m_var_value_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-    m_var_value_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-    // initialize vector if  The interface set supported by this resource
-    m_var_value_if.push_back("oic.if.baseline");
-    m_var_value_if.push_back("oic.if.s");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
-    m_var_value_rt.push_back("oic.r.energy.electrical");
-    m_var_value_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-    }
-
-/*
-* Destructor code
-*/
-Motor1Resource::~Motor1Resource() { }
-
-OCStackResult Motor1Resource::registerResource(uint8_t resourceProperty)
-{
-    OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&Motor1Resource::entityHandler, this,PH::_1);
-    result = OCPlatform::registerResource(m_resourceHandle,
-                                          m_resourceUri,
-                                          m_RESOURCE_TYPE[0],
-                                          m_RESOURCE_INTERFACE[0],
-                                          cb,
-                                          resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        std::cerr << "Failed to register Motor1Resource." << std::endl;
-        return result;
-    }
-
-    /// add the additional resource types
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0])); a++ )
-    {
-        result = OCPlatform::bindTypeToResource(m_resourceHandle, m_RESOURCE_TYPE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind resource type:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-    // add the additional interfaces
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0])); a++)
-    {
-        result = OCPlatform::bindInterfaceToResource(m_resourceHandle, m_RESOURCE_INTERFACE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind interface:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-
-    std::cout << "Motor1Resource:" << std::endl;
-    std::cout << "\t" << "# resource interfaces: "
-              << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
-    std::cout << "\t" << "# resource types     : "
-              << sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0]) << std::endl;
-
-    return result;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /motor1
-*/
-OCStackResult Motor1Resource::sendNotification(void)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        auto pResponse = std::make_shared<OC::OCResourceResponse>();
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /motor1
-* @param pResponse  the response to use for the observe
-*/
-OCStackResult Motor1Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-
-/*
-* Make the payload for the retrieve function (e.g. GET) /motor1
-* @param queries  the query parameters for this call
-*/
-OCRepresentation Motor1Resource::get(QueryParamsMap queries)
-{
-    OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-
-    std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
-    std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
-    std::cout << "\t\t" << "property 'desiredfrequency' : "<< m_var_value_desiredfrequency << std::endl;
-    std::cout << "\t\t" << "property 'desiredvoltage' : "<< m_var_value_desiredvoltage << std::endl;
-    std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
-    std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-    std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
-
-    return m_rep;
-}
-
-/*
-* Parse the payload for the update function (e.g. POST) /motor1
-* @param queries  the query parameters for this call
-* @param rep  the response to get the property values from
-* @return OCEntityHandlerResult ok or not ok indication
-*/
-OCEntityHandlerResult Motor1Resource::post(QueryParamsMap queries, const OCRepresentation& rep)
-{
-    OCEntityHandlerResult ehResult = OC_EH_OK;
-    OC_UNUSED(queries);
-    try {
-        if (rep.hasAttribute(m_var_name_current))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_current, value);
-
-            // check if "current" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'current' is readOnly "<< std::endl;
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_desiredcurrent))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_desiredcurrent, value);
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_desiredfrequency))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_desiredfrequency, value);
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_desiredvoltage))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_desiredvoltage, value);
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_frequency))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_frequency, value);
-
-            // check if "frequency" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'frequency' is readOnly "<< std::endl;
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_if))
-        {
-            // value exist in payload
-
-            // check if "if" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_n))
-        {
-            // value exist in payload
-
-            // check if "n" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_rt))
-        {
-            // value exist in payload
-
-            // check if "rt" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    try {
-        if (rep.hasAttribute(m_var_name_voltage))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_voltage, value);
-
-            // check if "voltage" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'voltage' is readOnly "<< std::endl;
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    if (ehResult == OC_EH_OK)
-    {
-        // no error: assign the variables
-
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_current, temp ))
-            {
-                m_var_value_current = temp;
-                std::cout << "\t\t" << "property 'current' UPDATED: " << m_var_value_current << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'current' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_desiredcurrent, temp ))
-            {
-                m_var_value_desiredcurrent = temp;
-                std::cout << "\t\t" << "property 'desiredcurrent' UPDATED: " << m_var_value_desiredcurrent << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'desiredcurrent' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_desiredfrequency, temp ))
-            {
-                m_var_value_desiredfrequency = temp;
-                std::cout << "\t\t" << "property 'desiredfrequency' UPDATED: " << m_var_value_desiredfrequency << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'desiredfrequency' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_desiredvoltage, temp ))
-            {
-                m_var_value_desiredvoltage = temp;
-                std::cout << "\t\t" << "property 'desiredvoltage' UPDATED: " << m_var_value_desiredvoltage << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'desiredvoltage' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_frequency, temp ))
-            {
-                m_var_value_frequency = temp;
-                std::cout << "\t\t" << "property 'frequency' UPDATED: " << m_var_value_frequency << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'frequency' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_if))
-            {
-                rep.getValue(m_var_name_if, m_var_value_if);
-                int first = 1;
-                std::cout << "\t\t" << "property 'if' UPDATED: " ;
-                for(auto myvar: m_var_value_if)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'if' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            std::string temp;
-            if (rep.getValue(m_var_name_n, temp ))
-            {
-                m_var_value_n = temp;
-                std::cout << "\t\t" << "property 'n' UPDATED: " << m_var_value_n << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'n' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_rt))
-            {
-                rep.getValue(m_var_name_rt, m_var_value_rt);
-                int first = 1;
-                std::cout << "\t\t" << "property 'rt' UPDATED: " ;
-                for(auto myvar: m_var_value_rt)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'rt' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_voltage, temp ))
-            {
-                m_var_value_voltage = temp;
-                std::cout << "\t\t" << "property 'voltage' UPDATED: " << m_var_value_voltage << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'voltage' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testExplorerHat->myParamArgs[0] = 1;
-        testExplorerHat->myParamArgs[1] = m_var_value_voltage;
-        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeMotor", 2, testExplorerHat->myParamArgs);
-    }
-    return ehResult;
-}
-/*
-* Check if the interface name is an registered interface name
-*/
-bool Motor1Resource::in_updatable_interfaces(std::string interface_name)
-{
-    for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
-    {
-        if (m_IF_UPDATE[i].compare(interface_name) == 0)
-            return true;
-    }
-    return false;
-}
-
-/*
-* the entity handler
-*/
-OCEntityHandlerResult Motor1Resource::entityHandler(std::shared_ptr<OCResourceRequest> request)
-{
-    OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for Motor1Resource " << std::endl;
-
-    if(request)
-    {
-        std::cout << "In entity handler for Motor1Resource, URI is : "
-                  << request->getResourceUri() << std::endl;
-
-        // Check for query params (if any)
-        QueryParamsMap queries = request->getQueryParameters();
-        if (!queries.empty())
-        {
-            std::cout << "\nQuery processing up to entityHandler" << std::endl;
-        }
-        for (auto it : queries)
-        {
-            std::cout << "Query key: " << it.first << " value : " << it.second
-                    << std::endl;
-        }
-        // get the value, so that we can AND it to check which flags are set
-        int requestFlag = request->getRequestHandlerFlag();
-
-        if(requestFlag & RequestHandlerFlag::RequestFlag)
-        {
-            // request flag is set
-            auto pResponse = std::make_shared<OC::OCResourceResponse>();
-            pResponse->setRequestHandle(request->getRequestHandle());
-            pResponse->setResourceHandle(request->getResourceHandle());
-
-            if(request->getRequestType() == "GET")
-            {
-                std::cout<<"Motor1Resource Get Request"<< std::endl;
-
-                pResponse->setResourceRepresentation(get(queries), "");
-                if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                {
-                    ehResult = OC_EH_OK;
-                }
-            }
-
-            else if(request->getRequestType() == "POST")
-            {
-                std::cout <<"Motor1Resource Post Request"<<std::endl;
-                bool  handle_post = true;
-
-                if (queries.size() > 0)
-                {
-                    for (const auto &eachQuery : queries)
-                    {
-                        std::string key = eachQuery.first;
-                        if (key.compare(INTERFACE_KEY) == 0)
-                        {
-                            std::string value = eachQuery.second;
-                            if (in_updatable_interfaces(value) == false)
-                            {
-                                std::cout << "Update request received via interface: " << value
-                                            << " . This interface is not authorized to update resource!!" << std::endl;
-                                pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_FORBIDDEN);
-                                handle_post = false;
-                                ehResult = OC_EH_ERROR;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (handle_post)
-                {
-                    ehResult = post(queries, request->getResourceRepresentation());
-                    if (ehResult == OC_EH_OK)
-                    {
-                        pResponse->setResourceRepresentation(get(queries), "");
-                        if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                        {
-                            if (OC_STACK_OK != sendNotification(pResponse) )
-                            {
-                                std::cerr << "NOTIFY failed." << std::endl;
-                            }
-                        }
-                    }
-                    else
-                    {
-                         pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_ERROR);
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "Motor1Resource unsupported request type (delete,put,..)"
-                    << request->getRequestType() << std::endl;
-                pResponse->setResponseResult(OC_EH_ERROR);
-                OCPlatform::sendResponse(pResponse);
-                ehResult = OC_EH_ERROR;
-            }
-        }
-
-        if(requestFlag & RequestHandlerFlag::ObserverFlag)
-        {
-            // observe flag is set
-            ObservationInfo observationInfo = request->getObservationInfo();
-            std::cout << "\t\trequestFlag : observer ";
-            if (ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                std::cout << "register" << std::endl;
-            }
-            else
-            {
-                std::cout << "unregister" << std::endl;
-            }
-
-            if(ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                // add observer
-                m_interestedObservers.push_back(observationInfo.obsId);
-            }
-            else if(ObserveAction::ObserveUnregister == observationInfo.action)
-            {
-                // delete observer
-                m_interestedObservers.erase(std::remove(
-                                            m_interestedObservers.begin(),
-                                            m_interestedObservers.end(),
-                                            observationInfo.obsId),
-                                            m_interestedObservers.end());
-            }
-            ehResult = OC_EH_OK;
-        }
-    }
-    return ehResult;
-}
-
-
-/*
- * class definition for class that handles /motor2
- *
- * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
- * Retrieves the current energy.
-*/
-class Motor2Resource : public Resource
-{
-    public:
-        /*
-         * constructor
-         *
-         * @param resourceUri the uri for this resource
-         */
-        Motor2Resource(std::string resourceUri = "/motor2");
-
-        /*
-         * destructor
-         */
-         virtual ~Motor2Resource(void);
-
-        /*
-         * Register the resource with the server
-         *
-         * setting resourceProperty as OC_DISCOVERABLE will allow Discovery of this resource
-         * setting resourceProperty as OC_OBSERVABLE will allow observation
-         * setting resourceProperty as OC_DISCOVERABLE | OC_OBSERVABLE will allow both discovery and observation
-         * setting resourceProperty as OC_SECURE the resource supports access via secure endpoints
-         * setting resourceProperty as OC_NONSECURE the resource supports access via non-secure endpoints
-         * setting resourceProperty as OC_SECURE | OC_NONSECURE will allow access via secure and non-secure endpoints
-         *
-         * @param resourceProperty indicates the property of the resource. Defined in octypes.h.
-         */
-        OCStackResult registerResource(uint8_t resourceProperty = OC_DISCOVERABLE | OC_OBSERVABLE | OC_SECURE);
-
-        /*
-         * Attempt to send out notifications to observing clients
-         * if no value on the device has been changed no notification
-         * will be sent.
-         *
-         * @return OC_STACK_OK on success
-         */
-        OCStackResult sendNotification();
-        OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
-    private:
-
-        /*
-         * Make the payload for the retrieve function (e.g. GET) /motor2
-         * This resource describes the attributes associated with electrical energy. This can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The voltage is in Volts (V), current in Amps (A), and frequency in Hertz (Hz).
-         * Retrieves the current energy.
-         * @param queries  the query parameters for this call
-         */
-        OCRepresentation get(OC::QueryParamsMap queries);
-
-        /*
-         * Parse the payload for the update function (e.g. POST) /motor2
-         * Sets the desired energy values
-         * @param queries  the query parameters for this call
-         * @param rep  the response to get the property values from
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        OCEntityHandlerResult post(OC::QueryParamsMap queries, const OC::OCRepresentation& rep);
-
-
-        std::string m_resourceUri;
-        // resource types and interfaces as array..
-        std::string m_RESOURCE_TYPE[1] = {"oic.r.energy.electrical"}; // rt value (as an array)
-        std::string m_RESOURCE_INTERFACE[2] = {"oic.if.baseline","oic.if.s"}; // interface if (as an array)
-        std::string m_IF_UPDATE[3] = {"oic.if.a", "oic.if.rw", "oic.if.baseline"}; // updateble interfaces
-        ObservationIds m_interestedObservers;
-
-        // member variables for path: "/motor2"
-        double m_var_value_current; // the value for the attribute "current": The electric current in Amps (A).
-        std::string m_var_name_current = "current"; // the name for the attribute "current"
-        double m_var_value_desiredcurrent; // the value for the attribute "desiredcurrent": The desired electric current in Amps (A).
-        std::string m_var_name_desiredcurrent = "desiredcurrent"; // the name for the attribute "desiredcurrent"
-        double m_var_value_desiredfrequency; // the value for the attribute "desiredfrequency": The desired electric frequency in Hertz (Hz).
-        std::string m_var_name_desiredfrequency = "desiredfrequency"; // the name for the attribute "desiredfrequency"
-        double m_var_value_desiredvoltage; // the value for the attribute "desiredvoltage": The desired electric voltage in Volts (V).
-        std::string m_var_name_desiredvoltage = "desiredvoltage"; // the name for the attribute "desiredvoltage"
-        double m_var_value_frequency; // the value for the attribute "frequency": The electric frequency in Hertz (Hz).
-        std::string m_var_name_frequency = "frequency"; // the name for the attribute "frequency"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
-        std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
-        std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
-        std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        double m_var_value_voltage; // the value for the attribute "voltage": The electric voltage in Volts (V).
-        std::string m_var_name_voltage = "voltage"; // the name for the attribute "voltage"
-
-    protected:
-        /*
-         * Check if the interface is
-         * @param  interface_name the interface name used during the request
-         * @return true: updatable interface
-         */
-        bool in_updatable_interfaces(std::string interface_name);
-
-        /*
-         * the entity handler for this resource
-         * @param request the incoming request to handle
-         * @return OCEntityHandlerResult ok or not ok indication
-         */
-        virtual OCEntityHandlerResult entityHandler(std::shared_ptr<OC::OCResourceRequest> request);
-};
-
-/*
-* Constructor code
-*/
-Motor2Resource::Motor2Resource(std::string resourceUri)
-{
-    std::cout << "- Running: Motor2Resource constructor" << std::endl;
-
-    m_resourceUri = resourceUri;
-    // initialize member variables /motor2
-    m_var_value_current = 5.0; // current value of property "current"  The electric current in Amps (A).
-    m_var_value_desiredcurrent = 0; // current value of property "desiredcurrent"  The desired electric current in Amps (A).
-    m_var_value_desiredfrequency = 0; // current value of property "desiredfrequency"  The desired electric frequency in Hertz (Hz).
-    m_var_value_desiredvoltage = 0; // current value of property "desiredvoltage"  The desired electric voltage in Volts (V).
-    m_var_value_frequency = 60.0; // current value of property "frequency"  The electric frequency in Hertz (Hz).
-    // initialize vector if  The interface set supported by this resource
-    m_var_value_if.push_back("oic.if.baseline");
-    m_var_value_if.push_back("oic.if.s");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
-    m_var_value_rt.push_back("oic.r.energy.electrical");
-    m_var_value_voltage = 120.0; // current value of property "voltage"  The electric voltage in Volts (V).
-    }
-
-/*
-* Destructor code
-*/
-Motor2Resource::~Motor2Resource() { }
-
-OCStackResult Motor2Resource::registerResource(uint8_t resourceProperty)
-{
-    OCStackResult result = OC_STACK_ERROR;
-    EntityHandler cb = std::bind(&Motor2Resource::entityHandler, this,PH::_1);
-    result = OCPlatform::registerResource(m_resourceHandle,
-                                          m_resourceUri,
-                                          m_RESOURCE_TYPE[0],
-                                          m_RESOURCE_INTERFACE[0],
-                                          cb,
-                                          resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        std::cerr << "Failed to register Motor2Resource." << std::endl;
-        return result;
-    }
-
-    /// add the additional resource types
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0])); a++ )
-    {
-        result = OCPlatform::bindTypeToResource(m_resourceHandle, m_RESOURCE_TYPE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind resource type:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-    // add the additional interfaces
-    for( unsigned int a = 1; a < (sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0])); a++)
-    {
-        result = OCPlatform::bindInterfaceToResource(m_resourceHandle, m_RESOURCE_INTERFACE[a].c_str());
-        if(OC_STACK_OK != result)
-        {
-            std::cerr << "Could not bind interface:" << m_RESOURCE_INTERFACE[a] << std::endl;
-            return result;
-        }
-    }
-
-    std::cout << "Motor2Resource:" << std::endl;
-    std::cout << "\t" << "# resource interfaces: "
-              << sizeof(m_RESOURCE_INTERFACE)/sizeof(m_RESOURCE_INTERFACE[0]) << std::endl;
-    std::cout << "\t" << "# resource types     : "
-              << sizeof(m_RESOURCE_TYPE)/sizeof(m_RESOURCE_TYPE[0]) << std::endl;
-
-    return result;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /motor2
-*/
-OCStackResult Motor2Resource::sendNotification(void)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        auto pResponse = std::make_shared<OC::OCResourceResponse>();
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-/*
-* Make the payload for the observe function (e.g. GET) /motor2
-* @param pResponse  the response to use for the observe
-*/
-OCStackResult Motor2Resource::sendNotification(const std::shared_ptr< OCResourceResponse > pResponse)
-{
-    OCStackResult sResult = OC_STACK_OK;
-    if ( m_interestedObservers.size() > 0) {
-        std::cout << "Notifying list "  << m_interestedObservers.size() << " of observers\n";
-        sResult = OCPlatform::notifyListOfObservers(m_resourceHandle,
-                                                    m_interestedObservers,
-                                                    pResponse);
-    }
-    return sResult;
-}
-
-
-/*
-* Make the payload for the retrieve function (e.g. GET) /motor2
-* @param queries  the query parameters for this call
-*/
-OCRepresentation Motor2Resource::get(QueryParamsMap queries)
-{
-    OC_UNUSED(queries);
-
-	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-	// the calls needs to fill in the member variable before it is returned.
-	// alternative is to have a callback from the hardware that sets the member variables
-
-    std::cout << "\t\t" << "property 'current' : "<< m_var_value_current << std::endl;
-    std::cout << "\t\t" << "property 'desiredcurrent' : "<< m_var_value_desiredcurrent << std::endl;
-    std::cout << "\t\t" << "property 'desiredfrequency' : "<< m_var_value_desiredfrequency << std::endl;
-    std::cout << "\t\t" << "property 'desiredvoltage' : "<< m_var_value_desiredvoltage << std::endl;
-    std::cout << "\t\t" << "property 'frequency' : "<< m_var_value_frequency << std::endl;
-    std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
-    std::cout << "\t\t" << "property 'voltage' : "<< m_var_value_voltage << std::endl;
-
-    m_rep.setValue(m_var_name_current, m_var_value_current );
-    m_rep.setValue(m_var_name_desiredcurrent, m_var_value_desiredcurrent );
-    m_rep.setValue(m_var_name_desiredfrequency, m_var_value_desiredfrequency );
-    m_rep.setValue(m_var_name_desiredvoltage, m_var_value_desiredvoltage );
-    m_rep.setValue(m_var_name_frequency, m_var_value_frequency );
-    m_rep.setValue(m_var_name_if,  m_var_value_if );
-    m_rep.setValue(m_var_name_n, m_var_value_n );
-    m_rep.setValue(m_var_name_rt,  m_var_value_rt );
-    m_rep.setValue(m_var_name_voltage, m_var_value_voltage );
-
-    return m_rep;
-}
-
-/*
-* Parse the payload for the update function (e.g. POST) /motor2
-* @param queries  the query parameters for this call
-* @param rep  the response to get the property values from
-* @return OCEntityHandlerResult ok or not ok indication
-*/
-OCEntityHandlerResult Motor2Resource::post(QueryParamsMap queries, const OCRepresentation& rep)
-{
-    OCEntityHandlerResult ehResult = OC_EH_OK;
-    OC_UNUSED(queries);
-    try {
-        if (rep.hasAttribute(m_var_name_current))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_current, value);
-
-            // check if "current" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'current' is readOnly "<< std::endl;
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_desiredcurrent))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_desiredcurrent, value);
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_desiredfrequency))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_desiredfrequency, value);
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_desiredvoltage))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_desiredvoltage, value);
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_frequency))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_frequency, value);
-
-            // check if "frequency" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'frequency' is readOnly "<< std::endl;
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_if))
-        {
-            // value exist in payload
-
-            // check if "if" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'if' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    try {
-        if (rep.hasAttribute(m_var_name_n))
-        {
-            // value exist in payload
-
-            // check if "n" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'n' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // TODO: missing code: add check on array contents out of range
-	// such a check is resource specific
-    try {
-        if (rep.hasAttribute(m_var_name_rt))
-        {
-            // value exist in payload
-
-            // check if "rt" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'rt' is readOnly "<< std::endl;
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    try {
-        if (rep.hasAttribute(m_var_name_voltage))
-        {
-            // value exist in payload
-            // allocate the variable
-            double value;
-            // get the actual value from the payload
-            rep.getValue(m_var_name_voltage, value);
-
-            // check if "voltage" is read only
-            ehResult = OC_EH_ERROR;
-            std::cout << "\t\t" << "property 'voltage' is readOnly "<< std::endl;
-
-
-
-        }
-    }
-    catch (std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    if (ehResult == OC_EH_OK)
-    {
-        // no error: assign the variables
-
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_current, temp ))
-            {
-                m_var_value_current = temp;
-                std::cout << "\t\t" << "property 'current' UPDATED: " << m_var_value_current << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'current' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_desiredcurrent, temp ))
-            {
-                m_var_value_desiredcurrent = temp;
-                std::cout << "\t\t" << "property 'desiredcurrent' UPDATED: " << m_var_value_desiredcurrent << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'desiredcurrent' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_desiredfrequency, temp ))
-            {
-                m_var_value_desiredfrequency = temp;
-                std::cout << "\t\t" << "property 'desiredfrequency' UPDATED: " << m_var_value_desiredfrequency << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'desiredfrequency' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_desiredvoltage, temp ))
-            {
-                m_var_value_desiredvoltage = temp;
-                std::cout << "\t\t" << "property 'desiredvoltage' UPDATED: " << m_var_value_desiredvoltage << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'desiredvoltage' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_frequency, temp ))
-            {
-                m_var_value_frequency = temp;
-                std::cout << "\t\t" << "property 'frequency' UPDATED: " << m_var_value_frequency << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'frequency' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_if))
-            {
-                rep.getValue(m_var_name_if, m_var_value_if);
-                int first = 1;
-                std::cout << "\t\t" << "property 'if' UPDATED: " ;
-                for(auto myvar: m_var_value_if)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'if' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            std::string temp;
-            if (rep.getValue(m_var_name_n, temp ))
-            {
-                m_var_value_n = temp;
-                std::cout << "\t\t" << "property 'n' UPDATED: " << m_var_value_n << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'n' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }// array only works for integer, boolean, numbers and strings
-        // TODO: missing code, make it also work with array of objects
-        try {
-            if (rep.hasAttribute(m_var_name_rt))
-            {
-                rep.getValue(m_var_name_rt, m_var_value_rt);
-                int first = 1;
-                std::cout << "\t\t" << "property 'rt' UPDATED: " ;
-                for(auto myvar: m_var_value_rt)
-                {
-                    if(first)
-                    {
-                        std::cout << myvar;
-                        first = 0;
-                    }
-                    else
-                    {
-                        std::cout << "," << myvar;
-                    }
-                }
-                std::cout <<  std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'rt' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        try {
-            // value exist in payload
-            double temp;
-            if (rep.getValue(m_var_name_voltage, temp ))
-            {
-                m_var_value_voltage = temp;
-                std::cout << "\t\t" << "property 'voltage' UPDATED: " << m_var_value_voltage << std::endl;
-            }
-            else
-            {
-                std::cout << "\t\t" << "property 'voltage' not found in the representation" << std::endl;
-            }
-        }
-        catch (std::exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-        // TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
-      	// one can use the member variables as input to those calls
-      	// the member values have been updated already with the request data
-        testExplorerHat->myParamArgs[0] = 1;
-        testExplorerHat->myParamArgs[1] = m_var_value_voltage;
-        testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeMotor", 2, testExplorerHat->myParamArgs);
-    }
-    return ehResult;
-}
-/*
-* Check if the interface name is an registered interface name
-*/
-bool Motor2Resource::in_updatable_interfaces(std::string interface_name)
-{
-    for (unsigned int i=0; i < (sizeof(m_IF_UPDATE)/sizeof(m_IF_UPDATE[0])); i++)
-    {
-        if (m_IF_UPDATE[i].compare(interface_name) == 0)
-            return true;
-    }
-    return false;
-}
-
-/*
-* the entity handler
-*/
-OCEntityHandlerResult Motor2Resource::entityHandler(std::shared_ptr<OCResourceRequest> request)
-{
-    OCEntityHandlerResult ehResult = OC_EH_ERROR;
-    //std::cout << "In entity handler for Motor2Resource " << std::endl;
-
-    if(request)
-    {
-        std::cout << "In entity handler for Motor2Resource, URI is : "
-                  << request->getResourceUri() << std::endl;
-
-        // Check for query params (if any)
-        QueryParamsMap queries = request->getQueryParameters();
-        if (!queries.empty())
-        {
-            std::cout << "\nQuery processing up to entityHandler" << std::endl;
-        }
-        for (auto it : queries)
-        {
-            std::cout << "Query key: " << it.first << " value : " << it.second
-                    << std::endl;
-        }
-        // get the value, so that we can AND it to check which flags are set
-        int requestFlag = request->getRequestHandlerFlag();
-
-        if(requestFlag & RequestHandlerFlag::RequestFlag)
-        {
-            // request flag is set
-            auto pResponse = std::make_shared<OC::OCResourceResponse>();
-            pResponse->setRequestHandle(request->getRequestHandle());
-            pResponse->setResourceHandle(request->getResourceHandle());
-
-            if(request->getRequestType() == "GET")
-            {
-                std::cout<<"Motor2Resource Get Request"<< std::endl;
-
-                pResponse->setResourceRepresentation(get(queries), "");
-                if(OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                {
-                    ehResult = OC_EH_OK;
-                }
-            }
-
-            else if(request->getRequestType() == "POST")
-            {
-                std::cout <<"Motor2Resource Post Request"<<std::endl;
-                bool  handle_post = true;
-
-                if (queries.size() > 0)
-                {
-                    for (const auto &eachQuery : queries)
-                    {
-                        std::string key = eachQuery.first;
-                        if (key.compare(INTERFACE_KEY) == 0)
-                        {
-                            std::string value = eachQuery.second;
-                            if (in_updatable_interfaces(value) == false)
-                            {
-                                std::cout << "Update request received via interface: " << value
-                                            << " . This interface is not authorized to update resource!!" << std::endl;
-                                pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_FORBIDDEN);
-                                handle_post = false;
-                                ehResult = OC_EH_ERROR;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (handle_post)
-                {
-                    ehResult = post(queries, request->getResourceRepresentation());
-                    if (ehResult == OC_EH_OK)
-                    {
-                        pResponse->setResourceRepresentation(get(queries), "");
-                        if (OC_STACK_OK == OCPlatform::sendResponse(pResponse))
-                        {
-                            if (OC_STACK_OK != sendNotification(pResponse) )
-                            {
-                                std::cerr << "NOTIFY failed." << std::endl;
-                            }
-                        }
-                    }
-                    else
-                    {
-                         pResponse->setResponseResult(OCEntityHandlerResult::OC_EH_ERROR);
-                    }
-                }
-            }
-            else
-            {
-                std::cout << "Motor2Resource unsupported request type (delete,put,..)"
-                    << request->getRequestType() << std::endl;
-                pResponse->setResponseResult(OC_EH_ERROR);
-                OCPlatform::sendResponse(pResponse);
-                ehResult = OC_EH_ERROR;
-            }
-        }
-
-        if(requestFlag & RequestHandlerFlag::ObserverFlag)
-        {
-            // observe flag is set
-            ObservationInfo observationInfo = request->getObservationInfo();
-            std::cout << "\t\trequestFlag : observer ";
-            if (ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                std::cout << "register" << std::endl;
-            }
-            else
-            {
-                std::cout << "unregister" << std::endl;
-            }
-
-            if(ObserveAction::ObserveRegister == observationInfo.action)
-            {
-                // add observer
-                m_interestedObservers.push_back(observationInfo.obsId);
-            }
-            else if(ObserveAction::ObserveUnregister == observationInfo.action)
-            {
-                // delete observer
-                m_interestedObservers.erase(std::remove(
-                                            m_interestedObservers.begin(),
-                                            m_interestedObservers.end(),
-                                            observationInfo.obsId),
-                                            m_interestedObservers.end());
-            }
-            ehResult = OC_EH_OK;
-        }
-    }
-    return ehResult;
-}
-
-
-/*
  * class definition for class that handles /output1
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -6621,8 +5073,8 @@ class Output1Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /output1
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -6647,13 +5099,13 @@ class Output1Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/output1"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -6681,13 +5133,13 @@ Output1Resource::Output1Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /output1
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -7127,8 +5579,8 @@ OCEntityHandlerResult Output1Resource::entityHandler(std::shared_ptr<OCResourceR
 /*
  * class definition for class that handles /output2
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -7174,8 +5626,8 @@ class Output2Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /output2
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -7200,13 +5652,13 @@ class Output2Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/output2"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -7234,13 +5686,13 @@ Output2Resource::Output2Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /output2
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -7680,8 +6132,8 @@ OCEntityHandlerResult Output2Resource::entityHandler(std::shared_ptr<OCResourceR
 /*
  * class definition for class that handles /output3
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -7727,8 +6179,8 @@ class Output3Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /output3
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -7753,13 +6205,13 @@ class Output3Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/output3"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -7787,13 +6239,13 @@ Output3Resource::Output3Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /output3
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -8233,8 +6685,8 @@ OCEntityHandlerResult Output3Resource::entityHandler(std::shared_ptr<OCResourceR
 /*
  * class definition for class that handles /output4
  *
- * This resource describes a binary switch (on/off).
- * The value is a boolean.
+ * This Resource describes a binary switch (on/off).
+ * The Property "value" is a boolean.
  * A value of 'true' means that the switch is on.
  * A value of 'false' means that the switch is off.
 */
@@ -8280,8 +6732,8 @@ class Output4Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /output4
-         * This resource describes a binary switch (on/off).
-         * The value is a boolean.
+         * This Resource describes a binary switch (on/off).
+         * The Property "value" is a boolean.
          * A value of 'true' means that the switch is on.
          * A value of 'false' means that the switch is off.
          * @param queries  the query parameters for this call
@@ -8306,13 +6758,13 @@ class Output4Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/output4"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": Status of the switch
+        bool m_var_value_value; // the value for the attribute "value": The status of the switch.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -8340,13 +6792,13 @@ Output4Resource::Output4Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /output4
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.switch.binary");
-    m_var_value_value = false; // current value of property "value" Status of the switch
+    m_var_value_value = false; // current value of property "value" The status of the switch.
     }
 
 /*
@@ -8786,8 +7238,8 @@ OCEntityHandlerResult Output4Resource::entityHandler(std::shared_ptr<OCResourceR
 /*
  * class definition for class that handles /touch1
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -8837,8 +7289,8 @@ class Touch1Resource : public Resource
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch1
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -8854,13 +7306,13 @@ class Touch1Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch1"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -8888,13 +7340,13 @@ Touch1Resource::Touch1Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch1
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
 
     // set up the observation touch1ObserverLoop
     IoTObserverCb touch1ObsCb = bind(&Touch1Resource::touch1ObserverLoop, this);
@@ -8984,6 +7436,30 @@ OCStackResult Touch1Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+
+/*
+* Observer loop for the  observe function /touch1
+*/
+void Touch1Resource::touch1ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch1 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 1;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch1ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch1' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
+
 /*
 * Observer loop for the  observe function /touch1
 */
@@ -9015,12 +7491,9 @@ OCRepresentation Touch1Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 1;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -9089,7 +7562,7 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
                     ehResult = OC_EH_OK;
                 }
             }
-            else
+else
             {
                 std::cout << "Touch1Resource unsupported request type (delete,put,..)"
                     << request->getRequestType() << std::endl;
@@ -9116,14 +7589,12 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
             if(ObserveAction::ObserveRegister == observationInfo.action)
             {
                 // add observer
-                std::cout << "add observer" << std::endl;
                 m_interestedObservers.push_back(observationInfo.obsId);
                 m_touch1ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
                 // delete observer
-                std::cout << "delete observer" << std::endl;
                 m_interestedObservers.erase(std::remove(
                                             m_interestedObservers.begin(),
                                             m_interestedObservers.end(),
@@ -9140,8 +7611,8 @@ OCEntityHandlerResult Touch1Resource::entityHandler(std::shared_ptr<OCResourceRe
 /*
  * class definition for class that handles /touch2
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -9183,12 +7654,16 @@ class Touch2Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch2ObserverLoop;
+        void touch2ObserverLoop();
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch2
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -9204,13 +7679,13 @@ class Touch2Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch2"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -9238,14 +7713,18 @@ Touch2Resource::Touch2Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch2
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch2ObsCb = bind(&Touch1Resource::touch2ObserverLoop, this);
+    m_touch2ObserverLoop = make_shared<IoTObserver>(touch2ObsCb);
+}
 
 /*
 * Destructor code
@@ -9330,6 +7809,28 @@ OCStackResult Touch2Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch2
+*/
+void Touch2Resource::touch2ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch2 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 2;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch2ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch2' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch2
@@ -9339,12 +7840,9 @@ OCRepresentation Touch2Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 2;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -9441,6 +7939,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch2ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -9461,8 +7960,8 @@ else
 /*
  * class definition for class that handles /touch3
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -9504,12 +8003,16 @@ class Touch3Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch3ObserverLoop;
+        void touch3ObserverLoop();
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch3
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -9525,13 +8028,13 @@ class Touch3Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch3"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -9559,14 +8062,18 @@ Touch3Resource::Touch3Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch3
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch3ObsCb = bind(&Touch1Resource::touch3ObserverLoop, this);
+    m_touch3ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -9651,6 +8158,28 @@ OCStackResult Touch3Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch3
+*/
+void Touch3Resource::touch3ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch1 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 3;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch3ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch3' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch3
@@ -9660,12 +8189,9 @@ OCRepresentation Touch3Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 3;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -9762,6 +8288,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch3ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -9782,8 +8309,8 @@ else
 /*
  * class definition for class that handles /touch4
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -9825,12 +8352,16 @@ class Touch4Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch4ObserverLoop;
+        void touch4ObserverLoop();
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch4
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -9846,13 +8377,13 @@ class Touch4Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch4"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -9880,14 +8411,18 @@ Touch4Resource::Touch4Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch4
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch4ObsCb = bind(&Touch1Resource::touch4ObserverLoop, this);
+    m_touch4ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -9972,6 +8507,28 @@ OCStackResult Touch4Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch4
+*/
+void Touch4Resource::touch4ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch4 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 4;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch4ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch4' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch4
@@ -9981,12 +8538,9 @@ OCRepresentation Touch4Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 4;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -10083,6 +8637,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch4ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -10103,8 +8658,8 @@ else
 /*
  * class definition for class that handles /touch5
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -10146,12 +8701,16 @@ class Touch5Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch5ObserverLoop;
+        void touch5ObserverLoop();
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch5
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -10167,13 +8726,13 @@ class Touch5Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch5"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -10201,14 +8760,18 @@ Touch5Resource::Touch5Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch5
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch5ObsCb = bind(&Touch1Resource::touch5ObserverLoop, this);
+    m_touch5ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -10293,6 +8856,28 @@ OCStackResult Touch5Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch1
+*/
+void Touch5Resource::touch5ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch5 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 5;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch5ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch5' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch5
@@ -10302,12 +8887,9 @@ OCRepresentation Touch5Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 5;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -10404,6 +8986,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch5ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -10424,8 +9007,8 @@ else
 /*
  * class definition for class that handles /touch6
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -10467,12 +9050,16 @@ class Touch6Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch6ObserverLoop;
+        void touch6ObserverLoop();
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch6
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -10488,13 +9075,13 @@ class Touch6Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch6"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -10522,14 +9109,18 @@ Touch6Resource::Touch6Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch6
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch6ObsCb = bind(&Touch1Resource::touch6ObserverLoop, this);
+    m_touch6ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -10614,6 +9205,28 @@ OCStackResult Touch6Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch6
+*/
+void Touch6Resource::touch6ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch6 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 6;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch6ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch6' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch6
@@ -10623,12 +9236,9 @@ OCRepresentation Touch6Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 6;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -10725,6 +9335,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch6ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -10745,8 +9356,8 @@ else
 /*
  * class definition for class that handles /touch7
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -10788,12 +9399,16 @@ class Touch7Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch7ObserverLoop;
+        void touch7ObserverLoop();
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch7
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -10809,13 +9424,13 @@ class Touch7Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch7"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -10843,14 +9458,18 @@ Touch7Resource::Touch7Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch7
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch7ObsCb = bind(&Touch1Resource::touch7ObserverLoop, this);
+    m_touch7ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -10935,6 +9554,28 @@ OCStackResult Touch7Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch7
+*/
+void Touch7Resource::touch7ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch7 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 7;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch7ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch7' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch7
@@ -10944,12 +9585,9 @@ OCRepresentation Touch7Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 7;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -11046,6 +9684,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch7ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -11066,8 +9705,8 @@ else
 /*
  * class definition for class that handles /touch8
  *
- * This resource describes whether touch has been sensed or not.
- * The value is a boolean.
+ * This Resource describes whether a touch has been sensed or not.
+ * The Property "value" is a boolean.
  * A value of 'true' means that touch has been sensed.
  * A value of 'false' means that touch not been sensed.
 */
@@ -11109,12 +9748,16 @@ class Touch8Resource : public Resource
          */
         OCStackResult sendNotification();
         OCStackResult sendNotification(const std::shared_ptr< OCResourceResponse > pResponse);
+
+        //observer callback functions
+        shared_ptr<IoTObserver> m_touch8ObserverLoop;
+        void touch8ObserverLoop();
     private:
 
         /*
          * Make the payload for the retrieve function (e.g. GET) /touch8
-         * This resource describes whether touch has been sensed or not.
-         * The value is a boolean.
+         * This Resource describes whether a touch has been sensed or not.
+         * The Property "value" is a boolean.
          * A value of 'true' means that touch has been sensed.
          * A value of 'false' means that touch not been sensed.
          * @param queries  the query parameters for this call
@@ -11130,13 +9773,13 @@ class Touch8Resource : public Resource
         ObservationIds m_interestedObservers;
 
         // member variables for path: "/touch8"
-        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The interface set supported by this resource
+        std::vector<std::string>  m_var_value_if; // the value for the array attribute "if": The OCF Interface set supported by this Resource.
         std::string m_var_name_if = "if"; // the name for the attribute "if"
-        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the resource
+        std::string m_var_value_n; // the value for the attribute "n": Friendly name of the Resource
         std::string m_var_name_n = "n"; // the name for the attribute "n"
-        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": Resource Type
+        std::vector<std::string>  m_var_value_rt; // the value for the array attribute "rt": The Resource Type.
         std::string m_var_name_rt = "rt"; // the name for the attribute "rt"
-        bool m_var_value_value; // the value for the attribute "value": true = sensed, false = not sensed.
+        bool m_var_value_value; // the value for the attribute "value": The touch sensor, true = sensed, false = not sensed.
         std::string m_var_name_value = "value"; // the name for the attribute "value"
 
     protected:
@@ -11164,14 +9807,18 @@ Touch8Resource::Touch8Resource(std::string resourceUri)
 
     m_resourceUri = resourceUri;
     // initialize member variables /touch8
-    // initialize vector if  The interface set supported by this resource
+    // initialize vector if  The OCF Interface set supported by this Resource.
     m_var_value_if.push_back("oic.if.baseline");
     m_var_value_if.push_back("oic.if.a");
-    m_var_value_n = "";  // current value of property "n" Friendly name of the resource
-    // initialize vector rt  Resource Type
+    m_var_value_n = "";  // current value of property "n" Friendly name of the Resource
+    // initialize vector rt  The Resource Type.
     m_var_value_rt.push_back("oic.r.sensor.touch");
-    m_var_value_value = true; // current value of property "value" true = sensed, false = not sensed.
-    }
+    m_var_value_value = true; // current value of property "value" The touch sensor, true = sensed, false = not sensed.
+
+    // set up the observation touch1ObserverLoop
+    IoTObserverCb touch8ObsCb = bind(&Touch1Resource::touch8ObserverLoop, this);
+    m_touch8ObserverLoop = make_shared<IoTObserver>(touch1ObsCb);
+}
 
 /*
 * Destructor code
@@ -11256,6 +9903,28 @@ OCStackResult Touch8Resource::sendNotification(const std::shared_ptr< OCResource
     return sResult;
 }
 
+/*
+* Observer loop for the  observe function /touch8
+*/
+void Touch8Resource::touch8ObserverLoop()
+{
+    usleep(1500000);
+    std::cout << "Touch8 Observer Callback" << endl;
+    testExplorerHat->myParamArgs[0] = 8;
+    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
+    m_var_value_value = (bool)testExplorerHat->returnLong;
+
+//    OCStackResult result = sendNotification();
+
+//    if (result == OC_STACK_NO_OBSERVERS)
+//    {
+//        cout << "No more observers..Stopping observer loop..." << endl;
+//        m_touch8ObserverLoop->stop();
+//    }
+
+    std::cout << "\t\t" << "property 'touch8' : "<< m_var_value_value << std::endl;
+    m_rep.setValue(m_var_name_value, m_var_value_value);
+}
 
 /*
 * Make the payload for the retrieve function (e.g. GET) /touch8
@@ -11265,12 +9934,9 @@ OCRepresentation Touch8Resource::get(QueryParamsMap queries)
 {
     OC_UNUSED(queries);
 
-    // TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
-  	// the calls needs to fill in the member variable before it is returned.
-  	// alternative is to have a callback from the hardware that sets the member variables
-    testExplorerHat->myParamArgs[0] = 8;
-    testExplorerHat->CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, testExplorerHat->myParamArgs);
-    m_var_value_value = (bool)testExplorerHat->returnLong;
+	// TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+	// the calls needs to fill in the member variable before it is returned.
+	// alternative is to have a callback from the hardware that sets the member variables
 
     std::cout << "\t\t" << "property 'n' : "<< m_var_value_n << std::endl;
     std::cout << "\t\t" << "property 'value' : "<< ((m_var_value_value) ? "true" : "false") << std::endl;
@@ -11367,6 +10033,7 @@ else
             {
                 // add observer
                 m_interestedObservers.push_back(observationInfo.obsId);
+                m_touch8ObserverLoop->start();
             }
             else if(ObserveAction::ObserveUnregister == observationInfo.action)
             {
@@ -11426,8 +10093,6 @@ class IoTServer
         Light2Resource  m_light2Instance;
         Light3Resource  m_light3Instance;
         Light4Resource  m_light4Instance;
-        Motor1Resource  m_motor1Instance;
-        Motor2Resource  m_motor2Instance;
         Output1Resource  m_output1Instance;
         Output2Resource  m_output2Instance;
         Output3Resource  m_output3Instance;
@@ -11454,8 +10119,6 @@ IoTServer::IoTServer()
      m_light2Instance(),
      m_light3Instance(),
      m_light4Instance(),
-     m_motor1Instance(),
-     m_motor2Instance(),
      m_output1Instance(),
      m_output2Instance(),
      m_output3Instance(),
@@ -11536,16 +10199,6 @@ OCStackResult IoTServer::registerResources(uint8_t resourceProperty)
         return result;
     }
     result = m_light4Instance.registerResource(resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        return result;
-    }
-    result = m_motor1Instance.registerResource(resourceProperty);
-    if(OC_STACK_OK != result)
-    {
-        return result;
-    }
-    result = m_motor2Instance.registerResource(resourceProperty);
     if(OC_STACK_OK != result)
     {
         return result;
@@ -11658,7 +10311,7 @@ public:
 
     // Set of strings for each of device info fields
     std::string  deviceName = "Touch Sensor";
-    std::string  deviceType = "oic.d.light";
+    std::string  deviceType = "oic.d.cooldevice";
     std::string  specVersion = "ocf.1.0.0";
     std::vector<std::string> dataModelVersions;
 
@@ -11952,8 +10605,6 @@ int main(void)
     std::cout << "device type: " <<  platform.deviceType << std::endl;
     std::cout << "platformID: " <<  platform.getPlatformInfo()->platformID << std::endl;
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
-
-    testExplorerHat = new ExplorerHat();
 
     // create the server
     IoTServer server;
