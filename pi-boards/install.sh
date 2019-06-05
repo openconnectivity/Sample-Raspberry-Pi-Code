@@ -33,7 +33,7 @@ fi
 git clone https://github.com/openconnectivity/Sample-Raspberry-Pi-Code.git
 
 curl https://get.pimoroni.com/automationhat | bash
-curl https://get.pimoroni.com/envirophat | bash
 curl https://get.pimoroni.com/explorerhat | bash
+curl https://get.pimoroni.com/envirophat | bash
 
 cd $CURPWD
