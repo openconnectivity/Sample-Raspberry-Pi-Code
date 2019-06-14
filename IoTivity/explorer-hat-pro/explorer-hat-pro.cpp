@@ -10608,6 +10608,8 @@ int main(void)
     std::cout << "platformID: " <<  platform.getPlatformInfo()->platformID << std::endl;
     std::cout << "platform independent: " <<  platform.protocolIndependentID << std::endl;
 
+    testExplorerHat = new ExplorerHat();
+
     // create the server
     IoTServer server;
     if (OC_STACK_OK != server.registerResources())
