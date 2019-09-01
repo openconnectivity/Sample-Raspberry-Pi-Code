@@ -1,6 +1,6 @@
 {
-  "friendly_name" : "Explorer Hat Pro",
-  "device_type" : "oic.d.cooldevice",
+  "friendly_name" : "ExplorerHatPro",
+  "device_type" : "oic.d.explorerhatpro",
   "ocf_base_path" : "~",
   "implementation_paths" : [
     "/iot-lite",
