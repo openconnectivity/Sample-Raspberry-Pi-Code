@@ -24,7 +24,7 @@
 * register_resources
 *  function that registers all endpoints, e.g. sets the RETRIEVE/UPDATE handlers for each end point
 *
-* main
+* main 
 *  starts the stack, with the registered resources.
 *
 * Each resource has:
@@ -52,12 +52,10 @@
 */
 /*
  tool_version          : 20171123
- input_file            : /home/pi/workspace/exp/device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/workspace/explorer/device_output/out_codegeneration_merged.swagger.json
  version of input_file : 20190215
  title of input_file   : ExplorerHatPro
 */
-
-#include "/usr/include/python2.7/Python.h"
 
 #include "oc_api.h"
 #include "port/oc_clock.h"
@@ -87,84 +85,6 @@ static CRITICAL_SECTION cs;     /* event loop variable */
 
 volatile int quit = 0;          /* stop variable, used by handle_signal */
 
-
-//Python calling stuff
-static PyObject *pName, *pModule, *pFunc;
-static PyObject *pArgs, *pValue;
-
-int myParamArgs[2];
-long returnLong = 0;
-double returnDouble = 0.0;
-
-/*
-* Funcion to call Pimoroni python libraries
-*/
-int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[])
-{
-    int i;
-
-    printf("module = %s\n", moduleName);
-    pName = PyString_FromString(moduleName);
-    /* Error checking of pName left out */
-
-    pModule = PyImport_Import(pName);
-    Py_DECREF(pName);
-
-    if (pModule != NULL) {
-        printf("function = %s\n", functionName);
-        pFunc = PyObject_GetAttrString(pModule, functionName);
-        /* pFunc is a new reference */
-
-        if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(numArgs);
-            for (i = 0; i < numArgs; ++i) {
-                printf("arg%d = %d\n", i+1, args[i]);
-                pValue = PyInt_FromLong(args[i]);
-                if (!pValue) {
-                    Py_DECREF(pArgs);
-                    Py_DECREF(pModule);
-                    fprintf(stderr, "Cannot convert argument\n");
-                    return 1;
-                }
-                /* pValue reference stolen here: */
-                PyTuple_SetItem(pArgs, i, pValue);
-            }
-            pValue = PyObject_CallObject(pFunc, pArgs);
-            Py_DECREF(pArgs);
-            if (pValue != NULL) {
-                if (PyFloat_Check(pValue)) {
-                    returnDouble = PyFloat_AsDouble(pValue);
-                    printf("Result of call: %f\n", returnDouble);
-                } else {
-                    returnLong = PyInt_AsLong(pValue);
-                    printf("Result of call: %ld\n", PyInt_AsLong(pValue));
-                }
-                Py_DECREF(pValue);
-            }
-            else {
-                Py_DECREF(pFunc);
-                Py_DECREF(pModule);
-                PyErr_Print();
-                fprintf(stderr,"Call failed\n");
-                return 1;
-            }
-        }
-        else {
-            if (PyErr_Occurred())
-                PyErr_Print();
-            fprintf(stderr, "Cannot find function \"%s\"\n", functionName);
-        }
-        Py_XDECREF(pFunc);
-        Py_DECREF(pModule);
-    }
-    else {
-        PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", moduleName);
-        return 1;
-    }
-
-    return 0;
-}
 
 /* global property variables for path: "/analog1" */
 static char g_analog1_RESOURCE_PROPERTY_NAME_current[] = "current"; /* the name for the attribute */
@@ -457,7 +377,7 @@ app_init(void)
   /* the settings determine the appearance of the device on the network
      can be OCF1.3.1 or OCF2.0.0 (or even higher)
      supplied values are for OCF1.3.1 */
-  ret |= oc_add_device("/oic/d", "oic.d.explorerhatpro", "ExplorerHatPro",
+  ret |= oc_add_device("/oic/d", "oic.d.explorerhatpro", "ExplorerHatPro", 
                        "ocf.1.0.0", /* icv value */
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  /* dmv value */
                        NULL, NULL);
@@ -483,7 +403,7 @@ convert_if_string(char *interface_name)
 }
 
 /**
-* helper function to check if the POST input document contains
+* helper function to check if the POST input document contains 
 * the common readOnly properties or the resouce readOnly properties
 * @param name the name of the property
 * @return the error_status, e.g. if error_status is true, then the input document contains something illegal
@@ -520,7 +440,7 @@ check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
 }
 
 
-
+ 
 /**
 * get method for "/analog1" resource.
 * function is called to intialize the return values of the GET method.
@@ -539,15 +459,12 @@ get_analog1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 1;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
-  g_analog1_voltage = returnDouble;
-
+  
+  
   PRINT("-- Begin get_analog1: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -556,7 +473,7 @@ get_analog1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (number) 'current' */
     oc_rep_set_double(root, current, g_analog1_current);
     PRINT("   %s : %f\n", g_analog1_RESOURCE_PROPERTY_NAME_current, g_analog1_current);
@@ -588,7 +505,7 @@ get_analog1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_analog1\n");
 }
-
+ 
 /**
 * get method for "/analog2" resource.
 * function is called to intialize the return values of the GET method.
@@ -607,15 +524,12 @@ get_analog2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 2;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
-  g_analog2_voltage = returnDouble;
-
+  
+  
   PRINT("-- Begin get_analog2: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -624,7 +538,7 @@ get_analog2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (number) 'current' */
     oc_rep_set_double(root, current, g_analog2_current);
     PRINT("   %s : %f\n", g_analog2_RESOURCE_PROPERTY_NAME_current, g_analog2_current);
@@ -656,7 +570,7 @@ get_analog2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_analog2\n");
 }
-
+ 
 /**
 * get method for "/analog3" resource.
 * function is called to intialize the return values of the GET method.
@@ -675,15 +589,12 @@ get_analog3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 3;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
-  g_analog3_voltage = returnDouble;
-
+  
+  
   PRINT("-- Begin get_analog3: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -692,7 +603,7 @@ get_analog3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (number) 'current' */
     oc_rep_set_double(root, current, g_analog3_current);
     PRINT("   %s : %f\n", g_analog3_RESOURCE_PROPERTY_NAME_current, g_analog3_current);
@@ -724,7 +635,7 @@ get_analog3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_analog3\n");
 }
-
+ 
 /**
 * get method for "/analog4" resource.
 * function is called to intialize the return values of the GET method.
@@ -743,15 +654,12 @@ get_analog4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 4;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readAnalog", 1, myParamArgs);
-  g_analog4_voltage = returnDouble;
-
+  
+  
   PRINT("-- Begin get_analog4: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -760,7 +668,7 @@ get_analog4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (number) 'current' */
     oc_rep_set_double(root, current, g_analog4_current);
     PRINT("   %s : %f\n", g_analog4_RESOURCE_PROPERTY_NAME_current, g_analog4_current);
@@ -792,7 +700,7 @@ get_analog4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_analog4\n");
 }
-
+ 
 /**
 * get method for "/input1" resource.
 * function is called to intialize the return values of the GET method.
@@ -814,15 +722,12 @@ get_input1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 1;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
-  g_input1_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_input1: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -831,7 +736,7 @@ get_input1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_input1_value);
     PRINT("   %s : %s\n", g_input1_RESOURCE_PROPERTY_NAME_value,  btoa(g_input1_value));
@@ -848,7 +753,7 @@ get_input1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_input1\n");
 }
-
+ 
 /**
 * get method for "/input2" resource.
 * function is called to intialize the return values of the GET method.
@@ -870,15 +775,12 @@ get_input2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 2;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
-  g_input2_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_input2: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -887,7 +789,7 @@ get_input2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_input2_value);
     PRINT("   %s : %s\n", g_input2_RESOURCE_PROPERTY_NAME_value,  btoa(g_input2_value));
@@ -904,7 +806,7 @@ get_input2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_input2\n");
 }
-
+ 
 /**
 * get method for "/input3" resource.
 * function is called to intialize the return values of the GET method.
@@ -926,15 +828,12 @@ get_input3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 3;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
-  g_input3_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_input3: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -943,7 +842,7 @@ get_input3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_input3_value);
     PRINT("   %s : %s\n", g_input3_RESOURCE_PROPERTY_NAME_value,  btoa(g_input3_value));
@@ -960,7 +859,7 @@ get_input3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_input3\n");
 }
-
+ 
 /**
 * get method for "/input4" resource.
 * function is called to intialize the return values of the GET method.
@@ -982,15 +881,12 @@ get_input4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 4;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readInput", 1, myParamArgs);
-  g_input4_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_input4: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -999,7 +895,7 @@ get_input4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_input4_value);
     PRINT("   %s : %s\n", g_input4_RESOURCE_PROPERTY_NAME_value,  btoa(g_input4_value));
@@ -1016,7 +912,7 @@ get_input4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_input4\n");
 }
-
+ 
 /**
 * get method for "/light1" resource.
 * function is called to intialize the return values of the GET method.
@@ -1038,12 +934,12 @@ get_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_light1: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1052,7 +948,7 @@ get_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_light1_value);
     PRINT("   %s : %s\n", g_light1_RESOURCE_PROPERTY_NAME_value,  btoa(g_light1_value));
@@ -1069,7 +965,7 @@ get_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_light1\n");
 }
-
+ 
 /**
 * get method for "/light2" resource.
 * function is called to intialize the return values of the GET method.
@@ -1091,12 +987,12 @@ get_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_light2: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1105,7 +1001,7 @@ get_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_light2_value);
     PRINT("   %s : %s\n", g_light2_RESOURCE_PROPERTY_NAME_value,  btoa(g_light2_value));
@@ -1122,7 +1018,7 @@ get_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_light2\n");
 }
-
+ 
 /**
 * get method for "/light3" resource.
 * function is called to intialize the return values of the GET method.
@@ -1144,12 +1040,12 @@ get_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_light3: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1158,7 +1054,7 @@ get_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_light3_value);
     PRINT("   %s : %s\n", g_light3_RESOURCE_PROPERTY_NAME_value,  btoa(g_light3_value));
@@ -1175,7 +1071,7 @@ get_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_light3\n");
 }
-
+ 
 /**
 * get method for "/light4" resource.
 * function is called to intialize the return values of the GET method.
@@ -1197,12 +1093,12 @@ get_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_light4: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1211,7 +1107,7 @@ get_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_light4_value);
     PRINT("   %s : %s\n", g_light4_RESOURCE_PROPERTY_NAME_value,  btoa(g_light4_value));
@@ -1228,7 +1124,7 @@ get_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_light4\n");
 }
-
+ 
 /**
 * get method for "/output1" resource.
 * function is called to intialize the return values of the GET method.
@@ -1250,12 +1146,12 @@ get_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_output1: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1264,7 +1160,7 @@ get_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_output1_value);
     PRINT("   %s : %s\n", g_output1_RESOURCE_PROPERTY_NAME_value,  btoa(g_output1_value));
@@ -1281,7 +1177,7 @@ get_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_output1\n");
 }
-
+ 
 /**
 * get method for "/output2" resource.
 * function is called to intialize the return values of the GET method.
@@ -1303,12 +1199,12 @@ get_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_output2: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1317,7 +1213,7 @@ get_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_output2_value);
     PRINT("   %s : %s\n", g_output2_RESOURCE_PROPERTY_NAME_value,  btoa(g_output2_value));
@@ -1334,7 +1230,7 @@ get_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_output2\n");
 }
-
+ 
 /**
 * get method for "/output3" resource.
 * function is called to intialize the return values of the GET method.
@@ -1356,12 +1252,12 @@ get_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_output3: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1370,7 +1266,7 @@ get_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_output3_value);
     PRINT("   %s : %s\n", g_output3_RESOURCE_PROPERTY_NAME_value,  btoa(g_output3_value));
@@ -1387,7 +1283,7 @@ get_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_output3\n");
 }
-
+ 
 /**
 * get method for "/output4" resource.
 * function is called to intialize the return values of the GET method.
@@ -1409,12 +1305,12 @@ get_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-
+  
+  
   PRINT("-- Begin get_output4: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1423,7 +1319,7 @@ get_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_output4_value);
     PRINT("   %s : %s\n", g_output4_RESOURCE_PROPERTY_NAME_value,  btoa(g_output4_value));
@@ -1440,7 +1336,7 @@ get_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End get_output4\n");
 }
-
+ 
 /**
 * get method for "/touch1" resource.
 * function is called to intialize the return values of the GET method.
@@ -1462,15 +1358,12 @@ get_touch1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 1;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch1_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch1: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1479,7 +1372,7 @@ get_touch1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch1_value);
     PRINT("   %s : %s\n", g_touch1_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch1_value));
@@ -1496,7 +1389,7 @@ get_touch1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch1\n");
 }
-
+ 
 /**
 * get method for "/touch2" resource.
 * function is called to intialize the return values of the GET method.
@@ -1518,15 +1411,12 @@ get_touch2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 2;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch2_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch2: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1535,7 +1425,7 @@ get_touch2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch2_value);
     PRINT("   %s : %s\n", g_touch2_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch2_value));
@@ -1552,7 +1442,7 @@ get_touch2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch2\n");
 }
-
+ 
 /**
 * get method for "/touch3" resource.
 * function is called to intialize the return values of the GET method.
@@ -1574,15 +1464,12 @@ get_touch3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 3;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch3_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch3: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1591,7 +1478,7 @@ get_touch3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch3_value);
     PRINT("   %s : %s\n", g_touch3_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch3_value));
@@ -1608,7 +1495,7 @@ get_touch3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch3\n");
 }
-
+ 
 /**
 * get method for "/touch4" resource.
 * function is called to intialize the return values of the GET method.
@@ -1630,15 +1517,12 @@ get_touch4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 4;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch4_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch4: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1647,7 +1531,7 @@ get_touch4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch4_value);
     PRINT("   %s : %s\n", g_touch4_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch4_value));
@@ -1664,7 +1548,7 @@ get_touch4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch4\n");
 }
-
+ 
 /**
 * get method for "/touch5" resource.
 * function is called to intialize the return values of the GET method.
@@ -1686,15 +1570,12 @@ get_touch5(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 5;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch5_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch5: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1703,7 +1584,7 @@ get_touch5(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch5_value);
     PRINT("   %s : %s\n", g_touch5_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch5_value));
@@ -1720,7 +1601,7 @@ get_touch5(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch5\n");
 }
-
+ 
 /**
 * get method for "/touch6" resource.
 * function is called to intialize the return values of the GET method.
@@ -1742,15 +1623,12 @@ get_touch6(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 6;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch6_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch6: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1759,7 +1637,7 @@ get_touch6(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch6_value);
     PRINT("   %s : %s\n", g_touch6_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch6_value));
@@ -1776,7 +1654,7 @@ get_touch6(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch6\n");
 }
-
+ 
 /**
 * get method for "/touch7" resource.
 * function is called to intialize the return values of the GET method.
@@ -1798,15 +1676,12 @@ get_touch7(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 7;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch7_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch7: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1815,7 +1690,7 @@ get_touch7(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch7_value);
     PRINT("   %s : %s\n", g_touch7_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch7_value));
@@ -1832,7 +1707,7 @@ get_touch7(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch7\n");
 }
-
+ 
 /**
 * get method for "/touch8" resource.
 * function is called to intialize the return values of the GET method.
@@ -1854,15 +1729,12 @@ get_touch8(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 8;
-  CallPythonFunction((char *)"explorer-hat-pro", (char *)"readTouch", 1, myParamArgs);
-  g_touch8_value = (bool)returnLong;
-
+  
+  
   PRINT("-- Begin get_touch8: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -1871,7 +1743,7 @@ get_touch8(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (boolean) 'value' */
     oc_rep_set_boolean(root, value, g_touch8_value);
     PRINT("   %s : %s\n", g_touch8_RESOURCE_PROPERTY_NAME_value,  btoa(g_touch8_value));
@@ -1888,7 +1760,7 @@ get_touch8(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   }
   PRINT("-- End get_touch8\n");
 }
-
+ 
 /**
 * post method for "/light1" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -1909,11 +1781,11 @@ post_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   bool error_state = false;
   PRINT("-- Begin post_light1:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_light1_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -1931,7 +1803,7 @@ post_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_light1_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -1944,15 +1816,11 @@ post_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_light1_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 1;
-    myParamArgs[1] = g_light1_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -1963,7 +1831,7 @@ post_light1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End post_light1\n");
 }
-
+ 
 /**
 * post method for "/light2" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -1984,11 +1852,11 @@ post_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   bool error_state = false;
   PRINT("-- Begin post_light2:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_light2_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -2006,7 +1874,7 @@ post_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_light2_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -2019,15 +1887,11 @@ post_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_light2_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 2;
-    myParamArgs[1] = g_light2_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -2038,7 +1902,7 @@ post_light2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End post_light2\n");
 }
-
+ 
 /**
 * post method for "/light3" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -2059,11 +1923,11 @@ post_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   bool error_state = false;
   PRINT("-- Begin post_light3:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_light3_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -2081,7 +1945,7 @@ post_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_light3_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -2094,15 +1958,11 @@ post_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_light3_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 3;
-    myParamArgs[1] = g_light3_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -2113,7 +1973,7 @@ post_light3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End post_light3\n");
 }
-
+ 
 /**
 * post method for "/light4" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -2134,11 +1994,11 @@ post_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   bool error_state = false;
   PRINT("-- Begin post_light4:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_light4_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -2156,7 +2016,7 @@ post_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_light4_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -2169,15 +2029,11 @@ post_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_light4_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 4;
-    myParamArgs[1] = g_light4_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeLight", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -2188,7 +2044,7 @@ post_light4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   }
   PRINT("-- End post_light4\n");
 }
-
+ 
 /**
 * post method for "/output1" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -2209,11 +2065,11 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   bool error_state = false;
   PRINT("-- Begin post_output1:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_output1_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -2231,7 +2087,7 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_output1_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -2244,15 +2100,11 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_output1_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 1;
-    myParamArgs[1] = g_output1_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -2263,7 +2115,7 @@ post_output1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   }
   PRINT("-- End post_output1\n");
 }
-
+ 
 /**
 * post method for "/output2" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -2284,11 +2136,11 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   bool error_state = false;
   PRINT("-- Begin post_output2:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_output2_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -2306,7 +2158,7 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_output2_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -2319,15 +2171,11 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_output2_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 2;
-    myParamArgs[1] = g_output2_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -2338,7 +2186,7 @@ post_output2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   }
   PRINT("-- End post_output2\n");
 }
-
+ 
 /**
 * post method for "/output3" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -2359,11 +2207,11 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   bool error_state = false;
   PRINT("-- Begin post_output3:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_output3_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -2381,7 +2229,7 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_output3_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -2394,15 +2242,11 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_output3_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 3;
-    myParamArgs[1] = g_output3_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -2413,7 +2257,7 @@ post_output3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   }
   PRINT("-- End post_output3\n");
 }
-
+ 
 /**
 * post method for "/output4" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -2434,11 +2278,11 @@ post_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   bool error_state = false;
   PRINT("-- Begin post_output4:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* loop over the request document to check if all inputs are ok */
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_output4_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
@@ -2456,7 +2300,7 @@ post_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_output4_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
         PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
@@ -2469,15 +2313,11 @@ post_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_output4_value);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
-    myParamArgs[0] = 4;
-    myParamArgs[1] = g_output4_value ? 1 : 0;
-    CallPythonFunction((char *)"explorer-hat-pro", (char *)"writeOutput", 2, myParamArgs);
-
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
@@ -2492,10 +2332,10 @@ post_output4(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 * register all the resources to the stack
 * this function registers all application level resources:
 * - each resource path is bind to a specific function for the supported methods (GET, POST, PUT)
-* - each resource is
+* - each resource is 
 *   - secure
 *   - observable
-*   - discoverable
+*   - discoverable 
 *   - used interfaces (from the global variables).
 */
 static void
@@ -2512,7 +2352,7 @@ register_resources(void)
   for( int a = 0; a < g_analog1_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_analog1, convert_if_string(g_analog1_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_analog1, convert_if_string(g_analog1_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_analog1, convert_if_string(g_analog1_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_analog1_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_analog1, true);
   /* periodic observable
@@ -2523,7 +2363,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_analog1, true); */
-
+   
   oc_resource_set_request_handler(res_analog1, OC_GET, get_analog1, NULL);
   oc_add_resource(res_analog1);
 
@@ -2537,7 +2377,7 @@ register_resources(void)
   for( int a = 0; a < g_analog2_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_analog2, convert_if_string(g_analog2_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_analog2, convert_if_string(g_analog2_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_analog2, convert_if_string(g_analog2_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_analog2_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_analog2, true);
   /* periodic observable
@@ -2548,7 +2388,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_analog2, true); */
-
+   
   oc_resource_set_request_handler(res_analog2, OC_GET, get_analog2, NULL);
   oc_add_resource(res_analog2);
 
@@ -2562,7 +2402,7 @@ register_resources(void)
   for( int a = 0; a < g_analog3_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_analog3, convert_if_string(g_analog3_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_analog3, convert_if_string(g_analog3_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_analog3, convert_if_string(g_analog3_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_analog3_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_analog3, true);
   /* periodic observable
@@ -2573,7 +2413,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_analog3, true); */
-
+   
   oc_resource_set_request_handler(res_analog3, OC_GET, get_analog3, NULL);
   oc_add_resource(res_analog3);
 
@@ -2587,7 +2427,7 @@ register_resources(void)
   for( int a = 0; a < g_analog4_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_analog4, convert_if_string(g_analog4_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_analog4, convert_if_string(g_analog4_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_analog4, convert_if_string(g_analog4_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_analog4_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_analog4, true);
   /* periodic observable
@@ -2598,7 +2438,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_analog4, true); */
-
+   
   oc_resource_set_request_handler(res_analog4, OC_GET, get_analog4, NULL);
   oc_add_resource(res_analog4);
 
@@ -2612,7 +2452,7 @@ register_resources(void)
   for( int a = 0; a < g_input1_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_input1, convert_if_string(g_input1_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_input1, convert_if_string(g_input1_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_input1, convert_if_string(g_input1_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_input1_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_input1, true);
   /* periodic observable
@@ -2623,7 +2463,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_input1, true); */
-
+   
   oc_resource_set_request_handler(res_input1, OC_GET, get_input1, NULL);
   oc_add_resource(res_input1);
 
@@ -2637,7 +2477,7 @@ register_resources(void)
   for( int a = 0; a < g_input2_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_input2, convert_if_string(g_input2_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_input2, convert_if_string(g_input2_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_input2, convert_if_string(g_input2_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_input2_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_input2, true);
   /* periodic observable
@@ -2648,7 +2488,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_input2, true); */
-
+   
   oc_resource_set_request_handler(res_input2, OC_GET, get_input2, NULL);
   oc_add_resource(res_input2);
 
@@ -2662,7 +2502,7 @@ register_resources(void)
   for( int a = 0; a < g_input3_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_input3, convert_if_string(g_input3_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_input3, convert_if_string(g_input3_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_input3, convert_if_string(g_input3_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_input3_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_input3, true);
   /* periodic observable
@@ -2673,7 +2513,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_input3, true); */
-
+   
   oc_resource_set_request_handler(res_input3, OC_GET, get_input3, NULL);
   oc_add_resource(res_input3);
 
@@ -2687,7 +2527,7 @@ register_resources(void)
   for( int a = 0; a < g_input4_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_input4, convert_if_string(g_input4_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_input4, convert_if_string(g_input4_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_input4, convert_if_string(g_input4_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_input4_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_input4, true);
   /* periodic observable
@@ -2698,7 +2538,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_input4, true); */
-
+   
   oc_resource_set_request_handler(res_input4, OC_GET, get_input4, NULL);
   oc_add_resource(res_input4);
 
@@ -2712,7 +2552,7 @@ register_resources(void)
   for( int a = 0; a < g_light1_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_light1, convert_if_string(g_light1_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_light1, convert_if_string(g_light1_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_light1, convert_if_string(g_light1_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_light1_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_light1, true);
   /* periodic observable
@@ -2723,9 +2563,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_light1, true); */
-
+   
   oc_resource_set_request_handler(res_light1, OC_GET, get_light1, NULL);
-
+   
   oc_resource_set_request_handler(res_light1, OC_POST, post_light1, NULL);
   oc_add_resource(res_light1);
 
@@ -2739,7 +2579,7 @@ register_resources(void)
   for( int a = 0; a < g_light2_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_light2, convert_if_string(g_light2_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_light2, convert_if_string(g_light2_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_light2, convert_if_string(g_light2_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_light2_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_light2, true);
   /* periodic observable
@@ -2750,9 +2590,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_light2, true); */
-
+   
   oc_resource_set_request_handler(res_light2, OC_GET, get_light2, NULL);
-
+   
   oc_resource_set_request_handler(res_light2, OC_POST, post_light2, NULL);
   oc_add_resource(res_light2);
 
@@ -2766,7 +2606,7 @@ register_resources(void)
   for( int a = 0; a < g_light3_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_light3, convert_if_string(g_light3_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_light3, convert_if_string(g_light3_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_light3, convert_if_string(g_light3_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_light3_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_light3, true);
   /* periodic observable
@@ -2777,9 +2617,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_light3, true); */
-
+   
   oc_resource_set_request_handler(res_light3, OC_GET, get_light3, NULL);
-
+   
   oc_resource_set_request_handler(res_light3, OC_POST, post_light3, NULL);
   oc_add_resource(res_light3);
 
@@ -2793,7 +2633,7 @@ register_resources(void)
   for( int a = 0; a < g_light4_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_light4, convert_if_string(g_light4_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_light4, convert_if_string(g_light4_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_light4, convert_if_string(g_light4_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_light4_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_light4, true);
   /* periodic observable
@@ -2804,9 +2644,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_light4, true); */
-
+   
   oc_resource_set_request_handler(res_light4, OC_GET, get_light4, NULL);
-
+   
   oc_resource_set_request_handler(res_light4, OC_POST, post_light4, NULL);
   oc_add_resource(res_light4);
 
@@ -2820,7 +2660,7 @@ register_resources(void)
   for( int a = 0; a < g_output1_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_output1, convert_if_string(g_output1_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_output1, convert_if_string(g_output1_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_output1, convert_if_string(g_output1_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_output1_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_output1, true);
   /* periodic observable
@@ -2831,9 +2671,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_output1, true); */
-
+   
   oc_resource_set_request_handler(res_output1, OC_GET, get_output1, NULL);
-
+   
   oc_resource_set_request_handler(res_output1, OC_POST, post_output1, NULL);
   oc_add_resource(res_output1);
 
@@ -2847,7 +2687,7 @@ register_resources(void)
   for( int a = 0; a < g_output2_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_output2, convert_if_string(g_output2_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_output2, convert_if_string(g_output2_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_output2, convert_if_string(g_output2_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_output2_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_output2, true);
   /* periodic observable
@@ -2858,9 +2698,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_output2, true); */
-
+   
   oc_resource_set_request_handler(res_output2, OC_GET, get_output2, NULL);
-
+   
   oc_resource_set_request_handler(res_output2, OC_POST, post_output2, NULL);
   oc_add_resource(res_output2);
 
@@ -2874,7 +2714,7 @@ register_resources(void)
   for( int a = 0; a < g_output3_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_output3, convert_if_string(g_output3_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_output3, convert_if_string(g_output3_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_output3, convert_if_string(g_output3_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_output3_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_output3, true);
   /* periodic observable
@@ -2885,9 +2725,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_output3, true); */
-
+   
   oc_resource_set_request_handler(res_output3, OC_GET, get_output3, NULL);
-
+   
   oc_resource_set_request_handler(res_output3, OC_POST, post_output3, NULL);
   oc_add_resource(res_output3);
 
@@ -2901,7 +2741,7 @@ register_resources(void)
   for( int a = 0; a < g_output4_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_output4, convert_if_string(g_output4_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_output4, convert_if_string(g_output4_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_output4, convert_if_string(g_output4_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_output4_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_output4, true);
   /* periodic observable
@@ -2912,9 +2752,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_output4, true); */
-
+   
   oc_resource_set_request_handler(res_output4, OC_GET, get_output4, NULL);
-
+   
   oc_resource_set_request_handler(res_output4, OC_POST, post_output4, NULL);
   oc_add_resource(res_output4);
 
@@ -2928,7 +2768,7 @@ register_resources(void)
   for( int a = 0; a < g_touch1_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch1, convert_if_string(g_touch1_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch1, convert_if_string(g_touch1_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch1, convert_if_string(g_touch1_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch1_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch1, true);
   /* periodic observable
@@ -2939,7 +2779,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch1, true); */
-
+   
   oc_resource_set_request_handler(res_touch1, OC_GET, get_touch1, NULL);
   oc_add_resource(res_touch1);
 
@@ -2953,7 +2793,7 @@ register_resources(void)
   for( int a = 0; a < g_touch2_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch2, convert_if_string(g_touch2_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch2, convert_if_string(g_touch2_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch2, convert_if_string(g_touch2_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch2_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch2, true);
   /* periodic observable
@@ -2964,7 +2804,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch2, true); */
-
+   
   oc_resource_set_request_handler(res_touch2, OC_GET, get_touch2, NULL);
   oc_add_resource(res_touch2);
 
@@ -2978,7 +2818,7 @@ register_resources(void)
   for( int a = 0; a < g_touch3_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch3, convert_if_string(g_touch3_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch3, convert_if_string(g_touch3_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch3, convert_if_string(g_touch3_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch3_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch3, true);
   /* periodic observable
@@ -2989,7 +2829,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch3, true); */
-
+   
   oc_resource_set_request_handler(res_touch3, OC_GET, get_touch3, NULL);
   oc_add_resource(res_touch3);
 
@@ -3003,7 +2843,7 @@ register_resources(void)
   for( int a = 0; a < g_touch4_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch4, convert_if_string(g_touch4_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch4, convert_if_string(g_touch4_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch4, convert_if_string(g_touch4_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch4_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch4, true);
   /* periodic observable
@@ -3014,7 +2854,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch4, true); */
-
+   
   oc_resource_set_request_handler(res_touch4, OC_GET, get_touch4, NULL);
   oc_add_resource(res_touch4);
 
@@ -3028,7 +2868,7 @@ register_resources(void)
   for( int a = 0; a < g_touch5_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch5, convert_if_string(g_touch5_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch5, convert_if_string(g_touch5_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch5, convert_if_string(g_touch5_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch5_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch5, true);
   /* periodic observable
@@ -3039,7 +2879,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch5, true); */
-
+   
   oc_resource_set_request_handler(res_touch5, OC_GET, get_touch5, NULL);
   oc_add_resource(res_touch5);
 
@@ -3053,7 +2893,7 @@ register_resources(void)
   for( int a = 0; a < g_touch6_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch6, convert_if_string(g_touch6_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch6, convert_if_string(g_touch6_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch6, convert_if_string(g_touch6_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch6_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch6, true);
   /* periodic observable
@@ -3064,7 +2904,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch6, true); */
-
+   
   oc_resource_set_request_handler(res_touch6, OC_GET, get_touch6, NULL);
   oc_add_resource(res_touch6);
 
@@ -3078,7 +2918,7 @@ register_resources(void)
   for( int a = 0; a < g_touch7_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch7, convert_if_string(g_touch7_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch7, convert_if_string(g_touch7_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch7, convert_if_string(g_touch7_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch7_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch7, true);
   /* periodic observable
@@ -3089,7 +2929,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch7, true); */
-
+   
   oc_resource_set_request_handler(res_touch7, OC_GET, get_touch7, NULL);
   oc_add_resource(res_touch7);
 
@@ -3103,7 +2943,7 @@ register_resources(void)
   for( int a = 0; a < g_touch8_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_touch8, convert_if_string(g_touch8_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_touch8, convert_if_string(g_touch8_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_touch8, convert_if_string(g_touch8_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_touch8_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_touch8, true);
   /* periodic observable
@@ -3114,7 +2954,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_touch8, true); */
-
+   
   oc_resource_set_request_handler(res_touch8, OC_GET, get_touch8, NULL);
   oc_add_resource(res_touch8);
 }
@@ -3276,7 +3116,7 @@ int init;
   /* initialize global variables for resource "/touch6" */  g_touch6_value = true; /* current value of property "value" The touch sensor, true = sensed, false = not sensed. */
   /* initialize global variables for resource "/touch7" */  g_touch7_value = true; /* current value of property "value" The touch sensor, true = sensed, false = not sensed. */
   /* initialize global variables for resource "/touch8" */  g_touch8_value = true; /* current value of property "value" The touch sensor, true = sensed, false = not sensed. */
-
+  
   /* set the flag for NO oic/con resource. */
   oc_set_con_res_announced(false);
 
@@ -3286,12 +3126,12 @@ int init;
                                        .register_resources = register_resources
 #ifdef OC_CLIENT
                                        ,
-                                       .requests_entry = 0
+                                       .requests_entry = 0 
 #endif
                                        };
   oc_clock_time_t next_event;
-
-  PRINT("Used input file : \"/home/pi/workspace/exp/device_output/out_codegeneration_merged.swagger.json\"\n");
+  
+  PRINT("Used input file : \"/home/pi/workspace/explorer/device_output/out_codegeneration_merged.swagger.json\"\n");
   PRINT("OCF Server name : \"ExplorerHatPro\"\n");
 
 #ifdef OC_SECURITY
@@ -3308,8 +3148,6 @@ int init;
 #endif /* OC_SECURITY */
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
-
-  Py_Initialize();
 
   /* start the stack */
   init = oc_main_init(&handler);
@@ -3334,7 +3172,7 @@ int init;
     }
   }
 #endif
-
+  
 #ifdef __linux__
   /* linux specific loop */
   while (quit != 1) {
@@ -3353,8 +3191,5 @@ int init;
 
   /* shut down the stack */
   oc_main_shutdown();
-
-  Py_Finalize();
-
   return 0;
 }
