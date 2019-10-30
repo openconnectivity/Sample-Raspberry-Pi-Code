@@ -16,84 +16,84 @@
     {
       "path" : "/touch1",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/touch2",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/touch3",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/touch4",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/touch5",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/touch6",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/touch7",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/touch8",
       "rt"   : [ "oic.r.sensor.touch" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/input1",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/input2",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/input3",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/input4",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
