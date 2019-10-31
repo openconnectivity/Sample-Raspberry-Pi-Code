@@ -1,6 +1,6 @@
 {
-  "friendly_name" : "Switch",
-  "device_type" : "oic.d.switchdevice",
+  "friendly_name" : "MRAA_Example",
+  "device_type" : "oic.d.mraaexample",
   "ocf_base_path" : "~",
   "implementation_paths" : [
     "/iot-lite",

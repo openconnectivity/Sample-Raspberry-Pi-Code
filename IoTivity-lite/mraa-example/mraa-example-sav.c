@@ -52,10 +52,12 @@
 */
 /*
  tool_version          : 20171123
- input_file            : /home/pi/workspace/mraa/device_output/out_codegeneration_merged.swagger.json
+ input_file            : /home/pi/workspace/test10/device_output/out_codegeneration_merged.swagger.json
  version of input_file : 20190222
- title of input_file   : MRAA_Example
+ title of input_file   : Binary Switch
 */
+
+#include <mraa.h>
 
 #include "oc_api.h"
 #include "port/oc_clock.h"
@@ -76,15 +78,18 @@ static CONDITION_VARIABLE cv;   /* event loop variable */
 static CRITICAL_SECTION cs;     /* event loop variable */
 #endif
 
-#define btoa(x) ((x)?"true":"false")
-
-#define MAX_STRING 30           /* max size of the strings. */
+#define MAX_STRING 65           /* max size of the strings. */
 #define MAX_PAYLOAD_STRING 65   /* max size strings in the payload */
 #define MAX_ARRAY 10            /* max size of the array */
 /* Note: Magic numbers are derived from the resource definition, either from the example or the definition.*/
 
 volatile int quit = 0;          /* stop variable, used by handle_signal */
 
+mraa_gpio_context gpioLED;
+mraa_gpio_context gpioSwitch;
+int ledPin = 7;
+int switchPin = 11;
+int value = 0;
 
 /* global property variables for path: "/light" */
 static char g_light_RESOURCE_PROPERTY_NAME_value[] = "value"; /* the name for the attribute */
@@ -113,11 +118,21 @@ int g_switch_nr_resource_interfaces = 2;
 static int
 app_init(void)
 {
+  gpioLED = mraa_gpio_init(ledPin);
+  mraa_gpio_dir(gpioLED, MRAA_GPIO_OUT);
+  mraa_gpio_write(gpioLED,1);
+  sleep(1);
+  mraa_gpio_write(gpioLED,0);
+  PRINT("Lights should have flashed\n");
+
+  gpioSwitch = mraa_gpio_init(switchPin);
+  mraa_gpio_dir(gpioSwitch, MRAA_GPIO_IN);
+
   int ret = oc_init_platform("ocf", NULL, NULL);
   /* the settings determine the appearance of the device on the network
      can be OCF1.3.1 or OCF2.0.0 (or even higher)
      supplied values are for OCF1.3.1 */
-  ret |= oc_add_device("/oic/d", "oic.d.mraaexample", "MRAA_Example",
+  ret |= oc_add_device("/oic/d", "oic.d.switchdevice", "Binary Switch",
                        "ocf.1.0.0", /* icv value */
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  /* dmv value */
                        NULL, NULL);
@@ -142,35 +157,6 @@ convert_if_string(char *interface_name)
   return OC_IF_A;
 }
 
-/**
-* helper function to check if the POST input document contains
-* the common readOnly properties or the resouce readOnly properties
-* @param name the name of the property
-* @return the error_status, e.g. if error_status is true, then the input document contains something illegal
-*/
-static bool
-check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
-{
-  if (strcmp ( oc_string(name), "n") == 0) {
-    error_state = true;
-    PRINT ("   property \"n\" is ReadOnly \n");
-  }else if (strcmp ( oc_string(name), "if") == 0) {
-    error_state = true;
-    PRINT ("   property \"if\" is ReadOnly \n");
-  } else if (strcmp ( oc_string(name), "rt") == 0) {
-    error_state = true;
-    PRINT ("   property \"rt\" is ReadOnly \n");
-  } else if (strcmp ( oc_string(name), "id") == 0) {
-    error_state = true;
-    PRINT ("   property \"id\" is ReadOnly \n");
-  } else if (strcmp ( oc_string(name), "id") == 0) {
-    error_state = true;
-    PRINT ("   property \"id\" is ReadOnly \n");
-  }
-  return error_state;
-}
-
-
 
 /**
 * get method for "/light" resource.
@@ -189,17 +175,15 @@ check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
 static void
 get_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
-  (void)user_data;  /* variable not used */
+  (void)user_data;  /* not used */
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
 
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
-  bool error_state = false;
 
-
-  PRINT("-- Begin get_light: interface %d\n", interfaces);
+  PRINT("get_light: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
   case OC_IF_BASELINE:
@@ -207,22 +191,15 @@ get_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data
   case OC_IF_A:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
-    /* property (boolean) 'value' */
+    /* property "value" */
     oc_rep_set_boolean(root, value, g_light_value);
-    PRINT("   %s : %s\n", g_light_RESOURCE_PROPERTY_NAME_value,  btoa(g_light_value));
+    PRINT("   %s : %d\n", g_light_RESOURCE_PROPERTY_NAME_value,  g_light_value );  /* not handled value */
     break;
   default:
     break;
   }
   oc_rep_end_root_object();
-  if (error_state == false) {
-    oc_send_response(request, OC_STATUS_OK);
-  }
-  else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
-  }
-  PRINT("-- End get_light\n");
+  oc_send_response(request, OC_STATUS_OK);
 }
 
 /**
@@ -242,17 +219,16 @@ get_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data
 static void
 get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
 {
-  (void)user_data;  /* variable not used */
+  (void)user_data;  /* not used */
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
 
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
-  bool error_state = false;
+  value = mraa_gpio_read(gpioSwitch);
 
-
-  PRINT("-- Begin get_switch: interface %d\n", interfaces);
+  PRINT("get_switch: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
   case OC_IF_BASELINE:
@@ -260,22 +236,15 @@ get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
-    /* property (boolean) 'value' */
+    /* property "value" */
     oc_rep_set_boolean(root, value, g_switch_value);
-    PRINT("   %s : %s\n", g_switch_RESOURCE_PROPERTY_NAME_value,  btoa(g_switch_value));
+    PRINT("   %s : %d\n", g_switch_RESOURCE_PROPERTY_NAME_value,  g_switch_value );  /* not handled value */
     break;
   default:
     break;
   }
   oc_rep_end_root_object();
-  if (error_state == false) {
-    oc_send_response(request, OC_STATUS_OK);
-  }
-  else {
-    oc_send_response(request, OC_STATUS_BAD_OPTION);
-  }
-  PRINT("-- End get_switch\n");
+  oc_send_response(request, OC_STATUS_OK);
 }
 
 /**
@@ -286,9 +255,7 @@ get_switch(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
 * Resource Description:
 
 *
-* @param request the request representation.
-* @param interfaces the used interfaces during the request.
-* @param user_data the supplied user data.
+* @param requestRep the request representation.
 */
 static void
 post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
@@ -296,36 +263,19 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
   (void)interfaces;
   (void)user_data;
   bool error_state = false;
-  PRINT("-- Begin post_light:\n");
+  PRINT("post_light:\n");
   oc_rep_t *rep = request->request_payload;
-
-  /* loop over the request document for each required input field to check if all required input fields are present */
-  bool var_in_request= false;
-  rep = request->request_payload;
-  while (rep != NULL) {
-    if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value) == 0) {
-      var_in_request = true;
-    }
-    rep = rep->next;
-  }
-  if ( var_in_request == false)
-  {
-      error_state = true;
-      PRINT (" required property: 'value' not in request\n");
-  }
   /* loop over the request document to check if all inputs are ok */
-  rep = request->request_payload;
   while (rep != NULL) {
-    PRINT("key: (check) %s \n", oc_string(rep->name));
-
-    error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
-    if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value) == 0) {
+    PRINT("key: (check) %s \n", oc_string(rep->name));if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value) == 0) {
       /* property "value" of type boolean exist in payload */
       if (rep->type != OC_REP_BOOL) {
         error_state = true;
         PRINT ("   property 'value' is not of type bool %d \n", rep->type);
       }
-    }rep = rep->next;
+    }
+
+    rep = rep->next;
   }
   /* if the input is ok, then process the input document and assign the global variables */
   if (error_state == false)
@@ -335,10 +285,8 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
       if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value)== 0) {
         /* assign "value" */
-        PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
         g_light_value = rep->value.boolean;
       }
       rep = rep->next;
@@ -348,21 +296,21 @@ post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_dat
     oc_rep_start_root_object();
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_boolean(root, value, g_light_value);
-
     oc_rep_end_root_object();
+
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
        the global values have been updated already with the data from the request */
+     value = (g_light_value) ? 1 : 0;
+     mraa_gpio_write(gpioLED, value);
+
     oc_send_response(request, OC_STATUS_CHANGED);
   }
   else
   {
-    PRINT("  Returning Error \n");
     /* TODO: add error response, if any */
-    //oc_send_response(request, OC_STATUS_NOT_MODIFIED);
-    oc_send_response(request, OC_STATUS_BAD_REQUEST);
+    oc_send_response(request, OC_STATUS_NOT_MODIFIED);
   }
-  PRINT("-- End post_light\n");
 }
 /**
 * register all the resources to the stack
@@ -468,50 +416,6 @@ handle_signal(int signal)
   quit = 1;
 }
 
-#ifdef OC_SECURITY
-void
-random_pin_cb(const unsigned char *pin, size_t pin_len, void *data)
-{
-  (void)data;
-  PRINT("\n====================\n");
-  PRINT("Random PIN: %.*s\n", (int)pin_len, pin);
-  PRINT("====================\n");
-}
-#endif /* OC_SECURITY */
-
-void
-factory_presets_cb(size_t device, void *data)
-{
-  (void)device;
-  (void)data;
-#if defined(OC_SECURITY) && defined(OC_PKI)
-/* code to include an pki certificate and root trust anchor */
-#include "oc_pki.h"
-#include "pki_certs.h"
-  int credid =
-    oc_pki_add_mfg_cert(0, (const unsigned char *)my_cert, strlen(my_cert), (const unsigned char *)my_key, strlen(my_key));
-  if (credid < 0) {
-    PRINT("ERROR installing manufacturer certificate\n");
-  } else {
-    PRINT("Successfully installed manufacturer certificate\n");
-  }
-
-  if (oc_pki_add_mfg_intermediate_cert(0, credid, (const unsigned char *)int_ca, strlen(int_ca)) < 0) {
-    PRINT("ERROR installing intermediate CA certificate\n");
-  } else {
-    PRINT("Successfully installed intermediate CA certificate\n");
-  }
-
-  if (oc_pki_add_mfg_trust_anchor(0, (const unsigned char *)root_ca, strlen(root_ca)) < 0) {
-    PRINT("ERROR installing root certificate\n");
-  } else {
-    PRINT("Successfully installed root certificate\n");
-  }
-
-  oc_pki_set_security_profile(0, OC_SP_BLACK, OC_SP_BLACK, credid);
-#endif /* OC_SECURITY && OC_PKI */
-}
-
 /**
 * main application.
 * intializes the global variables
@@ -540,9 +444,11 @@ int init;
   /* install Ctrl-C */
   sigaction(SIGINT, &sa, NULL);
 #endif
-  /* initialize global variables for resource "/light" */  g_light_value = false; /* current value of property "value" The status of the switch. */
-  /* initialize global variables for resource "/switch" */  g_switch_value = false; /* current value of property "value" The status of the switch. */
+  /* initialize global variables for resource "/light" */
+  g_light_value = false; /* current value of property "value" The status of the switch. */
 
+  /* initialize global variables for resource "/switch" */
+  g_switch_value = false; /* current value of property "value" The status of the switch. */
   /* set the flag for NO oic/con resource. */
   oc_set_con_res_announced(false);
 
@@ -557,31 +463,21 @@ int init;
                                        };
   oc_clock_time_t next_event;
 
-  PRINT("Used input file : \"/home/pi/workspace/mraa/device_output/out_codegeneration_merged.swagger.json\"\n");
-  PRINT("OCF Server name : \"MRAA_Example\"\n");
+  PRINT("Used input file : \"/home/pi/workspace/test10/device_output/out_codegeneration_merged.swagger.json\"\n");
+  PRINT("OCF Server name : \"Binary Switch\"\n");
 
 #ifdef OC_SECURITY
   PRINT("Intialize Secure Resources\n");
-  oc_storage_config("./devicebuilderserver_creds");
+  oc_storage_config("./device_builder_server_creds/");
 #endif /* OC_SECURITY */
 
-#ifdef OC_SECURITY
-  /* please comment out if the server:
-    - have no display capabilities to display the PIN value
-    - server does not require to implement RANDOM PIN (oic.sec.doxm.rdp) onboarding mechanism
-  */
-  oc_set_random_pin_callback(random_pin_cb, NULL);
-#endif /* OC_SECURITY */
-
-  oc_set_factory_presets_cb(factory_presets_cb, NULL);
 
   /* start the stack */
   init = oc_main_init(&handler);
-
   if (init < 0)
     return init;
 
-  PRINT("OCF server \"MRAA_Example\" running, waiting on incoming connections.\n");
+  PRINT("OCF server \"Binary Switch\" running, waiting on incomming connections.\n");
 
 #ifdef WIN32
   /* windows specific loop */
@@ -614,6 +510,9 @@ int init;
     pthread_mutex_unlock(&mutex);
   }
 #endif
+
+  mraa_gpio_close(gpioLED);
+  mraa_gpio_close(gpioSwitch);
 
   /* shut down the stack */
   oc_main_shutdown();

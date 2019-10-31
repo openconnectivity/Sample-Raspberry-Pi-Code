@@ -42,7 +42,7 @@
     },
     {
       "path" : "/pressure",
-      "rt"   : [ "oic.r.sensor.atmosphericpressure" ],
+      "rt"   : [ "oic.r.sensor" ],
       "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "value" , "step", "precision" ],
       "remove_methods" : ["post"]
@@ -70,7 +70,7 @@
     },
     {
       "path" : "/heading",
-      "rt"   : [ "oic.r.sensor.magneticfielddirection" ],
+      "rt"   : [ "oic.r.sensor" ],
       "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step", "id" , "precision"],
       "remove_methods" : ["post"]
