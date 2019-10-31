@@ -88,7 +88,8 @@ volatile int quit = 0;          /* stop variable, used by handle_signal */
 
 /* global property variables for path: "/brightness" */
 static char g_brightness_RESOURCE_PROPERTY_NAME_brightness[] = "brightness"; /* the name for the attribute */
-int g_brightness_brightness = 50; /* current value of property "brightness" The Quantized representation in the range 0-100 of the current sensed or set value for Brightness. */
+int g_brightness_brightness = 50; /* current value of property "brightness" The Quantized representation in the range 0-100 of the current sensed or set value for Brig
+htness. */
 /* global property variables for path: "/color" */
 static char g_color_RESOURCE_PROPERTY_NAME_rgbValue[] = "rgbValue"; /* the name for the attribute */
 
@@ -101,20 +102,14 @@ static char g_colorSensorLight_RESOURCE_PROPERTY_NAME_value[] = "value"; /* the 
 bool g_colorSensorLight_value = false; /* current value of property "value" The status of the switch. */
 /* global property variables for path: "/heading" */
 static char g_heading_RESOURCE_PROPERTY_NAME_value[] = "value"; /* the name for the attribute */
-
-/* array value  The array containing Hx, Hy, Hz. */
-double g_heading_value[3];
-size_t g_heading_value_array_size;
-
+bool g_heading_value = true; /* current value of property "value" true = sensed, false = not sensed. */
 /* global property variables for path: "/pressure" */
-static char g_pressure_RESOURCE_PROPERTY_NAME_atmosphericPressure[] = "atmosphericPressure"; /* the name for the attribute */
-double g_pressure_atmosphericPressure = 1000.4; /* current value of property "atmosphericPressure"  The current atmospheric pressure in hPa. */
 /* global property variables for path: "/temperature" */
 static char g_temperature_RESOURCE_PROPERTY_NAME_temperature[] = "temperature"; /* the name for the attribute */
 double g_temperature_temperature = 20.0; /* current value of property "temperature"  The current temperature setting or measurement. */
 static char g_temperature_RESOURCE_PROPERTY_NAME_units[] = "units"; /* the name for the attribute */
-char g_temperature_units[ MAX_PAYLOAD_STRING ] = "C"; /* current value of property "units" The unit for the conveyed temperature value, Note that when doing an UPDATE, the unit on the device does NOT chang
-e, it only indicates the unit of the conveyed value during the UPDATE operation. */
+char g_temperature_units[ MAX_PAYLOAD_STRING ] = "C"; /* current value of property "units" The unit for the conveyed temperature value, Note that when doing an UPDATE,
+ the unit on the device does NOT change, it only indicates the unit of the conveyed value during the UPDATE operation. */
 /* global property variables for path: "/voltage0" */
 static char g_voltage0_RESOURCE_PROPERTY_NAME_current[] = "current"; /* the name for the attribute */
 double g_voltage0_current = 5.0; /* current value of property "current"  The electric current in Amps (A). */
@@ -175,7 +170,8 @@ static char g_ymotion_RESOURCE_PROPERTY_NAME_acceleration[] = "acceleration"; /*
 double g_ymotion_acceleration = 0.5; /* current value of property "acceleration"  The sensed acceleration experienced in 'g'. */
 /* global property variables for path: "/zmotion" */
 static char g_zmotion_RESOURCE_PROPERTY_NAME_acceleration[] = "acceleration"; /* the name for the attribute */
-double g_zmotion_acceleration = 0.5; /* current value of property "acceleration"  The sensed acceleration experienced in 'g'. *//* registration data variables for the resources */
+double g_zmotion_acceleration = 0.5; /* current value of property "acceleration"  The sensed acceleration experienced in 'g'. *//* registration data variables for the
+resources */
 
 /* global resource variables for path: /brightness */
 static char g_brightness_RESOURCE_ENDPOINT[] = "/brightness"; /* used path for this resource */
@@ -200,14 +196,14 @@ int g_colorSensorLight_nr_resource_interfaces = 2;
 
 /* global resource variables for path: /heading */
 static char g_heading_RESOURCE_ENDPOINT[] = "/heading"; /* used path for this resource */
-static char g_heading_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.magneticfielddirection"}; /* rt value (as an array) */
+static char g_heading_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor"}; /* rt value (as an array) */
 int g_heading_nr_resource_types = 1;
 static char g_heading_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; /* interface if (as an array) */
 int g_heading_nr_resource_interfaces = 2;
 
 /* global resource variables for path: /pressure */
 static char g_pressure_RESOURCE_ENDPOINT[] = "/pressure"; /* used path for this resource */
-static char g_pressure_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.atmosphericpressure"}; /* rt value (as an array) */
+static char g_pressure_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor"}; /* rt value (as an array) */
 int g_pressure_nr_resource_types = 1;
 static char g_pressure_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.s"}; /* interface if (as an array) */
 int g_pressure_nr_resource_interfaces = 2;
@@ -504,10 +500,10 @@ get_colorSensorLight(oc_request_t *request, oc_interface_mask_t interfaces, void
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource describes the direction of the Earth's magnetic field at the observer's current point in space.
-* Typical use case includes measurement of compass readings on a personal device.
-* The Property "value" is an array containing Hx, Hy, Hz (in that order) each of which are floats.
-* Each of Hx, Hy and Hz are expressed in A/m (Amperes per metre).
+* This Resource describes whether some value or property or entity has been sensed or not.
+* The Property "value" is a boolean.
+* A value of 'true' means that the target has been sensed.
+* A value of 'false' means that the target has not been sensed.
 *
 * @param request the request representation.
 * @param interfaces the interface used for this call
@@ -535,16 +531,9 @@ get_heading(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
 
-
-    /* property (array of numbers) 'value' */
-    oc_rep_set_array(root, value);
-    PRINT("   %s double = [ ", g_heading_RESOURCE_PROPERTY_NAME_value);
-    for (int i=0; i< (int)g_heading_value_array_size; i++) {
-      oc_rep_add_double(value, g_heading_value[i]);
-      PRINT("   %f ", g_heading_value[i]);
-    }
-    PRINT("   ]\n");
-    oc_rep_close_array(root, value);
+    /* property (boolean) 'value' */
+    oc_rep_set_boolean(root, value, g_heading_value);
+    PRINT("   %s : %s\n", g_heading_RESOURCE_PROPERTY_NAME_value,  btoa(g_heading_value));
     break;
   default:
     break;
@@ -564,9 +553,10 @@ get_heading(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource provides a measurement of Mean Sea Level Pressure experienced at the measuring point expressed in millibars.
-* The Property "atmosphericPressure" is a float which describes the atmospheric pressure in hPa (hectoPascals).
-* Note that hPa and the also commonly used unit of millibars (mbar) are numerically equivalent.
+* This Resource describes whether some value or property or entity has been sensed or not.
+* The Property "value" is a boolean.
+* A value of 'true' means that the target has been sensed.
+* A value of 'false' means that the target has not been sensed.
 *
 * @param request the request representation.
 * @param interfaces the interface used for this call
@@ -594,9 +584,6 @@ get_pressure(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
 
-    /* property (number) 'atmosphericPressure' */
-    oc_rep_set_double(root, atmosphericPressure, g_pressure_atmosphericPressure);
-    PRINT("   %s : %f\n", g_pressure_RESOURCE_PROPERTY_NAME_atmosphericPressure, g_pressure_atmosphericPressure);
     break;
   default:
     break;
@@ -692,8 +679,8 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltag
-e" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
+* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (r
+ead-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 *
 * @param request the request representation.
 * @param interfaces the interface used for this call
@@ -758,8 +745,8 @@ get_voltage0(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltag
-e" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
+* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (r
+ead-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 *
 * @param request the request representation.
 * @param interfaces the interface used for this call
@@ -824,8 +811,8 @@ get_voltage1(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltag
-e" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
+* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (r
+ead-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 *
 * @param request the request representation.
 * @param interfaces the interface used for this call
@@ -890,8 +877,8 @@ get_voltage2(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (read-only) energy. The Property "voltag
-e" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
+* This Resource describes the attributes associated with electrical energy. This Resource can be used for either rated (read-only), desired (read-write) or measured (r
+ead-only) energy. The Property "voltage" is in Volts (V), The Property "current" in Amps (A), and The Property "frequency" is in Hertz (Hz).
 *
 * @param request the request representation.
 * @param interfaces the interface used for this call
@@ -956,7 +943,8 @@ get_voltage3(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration (which is dependent on the co-ordinate system and the observer).
+* This Resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration (which is dependent on the co-ordinate system and the observ
+er).
 * The Property "value" is a float which describes the acceleration experienced by the object in "g".
 *
 * @param request the request representation.
@@ -1007,7 +995,8 @@ get_xmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration (which is dependent on the co-ordinate system and the observer).
+* This Resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration (which is dependent on the co-ordinate system and the observ
+er).
 * The Property "value" is a float which describes the acceleration experienced by the object in "g".
 *
 * @param request the request representation.
@@ -1058,7 +1047,8 @@ get_ymotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
 * Resource Description:
-* This Resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration (which is dependent on the co-ordinate system and the observer).
+* This Resource provides a measure of proper acceleration (g force) as opposed to co-ordinate acceleration (which is dependent on the co-ordinate system and the observ
+er).
 * The Property "value" is a float which describes the acceleration experienced by the object in "g".
 *
 * @param request the request representation.
@@ -1642,27 +1632,22 @@ int init;
   sigaction(SIGINT, &sa, NULL);
 #endif
   /* initialize global variables for resource "/brightness" */
-  g_brightness_brightness = 50; /* current value of property "brightness" The Quantized representation in the range 0-100 of the current sensed or set value for Brightness. */
+  g_brightness_brightness = 50; /* current value of property "brightness" The Quantized representation in the range 0-100 of the current sensed or set value for Bright
+ness. */
   /* initialize global variables for resource "/color" */
   /* initialize array "rgbValue" : The RGB value; the first item is the R, second the G, third the B. */g_color_rgbValue[0] = 255;
   g_color_rgbValue[1] = 255;
   g_color_rgbValue[2] = 255;
   g_color_rgbValue_array_size = 3;
 
-  /* initialize global variables for resource "/colorSensorLight" */  g_colorSensorLight_value = false; /* current value of property "value" The status of the switch. */
-  /* initialize global variables for resource "/heading" */
-  /* initialize array "value" : The array containing Hx, Hy, Hz. */
-  g_heading_value[0] = 100.0;
-  g_heading_value[1] = 15.0;
-  g_heading_value[2] = 90.0;
-  g_heading_value_array_size = 3;
-
+  /* initialize global variables for resource "/colorSensorLight" */  g_colorSensorLight_value = false; /* current value of property "value" The status of the switch.
+*/
+  /* initialize global variables for resource "/heading" */  g_heading_value = true; /* current value of property "value" true = sensed, false = not sensed. */
   /* initialize global variables for resource "/pressure" */
-  g_pressure_atmosphericPressure = 1000.4; /* current value of property "atmosphericPressure"  The current atmospheric pressure in hPa. */
   /* initialize global variables for resource "/temperature" */
   g_temperature_temperature = 20.0; /* current value of property "temperature"  The current temperature setting or measurement. */
-  strcpy(g_temperature_units, "C");  /* current value of property "units" The unit for the conveyed temperature value, Note that when doing an UPDATE, the unit on the device does NOT change, it only indica
-tes the unit of the conveyed value during the UPDATE operation. */
+  strcpy(g_temperature_units, "C");  /* current value of property "units" The unit for the conveyed temperature value, Note that when doing an UPDATE, the unit on the
+device does NOT change, it only indicates the unit of the conveyed value during the UPDATE operation. */
   /* initialize global variables for resource "/voltage0" */
   g_voltage0_current = 5.0; /* current value of property "current"  The electric current in Amps (A). */
   g_voltage0_desiredcurrent = 0; /* current value of property "desiredcurrent"  The desired electric current in Amps (A). */
