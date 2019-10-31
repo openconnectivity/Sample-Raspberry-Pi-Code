@@ -1,6 +1,6 @@
 {
-  "friendly_name" : "Switch",
-  "device_type" : "oic.d.switchdevice",
+  "friendly_name" : "AutomationPhat",
+  "device_type" : "oic.d.automationphat",
   "ocf_base_path" : "~",
   "implementation_paths" : [
     "/iot-lite",
@@ -62,21 +62,21 @@
     {
       "path" : "/input1",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/input2",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
     {
       "path" : "/input3",
       "rt"   : [ "oic.r.switch.binary" ],
-      "if"   : ["oic.if.baseline", "oic.if.a" ],
+      "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "step" , "id", "precision" ],
       "remove_methods" : ["post"]
     },
