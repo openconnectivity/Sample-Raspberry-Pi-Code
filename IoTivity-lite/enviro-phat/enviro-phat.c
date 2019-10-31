@@ -658,9 +658,6 @@ get_pressure(oc_request_t *request, oc_interface_mask_t interfaces, void *user_d
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
 
-  myParamArgs[0] = 0;
-  CallPythonFunction((char *)"enviro-phat", (char *)"readPressure", 0, myParamArgs);
-  g_pressure_atmosphericPressure = returnDouble;
 
   PRINT("-- Begin get_pressure: interface %d\n", interfaces);
   oc_rep_start_root_object();

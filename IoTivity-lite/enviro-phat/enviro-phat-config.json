@@ -42,7 +42,7 @@
     },
     {
       "path" : "/pressure",
-      "rt"   : [ "oic.r.sensor" ],
+      "rt"   : [ "oic.r.sensor.atmosphericpressure" ],
       "if"   : ["oic.if.baseline", "oic.if.s" ],
       "remove_properties" : [ "range", "value" , "step", "precision" ],
       "remove_methods" : ["post"]
