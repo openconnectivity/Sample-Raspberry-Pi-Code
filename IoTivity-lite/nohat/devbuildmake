@@ -10,7 +10,7 @@ include Makefile
 # typical addition of LIBS
 #
 #LIBS += `-lmylib`
-LIBS += -lwiringpi
+LIBS += -lwiringPi
 
 
 #
