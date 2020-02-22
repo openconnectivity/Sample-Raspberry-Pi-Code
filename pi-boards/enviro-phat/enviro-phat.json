@@ -56,7 +56,7 @@
   },
   {
     "path" : "/heading",
-    "rt"   : [ "oic.r.sensor.magneticfielddirection" ],
+    "rt"   : [ "oic.r.sensor" ],
     "if"   : ["oic.if.baseline", "oic.if.s" ],
     "remove_properties" : [ "range", "step", "id" , "precision"],
     "remove_methods" : ["post"]

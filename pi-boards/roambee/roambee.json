@@ -1,0 +1,21 @@
+[
+  {
+    "path" : "/temperature",
+    "rt"   : [ "oic.r.temperature" ],
+    "if"   : ["oic.if.s", "oic.if.baseline" ],
+    "remove_properties" : [ "range", "value", "step" , "id", "precision" ]
+  },
+  {
+    "path" : "/geolocation",
+    "rt"   : [ "oic.r.sensor.geolocation" ],
+    "if"   : ["oic.if.s", "oic.if.baseline" ],
+    "remove_properties" : [ "range", "value", "accuracy", "altitudeAccuracy", "heading", "speed", "step" , "id", "prec
+ision" ]
+  },
+  {
+    "path" : "/oic/p",
+    "rt"   : [ "oic.wk.p" ],
+    "if"   : ["oic.if.baseline", "oic.if.r" ],
+    "remove_properties" : [ "n", "range", "value", "step", "precision", "vid"  ]
+  }
+]
