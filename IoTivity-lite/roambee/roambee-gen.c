@@ -24,7 +24,7 @@
 * register_resources
 *  function that registers all endpoints, e.g. sets the RETRIEVE/UPDATE handlers for each end point
 *
-* main
+* main 
 *  starts the stack, with the registered resources.
 *
 * Each resource has:
@@ -56,7 +56,6 @@
  version of input_file : 20190215
  title of input_file   : Roambee
 */
-#include "/usr/include/python2.7/Python.h"
 
 #include "oc_api.h"
 #include "port/oc_clock.h"
@@ -88,91 +87,6 @@ static CRITICAL_SECTION cs;     /* event loop variable */
 
 volatile int quit = 0;          /* stop variable, used by handle_signal */
 
-//Python calling stuff
-#define MAX_BRIGHTNESS 65535  // maximum brightness of light sensor
-
-static PyObject *pName, *pModule, *pFunc;
-static PyObject *pArgs, *pValue;
-
-int myParamArgs[2];
-long returnLong = 0;
-double returnDouble = 0.0;
-double returnDoubleArray[3];
-
-/*
-* Funcion to call Pimoroni python libraries
-*/
-int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int args[])
-{
-    int i;
-
-    printf("module = %s\n", moduleName);
-    pName = PyString_FromString(moduleName);
-    /* Error checking of pName left out */
-
-    pModule = PyImport_Import(pName);
-    Py_DECREF(pName);
-
-    if (pModule != NULL) {
-        printf("function = %s\n", functionName);
-        pFunc = PyObject_GetAttrString(pModule, functionName);
-        /* pFunc is a new reference */
-
-        if (pFunc && PyCallable_Check(pFunc)) {
-            pArgs = PyTuple_New(numArgs);
-            for (i = 0; i < numArgs; ++i) {
-                printf("arg%d = %d\n", i+1, args[i]);
-                pValue = PyInt_FromLong(args[i]);
-                if (!pValue) {
-                    Py_DECREF(pArgs);
-                    Py_DECREF(pModule);
-                    fprintf(stderr, "Cannot convert argument\n");
-                    return 1;
-                }
-                /* pValue reference stolen here: */
-                PyTuple_SetItem(pArgs, i, pValue);
-            }
-            pValue = PyObject_CallObject(pFunc, pArgs);
-            Py_DECREF(pArgs);
-            if (pValue != NULL) {
-                if (PyList_Check(pValue)) {
-                  returnDoubleArray[0] = PyFloat_AsDouble(PyList_GetItem(pValue, 0));
-                  returnDoubleArray[1] = PyFloat_AsDouble(PyList_GetItem(pValue, 1));
-                  returnDoubleArray[2] = PyFloat_AsDouble(PyList_GetItem(pValue, 2));
-                  printf("Result of call: %f:%f:%f\n", returnDoubleArray[0], returnDoubleArray[1], returnDoubleArray[2]);
-                } else if (PyFloat_Check(pValue)) {
-                    returnDouble = PyFloat_AsDouble(pValue);
-                    printf("Result of call: %f\n", returnDouble);
-                } else {
-                    returnLong = PyInt_AsLong(pValue);
-                    printf("Result of call: %ld\n", PyInt_AsLong(pValue));
-                }
-                Py_DECREF(pValue);
-            }
-            else {
-                Py_DECREF(pFunc);
-                Py_DECREF(pModule);
-                PyErr_Print();
-                fprintf(stderr,"Call failed\n");
-                return 1;
-            }
-        }
-        else {
-            if (PyErr_Occurred())
-                PyErr_Print();
-            fprintf(stderr, "Cannot find function \"%s\"\n", functionName);
-        }
-        Py_XDECREF(pFunc);
-        Py_DECREF(pModule);
-    }
-    else {
-        PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", moduleName);
-        return 1;
-    }
-
-    return 0;
-}
 
 /* global property variables for path: "/geolocation" */
 static char g_geolocation_RESOURCE_PROPERTY_NAME_alt[] = "alt"; /* the name for the attribute */
@@ -211,7 +125,7 @@ app_init(void)
   /* the settings determine the appearance of the device on the network
      can be OCF1.3.1 or OCF2.0.0 (or even higher)
      supplied values are for OCF1.3.1 */
-  ret |= oc_add_device("/oic/d", "oic.d.roambee", "Roambee",
+  ret |= oc_add_device("/oic/d", "oic.d.roambee", "Roambee", 
                        "ocf.2.0.5", /* icv value */
                        "ocf.res.1.3.0, ocf.sh.1.3.0",  /* dmv value */
                        NULL, NULL);
@@ -237,7 +151,7 @@ convert_if_string(char *interface_name)
 }
 
 /**
-* helper function to check if the POST input document contains
+* helper function to check if the POST input document contains 
 * the common readOnly properties or the resouce readOnly properties
 * @param name the name of the property
 * @return the error_status, e.g. if error_status is true, then the input document contains something illegal
@@ -260,12 +174,12 @@ check_on_readonly_common_resource_properties(oc_string_t name, bool error_state)
   } else if (strcmp ( oc_string(name), "id") == 0) {
     error_state = true;
     PRINT ("   property \"id\" is ReadOnly \n");
-  }
+  } 
   return error_state;
 }
 
 
-
+ 
 /**
 * get method for "/geolocation" resource.
 * function is called to intialize the return values of the GET method.
@@ -292,17 +206,12 @@ get_geolocation(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 0;
-  CallPythonFunction((char *)"enviro-phat", (char *)"readAccelerometer", 0, myParamArgs);
-  g_geolocation_alt = returnDoubleArray[0];
-  g_geolocation_latitude = returnDoubleArray[1];
-  g_geolocation_longitude = returnDoubleArray[2];
-
+  
+  
   PRINT("-- Begin get_geolocation: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -311,7 +220,7 @@ get_geolocation(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (number) 'alt' */
     oc_rep_set_double(root, alt, g_geolocation_alt);
     PRINT("   %s : %f\n", g_geolocation_RESOURCE_PROPERTY_NAME_alt, g_geolocation_alt);
@@ -334,7 +243,7 @@ get_geolocation(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   }
   PRINT("-- End get_geolocation\n");
 }
-
+ 
 /**
 * get method for "/temperature" resource.
 * function is called to intialize the return values of the GET method.
@@ -362,30 +271,26 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
      the call to the HW needs to fill in the global variable before it returns to this function here.
      alternative is to have a callback from the hardware that sets the global variables.
-
+  
      The implementation always return everything that belongs to the resource.
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
-
-  myParamArgs[0] = 0;
-  CallPythonFunction((char *)"enviro-phat", (char *)"readTemperature", 0, myParamArgs);
-  g_temperature_temperature = returnDouble;
-
+  
   /* query name 'units' type: 'string', enum: ['C', 'F', 'K']*/
   char *_units = NULL; /* not null terminated Units */
   int _units_len = oc_get_query_value(request, "units", &_units);
   if (_units_len != -1) {
     PRINT (" query value 'units': %.*s\n", _units_len, _units);
     bool query_ok = false;
-
+  
     if ( strncmp (_units, "C", _units_len) == 0)  query_ok = true;
     if ( strncmp (_units, "F", _units_len) == 0)  query_ok = true;
     if ( strncmp (_units, "K", _units_len) == 0)  query_ok = true;
     if (query_ok == false) error_state = true;
-
+    
     /* TODO: use the query value to tailer the response*/
   }
-
+  
   PRINT("-- Begin get_temperature: interface %d\n", interfaces);
   oc_rep_start_root_object();
   switch (interfaces) {
@@ -394,7 +299,7 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   case OC_IF_S:
   PRINT("   Adding Baseline info\n" );
     oc_process_baseline_interface(request->resource);
-
+    
     /* property (number) 'temperature' */
     oc_rep_set_double(root, temperature, g_temperature_temperature);
     PRINT("   %s : %f\n", g_temperature_RESOURCE_PROPERTY_NAME_temperature, g_temperature_temperature);
@@ -414,7 +319,7 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
   }
   PRINT("-- End get_temperature\n");
 }
-
+ 
 /**
 * post method for "/temperature" resource.
 * The function has as input the request body, which are the input values of the POST method.
@@ -437,13 +342,13 @@ post_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *us
   bool error_state = false;
   PRINT("-- Begin post_temperature:\n");
   oc_rep_t *rep = request->request_payload;
-
+  
   /* query name 'units' type: 'string', enum: ['C', 'F', 'K']*/
   char *_units = NULL; /* not null terminated Units */
   int _units_len = oc_get_query_value(request, "units", &_units);
   if (_units_len != -1) {
     bool query_ok = false;
-
+  
     if ( strncmp (_units, "C", _units_len) == 0)  query_ok = true;
     if ( strncmp (_units, "F", _units_len) == 0)  query_ok = true;
     if ( strncmp (_units, "K", _units_len) == 0)  query_ok = true;
@@ -452,7 +357,7 @@ post_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *us
     /* TODO: use the query value to tailer the response*/
   }
   /* loop over the request document for each required input field to check if all required input fields are present */
-  bool var_in_request= false;
+  bool var_in_request= false; 
   rep = request->request_payload;
   while (rep != NULL) {
     if (strcmp ( oc_string(rep->name), g_temperature_RESOURCE_PROPERTY_NAME_temperature) == 0) {
@@ -460,8 +365,8 @@ post_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *us
     }
     rep = rep->next;
   }
-  if ( var_in_request == false)
-  {
+  if ( var_in_request == false) 
+  { 
       error_state = true;
       PRINT (" required property: 'temperature' not in request\n");
   }
@@ -469,10 +374,10 @@ post_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *us
   rep = request->request_payload;
   while (rep != NULL) {
     PRINT("key: (check) %s \n", oc_string(rep->name));
-
+    
     error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
     if (strcmp ( oc_string(rep->name), g_temperature_RESOURCE_PROPERTY_NAME_temperature) == 0) {
-      /* property "temperature" of type double exist in payload */
+      /* property "temperature" of type double exist in payload */ 
       if ( (rep->type != OC_REP_DOUBLE) & (rep->type != OC_REP_INT)) {
         error_state = true;
         PRINT ("   property 'temperature' is not of type double or int %d \n", rep->type);
@@ -499,7 +404,7 @@ post_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *us
     while (rep != NULL) {
       PRINT("key: (assign) %s \n", oc_string(rep->name));
       /* no error: assign the variables */
-
+      
       if (strcmp ( oc_string(rep->name), g_temperature_RESOURCE_PROPERTY_NAME_temperature) == 0) {
         /* assign "temperature" */
         PRINT ("  property 'temperature' : %f\n", rep->value.double_p);
@@ -518,7 +423,7 @@ post_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *us
     /*oc_process_baseline_interface(request->resource); */
     oc_rep_set_double(root, temperature, g_temperature_temperature );
     oc_rep_set_text_string(root, units, g_temperature_units);
-
+    
     oc_rep_end_root_object();
     /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
        one can use the global variables as input to those calls
@@ -538,10 +443,10 @@ post_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *us
 * register all the resources to the stack
 * this function registers all application level resources:
 * - each resource path is bind to a specific function for the supported methods (GET, POST, PUT)
-* - each resource is
+* - each resource is 
 *   - secure
 *   - observable
-*   - discoverable
+*   - discoverable 
 *   - used interfaces (from the global variables).
 */
 static void
@@ -558,7 +463,7 @@ register_resources(void)
   for( int a = 0; a < g_geolocation_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_geolocation, convert_if_string(g_geolocation_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_geolocation, convert_if_string(g_geolocation_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_geolocation, convert_if_string(g_geolocation_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_geolocation_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_geolocation, true);
   /* periodic observable
@@ -569,7 +474,7 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_geolocation, true); */
-
+   
   oc_resource_set_request_handler(res_geolocation, OC_GET, get_geolocation, NULL);
   oc_add_resource(res_geolocation);
 
@@ -583,7 +488,7 @@ register_resources(void)
   for( int a = 0; a < g_temperature_nr_resource_interfaces; a++ ) {
     oc_resource_bind_resource_interface(res_temperature, convert_if_string(g_temperature_RESOURCE_INTERFACE[a]));
   }
-  oc_resource_set_default_interface(res_temperature, convert_if_string(g_temperature_RESOURCE_INTERFACE[0]));
+  oc_resource_set_default_interface(res_temperature, convert_if_string(g_temperature_RESOURCE_INTERFACE[0]));  
   PRINT("     Default OCF Interface: \"%s\"\n", g_temperature_RESOURCE_INTERFACE[0]);
   oc_resource_set_discoverable(res_temperature, true);
   /* periodic observable
@@ -594,9 +499,9 @@ register_resources(void)
      events are send when oc_notify_observers(oc_resource_t *resource) is called.
     this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
   /*oc_resource_set_observable(res_temperature, true); */
-
+   
   oc_resource_set_request_handler(res_temperature, OC_GET, get_temperature, NULL);
-
+   
   oc_resource_set_request_handler(res_temperature, OC_POST, post_temperature, NULL);
   oc_add_resource(res_temperature);
 }
@@ -664,7 +569,7 @@ initialize_variables(void)
   /* initialize global variables for resource "/temperature" */
   g_temperature_temperature = 20.0; /* current value of property "temperature"  The current temperature setting or measurement. */
   strcpy(g_temperature_units, "C");  /* current value of property "units" The unit for the conveyed temperature value, Note that when doing an UPDATE, the unit on the device does NOT change, it only indicates the unit of the conveyed value during the UPDATE operation. */
-
+  
   /* set the flag for NO oic/con resource. */
   oc_set_con_res_announced(false);
 
@@ -746,15 +651,15 @@ int init;
 
   /*intialize the variables */
   initialize_variables();
-
-
+  
+  
   /* initializes the handlers structure */
   static const oc_handler_t handler = {.init = app_init,
                                        .signal_event_loop = signal_event_loop,
                                        .register_resources = register_resources
 #ifdef OC_CLIENT
                                        ,
-                                       .requests_entry = 0
+                                       .requests_entry = 0 
 #endif
                                        };
 
@@ -772,9 +677,8 @@ int init;
 #endif /* OC_SECURITY */
 
   oc_set_factory_presets_cb(factory_presets_cb, NULL);
-
-  Py_Initialize();
-
+  
+  
   /* start the stack */
   init = oc_main_init(&handler);
 
@@ -800,7 +704,7 @@ int init;
     }
   }
 #endif
-
+  
 #ifdef __linux__
   /* linux specific loop */
   while (quit != 1) {
@@ -819,9 +723,6 @@ int init;
 
   /* shut down the stack */
   oc_main_shutdown();
-
-  Py_Finalize();
-
   return 0;
 }
 #endif /* NO_MAIN */

@@ -23,8 +23,7 @@
       "path" : "/geolocation",
       "rt"   : [ "oic.r.sensor.geolocation" ],
       "if"   : ["oic.if.s", "oic.if.baseline" ],
-      "remove_properties" : [ "range", "value", "accuracy", "altitudeAccuracy", "heading", "speed", "step" , "id", "prec
-ision" ]
+      "remove_properties" : [ "range", "value", "accuracy", "altitudeAccuracy", "heading", "speed", "step" , "id", "precision" ]
     },
     {
       "path" : "/oic/p",
