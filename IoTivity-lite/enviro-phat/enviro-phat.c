@@ -133,7 +133,11 @@ int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int 
             pValue = PyObject_CallObject(pFunc, pArgs);
             Py_DECREF(pArgs);
             if (pValue != NULL) {
-                if (PyFloat_Check(pValue)) {
+                if (PyList_Check(pValue)) {
+                  printf("x: %f\n", PyFloat_AsDouble(PyList_GetItem(pValue, 0)));
+                  printf("y: %f\n", PyFloat_AsDouble(PyList_GetItem(pValue, 1)));
+                  printf("z: %f\n", PyFloat_AsDouble(PyList_GetItem(pValue, 2)));
+                } else if (PyFloat_Check(pValue)) {
                     returnDouble = PyFloat_AsDouble(pValue);
                     printf("Result of call: %f\n", returnDouble);
                 } else {
