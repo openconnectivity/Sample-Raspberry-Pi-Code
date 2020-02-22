@@ -96,6 +96,7 @@ static PyObject *pArgs, *pValue;
 int myParamArgs[2];
 long returnLong = 0;
 double returnDouble = 0.0;
+double returnDoubleArray[3];
 
 /*
 * Funcion to call Pimoroni python libraries
@@ -134,9 +135,9 @@ int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int 
             Py_DECREF(pArgs);
             if (pValue != NULL) {
                 if (PyList_Check(pValue)) {
-                  printf("x: %f\n", PyFloat_AsDouble(PyList_GetItem(pValue, 0)));
-                  printf("y: %f\n", PyFloat_AsDouble(PyList_GetItem(pValue, 1)));
-                  printf("z: %f\n", PyFloat_AsDouble(PyList_GetItem(pValue, 2)));
+                  printf("x: %f\n", returnDoubleArray[0] = PyFloat_AsDouble(PyList_GetItem(pValue, 0)));
+                  printf("y: %f\n", returnDoubleArray[1] = PyFloat_AsDouble(PyList_GetItem(pValue, 1)));
+                  printf("z: %f\n", returnDoubleArray[2] = PyFloat_AsDouble(PyList_GetItem(pValue, 2)));
                 } else if (PyFloat_Check(pValue)) {
                     returnDouble = PyFloat_AsDouble(pValue);
                     printf("Result of call: %f\n", returnDouble);
@@ -1067,6 +1068,11 @@ get_xmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
 
+  myParamArgs[0] = 0;
+  CallPythonFunction((char *)"enviro-phat", (char *)"readAccelerometer", 0, myParamArgs);
+  g_xmotion_acceleration = returnDoubleArray[0];
+  g_ymotion_acceleration = returnDoubleArray[1];
+  g_zmotion_acceleration = returnDoubleArray[2];
 
   PRINT("-- Begin get_xmotion: interface %d\n", interfaces);
   oc_rep_start_root_object();
