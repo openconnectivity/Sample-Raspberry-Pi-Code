@@ -28,7 +28,7 @@ def readMagnetometer():
 def readAccelerometer():
     acceleration = motion.accelerometer()
     print "acceleration value = ", acceleration
-    return acceleration
+    return list(acceleration)
 
 def readHeading():
     heading = motion.heading()

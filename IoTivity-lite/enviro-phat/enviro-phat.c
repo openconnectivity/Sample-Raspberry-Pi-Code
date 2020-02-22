@@ -135,9 +135,12 @@ int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int 
             Py_DECREF(pArgs);
             if (pValue != NULL) {
                 if (PyList_Check(pValue)) {
-                  printf("x: %f\n", returnDoubleArray[0] = PyFloat_AsDouble(PyList_GetItem(pValue, 0)));
-                  printf("y: %f\n", returnDoubleArray[1] = PyFloat_AsDouble(PyList_GetItem(pValue, 1)));
-                  printf("z: %f\n", returnDoubleArray[2] = PyFloat_AsDouble(PyList_GetItem(pValue, 2)));
+                  returnDoubleArray[0] = PyFloat_AsDouble(PyList_GetItem(pValue, 0));
+                  returnDoubleArray[1] = PyFloat_AsDouble(PyList_GetItem(pValue, 1));
+                  returnDoubleArray[2] = PyFloat_AsDouble(PyList_GetItem(pValue, 2));
+                  printf("x: %f\n", returnDoubleArray[0]);
+                  printf("y: %f\n", returnDoubleArray[1]);
+                  printf("z: %f\n", returnDoubleArray[2]);
                 } else if (PyFloat_Check(pValue)) {
                     returnDouble = PyFloat_AsDouble(pValue);
                     printf("Result of call: %f\n", returnDouble);
