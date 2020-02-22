@@ -138,9 +138,7 @@ int CallPythonFunction(char moduleName[], char functionName[], int numArgs, int 
                   returnDoubleArray[0] = PyFloat_AsDouble(PyList_GetItem(pValue, 0));
                   returnDoubleArray[1] = PyFloat_AsDouble(PyList_GetItem(pValue, 1));
                   returnDoubleArray[2] = PyFloat_AsDouble(PyList_GetItem(pValue, 2));
-                  printf("x: %f\n", returnDoubleArray[0]);
-                  printf("y: %f\n", returnDoubleArray[1]);
-                  printf("z: %f\n", returnDoubleArray[2]);
+                  printf("Result of call: %f:%f:%f\n", returnDoubleArray[0], returnDoubleArray[1], returnDoubleArray[2]);
                 } else if (PyFloat_Check(pValue)) {
                     returnDouble = PyFloat_AsDouble(pValue);
                     printf("Result of call: %f\n", returnDouble);
@@ -1074,8 +1072,6 @@ get_xmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
   myParamArgs[0] = 0;
   CallPythonFunction((char *)"enviro-phat", (char *)"readAccelerometer", 0, myParamArgs);
   g_xmotion_acceleration = returnDoubleArray[0];
-  g_ymotion_acceleration = returnDoubleArray[1];
-  g_zmotion_acceleration = returnDoubleArray[2];
 
   PRINT("-- Begin get_xmotion: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -1128,6 +1124,9 @@ get_ymotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
 
+  myParamArgs[0] = 0;
+  CallPythonFunction((char *)"enviro-phat", (char *)"readAccelerometer", 0, myParamArgs);
+  g_ymotion_acceleration = returnDoubleArray[1];
 
   PRINT("-- Begin get_ymotion: interface %d\n", interfaces);
   oc_rep_start_root_object();
@@ -1180,6 +1179,9 @@ get_zmotion(oc_request_t *request, oc_interface_mask_t interfaces, void *user_da
      this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
   bool error_state = false;
 
+  myParamArgs[0] = 0;
+  CallPythonFunction((char *)"enviro-phat", (char *)"readAccelerometer", 0, myParamArgs);
+  g_zmotion_acceleration = returnDoubleArray[2];
 
   PRINT("-- Begin get_zmotion: interface %d\n", interfaces);
   oc_rep_start_root_object();
