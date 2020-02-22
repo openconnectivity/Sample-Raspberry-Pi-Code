@@ -53,7 +53,7 @@
 /*
  tool_version          : 20200103
  input_file            : /home/pi/workspace/roambee/device_output/out_codegeneration_merged.swagger.json
- version of input_file : 20190215
+ version of input_file : 20190222
  title of input_file   : Roambee
 */
 
@@ -95,6 +95,9 @@ static char g_geolocation_RESOURCE_PROPERTY_NAME_latitude[] = "latitude"; /* the
 double g_geolocation_latitude = 55.070859; /* current value of property "latitude"  The Device's Current Latitude coordinate (degrees). */
 static char g_geolocation_RESOURCE_PROPERTY_NAME_longitude[] = "longitude"; /* the name for the attribute */
 double g_geolocation_longitude = -3.60512; /* current value of property "longitude"  The Device's Current Longitude coordinate (degrees). */
+/* global property variables for path: "/light" */
+static char g_light_RESOURCE_PROPERTY_NAME_value[] = "value"; /* the name for the attribute */
+bool g_light_value = false; /* current value of property "value" The status of the switch. */
 /* global property variables for path: "/temperature" */
 static char g_temperature_RESOURCE_PROPERTY_NAME_temperature[] = "temperature"; /* the name for the attribute */
 double g_temperature_temperature = 20.0; /* current value of property "temperature"  The current temperature setting or measurement. */
@@ -107,6 +110,13 @@ static char g_geolocation_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.sensor.geolocati
 int g_geolocation_nr_resource_types = 1;
 static char g_geolocation_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.s","oic.if.baseline"}; /* interface if (as an array) */
 int g_geolocation_nr_resource_interfaces = 2;
+
+/* global resource variables for path: /light */
+static char g_light_RESOURCE_ENDPOINT[] = "/light"; /* used path for this resource */
+static char g_light_RESOURCE_TYPE[][MAX_STRING] = {"oic.r.switch.binary"}; /* rt value (as an array) */
+int g_light_nr_resource_types = 1;
+static char g_light_RESOURCE_INTERFACE[][MAX_STRING] = {"oic.if.baseline","oic.if.a"}; /* interface if (as an array) */
+int g_light_nr_resource_interfaces = 2;
 
 /* global resource variables for path: /temperature */
 static char g_temperature_RESOURCE_ENDPOINT[] = "/temperature"; /* used path for this resource */
@@ -245,6 +255,59 @@ get_geolocation(oc_request_t *request, oc_interface_mask_t interfaces, void *use
 }
  
 /**
+* get method for "/light" resource.
+* function is called to intialize the return values of the GET method.
+* initialisation of the returned values are done from the global property values.
+* Resource Description:
+* This Resource describes a binary switch (on/off).
+* The Property "value" is a boolean.
+* A value of 'true' means that the switch is on.
+* A value of 'false' means that the switch is off.
+*
+* @param request the request representation.
+* @param interfaces the interface used for this call
+* @param user_data the user data.
+*/
+static void
+get_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
+{
+  (void)user_data;  /* variable not used */
+  /* TODO: SENSOR add here the code to talk to the HW if one implements a sensor.
+     the call to the HW needs to fill in the global variable before it returns to this function here.
+     alternative is to have a callback from the hardware that sets the global variables.
+  
+     The implementation always return everything that belongs to the resource.
+     this implementation is not optimal, but is functionally correct and will pass CTT1.2.2 */
+  bool error_state = false;
+  
+  
+  PRINT("-- Begin get_light: interface %d\n", interfaces);
+  oc_rep_start_root_object();
+  switch (interfaces) {
+  case OC_IF_BASELINE:
+    /* fall through */
+  case OC_IF_A:
+  PRINT("   Adding Baseline info\n" );
+    oc_process_baseline_interface(request->resource);
+    
+    /* property (boolean) 'value' */
+    oc_rep_set_boolean(root, value, g_light_value);
+    PRINT("   %s : %s\n", g_light_RESOURCE_PROPERTY_NAME_value,  btoa(g_light_value));
+    break;
+  default:
+    break;
+  }
+  oc_rep_end_root_object();
+  if (error_state == false) {
+    oc_send_response(request, OC_STATUS_OK);
+  }
+  else {
+    oc_send_response(request, OC_STATUS_BAD_OPTION);
+  }
+  PRINT("-- End get_light\n");
+}
+ 
+/**
 * get method for "/temperature" resource.
 * function is called to intialize the return values of the GET method.
 * initialisation of the returned values are done from the global property values.
@@ -318,6 +381,93 @@ get_temperature(oc_request_t *request, oc_interface_mask_t interfaces, void *use
     oc_send_response(request, OC_STATUS_BAD_OPTION);
   }
   PRINT("-- End get_temperature\n");
+}
+ 
+/**
+* post method for "/light" resource.
+* The function has as input the request body, which are the input values of the POST method.
+* The input values (as a set) are checked if all supplied values are correct.
+* If the input values are correct, they will be assigned to the global  property values.
+* Resource Description:
+
+*
+* @param request the request representation.
+* @param interfaces the used interfaces during the request.
+* @param user_data the supplied user data.
+*/
+static void
+post_light(oc_request_t *request, oc_interface_mask_t interfaces, void *user_data)
+{
+  (void)interfaces;
+  (void)user_data;
+  bool error_state = false;
+  PRINT("-- Begin post_light:\n");
+  oc_rep_t *rep = request->request_payload;
+  
+  /* loop over the request document for each required input field to check if all required input fields are present */
+  bool var_in_request= false; 
+  rep = request->request_payload;
+  while (rep != NULL) {
+    if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value) == 0) {
+      var_in_request = true;
+    }
+    rep = rep->next;
+  }
+  if ( var_in_request == false) 
+  { 
+      error_state = true;
+      PRINT (" required property: 'value' not in request\n");
+  }
+  /* loop over the request document to check if all inputs are ok */
+  rep = request->request_payload;
+  while (rep != NULL) {
+    PRINT("key: (check) %s \n", oc_string(rep->name));
+    
+    error_state = check_on_readonly_common_resource_properties(rep->name, error_state);
+    if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value) == 0) {
+      /* property "value" of type boolean exist in payload */
+      if (rep->type != OC_REP_BOOL) {
+        error_state = true;
+        PRINT ("   property 'value' is not of type bool %d \n", rep->type);
+      }
+    }rep = rep->next;
+  }
+  /* if the input is ok, then process the input document and assign the global variables */
+  if (error_state == false)
+  {
+    /* loop over all the properties in the input document */
+    oc_rep_t *rep = request->request_payload;
+    while (rep != NULL) {
+      PRINT("key: (assign) %s \n", oc_string(rep->name));
+      /* no error: assign the variables */
+      
+      if (strcmp ( oc_string(rep->name), g_light_RESOURCE_PROPERTY_NAME_value)== 0) {
+        /* assign "value" */
+        PRINT ("  property 'value' : %s\n", btoa(rep->value.boolean));
+        g_light_value = rep->value.boolean;
+      }
+      rep = rep->next;
+    }
+    /* set the response */
+    PRINT("Set response \n");
+    oc_rep_start_root_object();
+    /*oc_process_baseline_interface(request->resource); */
+    oc_rep_set_boolean(root, value, g_light_value);
+    
+    oc_rep_end_root_object();
+    /* TODO: ACTUATOR add here the code to talk to the HW if one implements an actuator.
+       one can use the global variables as input to those calls
+       the global values have been updated already with the data from the request */
+    oc_send_response(request, OC_STATUS_CHANGED);
+  }
+  else
+  {
+    PRINT("  Returning Error \n");
+    /* TODO: add error response, if any */
+    //oc_send_response(request, OC_STATUS_NOT_MODIFIED);
+    oc_send_response(request, OC_STATUS_BAD_REQUEST);
+  }
+  PRINT("-- End post_light\n");
 }
  
 /**
@@ -478,6 +628,33 @@ register_resources(void)
   oc_resource_set_request_handler(res_geolocation, OC_GET, get_geolocation, NULL);
   oc_add_resource(res_geolocation);
 
+  PRINT("Register Resource with local path \"/light\"\n");
+  oc_resource_t *res_light = oc_new_resource(NULL, g_light_RESOURCE_ENDPOINT, g_light_nr_resource_types, 0);
+  PRINT("     number of Resource Types: %d\n", g_light_nr_resource_types);
+  for( int a = 0; a < g_light_nr_resource_types; a++ ) {
+    PRINT("     Resource Type: \"%s\"\n", g_light_RESOURCE_TYPE[a]);
+    oc_resource_bind_resource_type(res_light,g_light_RESOURCE_TYPE[a]);
+  }
+  for( int a = 0; a < g_light_nr_resource_interfaces; a++ ) {
+    oc_resource_bind_resource_interface(res_light, convert_if_string(g_light_RESOURCE_INTERFACE[a]));
+  }
+  oc_resource_set_default_interface(res_light, convert_if_string(g_light_RESOURCE_INTERFACE[0]));  
+  PRINT("     Default OCF Interface: \"%s\"\n", g_light_RESOURCE_INTERFACE[0]);
+  oc_resource_set_discoverable(res_light, true);
+  /* periodic observable
+     to be used when one wants to send an event per time slice
+     period is 1 second */
+  oc_resource_set_periodic_observable(res_light, 1);
+  /* set observable
+     events are send when oc_notify_observers(oc_resource_t *resource) is called.
+    this function must be called when the value changes, perferable on an interrupt when something is read from the hardware. */
+  /*oc_resource_set_observable(res_light, true); */
+   
+  oc_resource_set_request_handler(res_light, OC_GET, get_light, NULL);
+   
+  oc_resource_set_request_handler(res_light, OC_POST, post_light, NULL);
+  oc_add_resource(res_light);
+
   PRINT("Register Resource with local path \"/temperature\"\n");
   oc_resource_t *res_temperature = oc_new_resource(NULL, g_temperature_RESOURCE_ENDPOINT, g_temperature_nr_resource_types, 0);
   PRINT("     number of Resource Types: %d\n", g_temperature_nr_resource_types);
@@ -566,6 +743,7 @@ initialize_variables(void)
   g_geolocation_alt = 12.07; /* current value of property "alt"  The current distance (metres) above or below 'local' sea-level. */
   g_geolocation_latitude = 55.070859; /* current value of property "latitude"  The Device's Current Latitude coordinate (degrees). */
   g_geolocation_longitude = -3.60512; /* current value of property "longitude"  The Device's Current Longitude coordinate (degrees). */
+  /* initialize global variables for resource "/light" */  g_light_value = false; /* current value of property "value" The status of the switch. */
   /* initialize global variables for resource "/temperature" */
   g_temperature_temperature = 20.0; /* current value of property "temperature"  The current temperature setting or measurement. */
   strcpy(g_temperature_units, "C");  /* current value of property "units" The unit for the conveyed temperature value, Note that when doing an UPDATE, the unit on the device does NOT change, it only indicates the unit of the conveyed value during the UPDATE operation. */
